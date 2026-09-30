@@ -952,7 +952,16 @@ export function resolveFamilyTransport(
   return UNIFIED_EQUIVALENT_FAMILIES.has(family) ? "unified" : "horizon";
 }
 
-// Error class for invalid network validation
+/**
+ * Thrown when an {@link EventEngine} is configured with a network name it does
+ * not recognise.
+ *
+ * Only `"mainnet"` and `"testnet"` are supported. The message names the
+ * rejected value and lists the valid ones, so a config typo is diagnosable
+ * from the error alone.
+ *
+ * @param network - The rejected network identifier, as passed to the engine.
+ */
 export class UnknownNetworkError extends Error {
   constructor(network: string) {
     const validNetworks = ["mainnet", "testnet"].join(", ");

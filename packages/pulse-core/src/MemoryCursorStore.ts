@@ -1,5 +1,6 @@
 import { CursorStore } from "./CursorStore.js";
 
+/** In-memory cursor store used for tests and ephemeral local state. */
 export class MemoryCursorStore extends CursorStore {
   private store = new Map<string, string>();
 

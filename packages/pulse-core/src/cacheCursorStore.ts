@@ -43,6 +43,13 @@ class CacheCursorStore extends CursorStore {
   }
 }
 
+/**
+ * Wrap a cursor store with a small in-memory TTL cache.
+ *
+ * @param inner - The cursor store to delegate to.
+ * @param options - `ttlMs`: how long a cached `get` result stays fresh, in milliseconds.
+ * @returns A {@link CursorStore} that caches reads and invalidates on write.
+ */
 export function cacheCursorStore(inner: CursorStore, { ttlMs }: { ttlMs: number }): CursorStore {
   return new CacheCursorStore(inner, ttlMs);
 }

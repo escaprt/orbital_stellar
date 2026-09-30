@@ -43,6 +43,11 @@ describe("mapTypeDef - composite and edge-case types not covered by the real WAS
     expect(() => mapTypeDef(xdr.ScSpecTypeDef.scSpecTypeVal())).toThrow(UnsupportedSpecTypeError);
   });
 
+  it("maps the empty tuple (Rust unit) to void", () => {
+    const type = xdr.ScSpecTypeDef.scSpecTypeTuple(new xdr.ScSpecTypeTuple({ valueTypes: [] }));
+    expect(mapTypeDef(type)).toBe("void");
+  });
+
   it("recurses through nested composites: Option<Vec<Address>>", () => {
     const type = xdr.ScSpecTypeDef.scSpecTypeOption(
       new xdr.ScSpecTypeOption({

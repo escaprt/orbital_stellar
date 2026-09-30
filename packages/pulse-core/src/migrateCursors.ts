@@ -4,6 +4,13 @@ export interface MigrateCursorsResult {
   migrated: number;
 }
 
+/**
+ * Copy all stored cursors from one durable store to another.
+ *
+ * @param source - Store to read every cursor from via `getAll()`.
+ * @param target - Store each cursor is written to.
+ * @returns A result whose `migrated` field is the number of cursors copied.
+ */
 export async function migrateCursors(
   source: CursorStore,
   target: CursorStore,
