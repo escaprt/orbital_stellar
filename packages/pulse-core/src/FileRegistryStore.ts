@@ -5,6 +5,7 @@ import type { Logger } from "./index.js";
 
 type RegistryData = Record<string, string[]>;
 
+/** File-backed registry store for persisted webhook subscriptions. */
 export class FileRegistryStore implements IRegistryStore {
   private readonly filePath: string;
   private readonly logger?: Logger;

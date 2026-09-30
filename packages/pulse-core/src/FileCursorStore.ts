@@ -7,6 +7,7 @@ function safeFilename(streamKey: string): string {
   return encodeURIComponent(streamKey) + ".json";
 }
 
+/** Cursor store backed by JSON files on disk. */
 export class FileCursorStore extends CursorStore {
   private readonly dir: string;
   private readonly logger?: Logger;

@@ -1,0 +1,627 @@
+{
+  "contractId": "CAF3UJ45ZQJP6USFUIMVMGOUETUTXEC35R2247VJYIVQBGKTKBZKNBJ3",
+  "description": "Phoenix DeFi Hub stake contract on Stellar mainnet: LP staking and reward distribution for a Phoenix liquidity pool (representative XLM/USDC instance; all Phoenix stake contracts share this WASM).",
+  "events": [],
+  "functions": [
+    {
+      "name": "__constructor",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "lp_token",
+          "type": "address"
+        },
+        {
+          "name": "min_bond",
+          "type": "i128"
+        },
+        {
+          "name": "min_reward",
+          "type": "i128"
+        },
+        {
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "name": "max_complexity",
+          "type": "u32"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "bond",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": "i128"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "unbond",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "stake_amount",
+          "type": "i128"
+        },
+        {
+          "name": "stake_timestamp",
+          "type": "u64"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "create_distribution_flow",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "distribute_rewards",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        },
+        {
+          "name": "reward_token",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "withdraw_rewards",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "query_config",
+      "params": [],
+      "returns": {
+        "name": "ConfigResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "query_admin",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "query_staked",
+      "params": [
+        {
+          "name": "address",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "name": "StakedResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "query_total_staked",
+      "params": [],
+      "returns": "i128"
+    },
+    {
+      "name": "query_withdrawable_rewards",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "name": "WithdrawableRewardsResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "migrate_admin_key",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "update",
+      "params": [
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "Phoenix Stake (XLM/USDC)",
+  "network": "mainnet",
+  "types": {
+    "AdminChange": {
+      "fields": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        },
+        {
+          "name": "time_limit",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "AdminChange"
+    },
+    "AnnualizedReward": {
+      "fields": [
+        {
+          "name": "amount",
+          "type": "string"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "AnnualizedReward"
+    },
+    "AnnualizedRewardsResponse": {
+      "fields": [
+        {
+          "name": "rewards",
+          "type": {
+            "item": {
+              "name": "AnnualizedReward",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "AnnualizedRewardsResponse"
+    },
+    "AutoUnstakeInfo": {
+      "fields": [
+        {
+          "name": "stake_amount",
+          "type": "i128"
+        },
+        {
+          "name": "stake_timestamp",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "AutoUnstakeInfo"
+    },
+    "BondingInfo": {
+      "fields": [
+        {
+          "doc": "Last time when user has claimed rewards",
+          "name": "last_reward_time",
+          "type": "u64"
+        },
+        {
+          "doc": "The rewards debt is a mechanism to determine how much a user has already been credited in terms of staking rewards.\nWhenever a user deposits or withdraws staked tokens to the pool, the rewards for the user is updated based on the\naccumulated rewards per share, and the difference is stored as reward debt. When claiming rewards, this reward debt\nis used to determine how much rewards a user can actually claim.",
+          "name": "reward_debt",
+          "type": "u128"
+        },
+        {
+          "doc": "Vec of stakes sorted by stake timestamp",
+          "name": "stakes",
+          "type": {
+            "item": {
+              "name": "Stake",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "doc": "Total amount of staked tokens",
+          "name": "total_stake",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "BondingInfo"
+    },
+    "Config": {
+      "fields": [
+        {
+          "name": "lp_token",
+          "type": "address"
+        },
+        {
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "name": "max_complexity",
+          "type": "u32"
+        },
+        {
+          "name": "min_bond",
+          "type": "i128"
+        },
+        {
+          "name": "min_reward",
+          "type": "i128"
+        },
+        {
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "Config"
+    },
+    "ConfigResponse": {
+      "fields": [
+        {
+          "name": "config",
+          "type": {
+            "name": "Config",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "ConfigResponse"
+    },
+    "ContractError": {
+      "kind": "enum",
+      "name": "ContractError",
+      "variants": [
+        {
+          "discriminant": 500,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 501,
+          "name": "InvalidMinBond"
+        },
+        {
+          "discriminant": 502,
+          "name": "InvalidMinReward"
+        },
+        {
+          "discriminant": 503,
+          "name": "InvalidBond"
+        },
+        {
+          "discriminant": 504,
+          "name": "Unauthorized"
+        },
+        {
+          "discriminant": 505,
+          "name": "MinRewardNotEnough"
+        },
+        {
+          "discriminant": 506,
+          "name": "RewardsInvalid"
+        },
+        {
+          "discriminant": 509,
+          "name": "StakeNotFound"
+        },
+        {
+          "discriminant": 510,
+          "name": "InvalidTime"
+        },
+        {
+          "discriminant": 511,
+          "name": "DistributionExists"
+        },
+        {
+          "discriminant": 512,
+          "name": "InvalidRewardAmount"
+        },
+        {
+          "discriminant": 513,
+          "name": "InvalidMaxComplexity"
+        },
+        {
+          "discriminant": 514,
+          "name": "DistributionNotFound"
+        },
+        {
+          "discriminant": 515,
+          "name": "AdminNotSet"
+        },
+        {
+          "discriminant": 516,
+          "name": "ContractMathError"
+        },
+        {
+          "discriminant": 517,
+          "name": "RewardCurveDoesNotExist"
+        },
+        {
+          "discriminant": 518,
+          "name": "SameAdmin"
+        },
+        {
+          "discriminant": 519,
+          "name": "NoAdminChangeInPlace"
+        },
+        {
+          "discriminant": 520,
+          "name": "AdminChangeExpired"
+        }
+      ]
+    },
+    "DistributionDataKey": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "RewardHistory"
+        },
+        {
+          "fields": [],
+          "name": "TotalStakedHistory"
+        }
+      ],
+      "kind": "union",
+      "name": "DistributionDataKey"
+    },
+    "LiquidityPoolInitInfo": {
+      "fields": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "default_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "name": "fee_recipient",
+          "type": "address"
+        },
+        {
+          "name": "max_allowed_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "name": "max_allowed_spread_bps",
+          "type": "i64"
+        },
+        {
+          "name": "max_referral_bps",
+          "type": "i64"
+        },
+        {
+          "name": "stake_init_info",
+          "type": {
+            "name": "StakeInitInfo",
+            "type": "named"
+          }
+        },
+        {
+          "name": "swap_fee_bps",
+          "type": "i64"
+        },
+        {
+          "name": "token_init_info",
+          "type": {
+            "name": "TokenInitInfo",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidityPoolInitInfo"
+    },
+    "PoolType": {
+      "kind": "enum",
+      "name": "PoolType",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "Xyk"
+        },
+        {
+          "discriminant": 1,
+          "name": "Stable"
+        }
+      ]
+    },
+    "Stake": {
+      "fields": [
+        {
+          "doc": "The amount of staked tokens",
+          "name": "stake",
+          "type": "i128"
+        },
+        {
+          "doc": "The timestamp when the stake was made",
+          "name": "stake_timestamp",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "Stake"
+    },
+    "StakeInitInfo": {
+      "fields": [
+        {
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "name": "max_complexity",
+          "type": "u32"
+        },
+        {
+          "name": "min_bond",
+          "type": "i128"
+        },
+        {
+          "name": "min_reward",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "StakeInitInfo"
+    },
+    "StakedResponse": {
+      "fields": [
+        {
+          "name": "last_reward_time",
+          "type": "u64"
+        },
+        {
+          "name": "stakes",
+          "type": {
+            "item": {
+              "name": "Stake",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "total_stake",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "StakedResponse"
+    },
+    "TokenInitInfo": {
+      "fields": [
+        {
+          "name": "token_a",
+          "type": "address"
+        },
+        {
+          "name": "token_b",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "TokenInitInfo"
+    },
+    "WithdrawableReward": {
+      "fields": [
+        {
+          "name": "reward_address",
+          "type": "address"
+        },
+        {
+          "name": "reward_amount",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "WithdrawableReward"
+    },
+    "WithdrawableRewardsResponse": {
+      "fields": [
+        {
+          "doc": "Amount of rewards assigned for withdrawal from the given address.",
+          "name": "rewards",
+          "type": {
+            "item": {
+              "name": "WithdrawableReward",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "WithdrawableRewardsResponse"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAcAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAsAAAAAAAAAB21hbmFnZXIAAAAAEwAAAAAAAAAFb3duZXIAAAAAAAATAAAAAAAAAA5tYXhfY29tcGxleGl0eQAAAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAEYm9uZAAAAAIAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAALAAAAAA==",
+    "AAAAAAAAAAAAAAAGdW5ib25kAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHN0YWtlX2Ftb3VudAAAAAsAAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAGAAAAAA==",
+    "AAAAAAAAAAAAAAAYY3JlYXRlX2Rpc3RyaWJ1dGlvbl9mbG93AAAAAgAAAAAAAAAGc2VuZGVyAAAAAAATAAAAAAAAAAVhc3NldAAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAASZGlzdHJpYnV0ZV9yZXdhcmRzAAAAAAADAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAMcmV3YXJkX3Rva2VuAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAQd2l0aGRyYXdfcmV3YXJkcwAAAAEAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAfQAAAADkNvbmZpZ1Jlc3BvbnNlAAA=",
+    "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAMcXVlcnlfc3Rha2VkAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAQAAB9AAAAAOU3Rha2VkUmVzcG9uc2UAAA==",
+    "AAAAAAAAAAAAAAAScXVlcnlfdG90YWxfc3Rha2VkAAAAAAAAAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAacXVlcnlfd2l0aGRyYXdhYmxlX3Jld2FyZHMAAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAB9AAAAAbV2l0aGRyYXdhYmxlUmV3YXJkc1Jlc3BvbnNlAA==",
+    "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAAAAAAAGdXBkYXRlAAAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
+    "AAAAAgAAAAAAAAAAAAAAE0Rpc3RyaWJ1dGlvbkRhdGFLZXkAAAAAAgAAAAEAAAAAAAAADVJld2FyZEhpc3RvcnkAAAAAAAABAAAAEwAAAAAAAAAAAAAAElRvdGFsU3Rha2VkSGlzdG9yeQAA",
+    "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAATAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAfQAAAAAAAAADkludmFsaWRNaW5Cb25kAAAAAAH1AAAAAAAAABBJbnZhbGlkTWluUmV3YXJkAAAB9gAAAAAAAAALSW52YWxpZEJvbmQAAAAB9wAAAAAAAAAMVW5hdXRob3JpemVkAAAB+AAAAAAAAAASTWluUmV3YXJkTm90RW5vdWdoAAAAAAH5AAAAAAAAAA5SZXdhcmRzSW52YWxpZAAAAAAB+gAAAAAAAAANU3Rha2VOb3RGb3VuZAAAAAAAAf0AAAAAAAAAC0ludmFsaWRUaW1lAAAAAf4AAAAAAAAAEkRpc3RyaWJ1dGlvbkV4aXN0cwAAAAAB/wAAAAAAAAATSW52YWxpZFJld2FyZEFtb3VudAAAAAIAAAAAAAAAABRJbnZhbGlkTWF4Q29tcGxleGl0eQAAAgEAAAAAAAAAFERpc3RyaWJ1dGlvbk5vdEZvdW5kAAACAgAAAAAAAAALQWRtaW5Ob3RTZXQAAAACAwAAAAAAAAARQ29udHJhY3RNYXRoRXJyb3IAAAAAAAIEAAAAAAAAABdSZXdhcmRDdXJ2ZURvZXNOb3RFeGlzdAAAAAIFAAAAAAAAAAlTYW1lQWRtaW4AAAAAAAIGAAAAAAAAABROb0FkbWluQ2hhbmdlSW5QbGFjZQAAAgcAAAAAAAAAEkFkbWluQ2hhbmdlRXhwaXJlZAAAAAACCA==",
+    "AAAAAQAAAAAAAAAAAAAADkNvbmZpZ1Jlc3BvbnNlAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAGQ29uZmlnAAA=",
+    "AAAAAQAAAAAAAAAAAAAADlN0YWtlZFJlc3BvbnNlAAAAAAADAAAAAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAAAAAAAGc3Rha2VzAAAAAAPqAAAH0AAAAAVTdGFrZQAAAAAAAAAAAAALdG90YWxfc3Rha2UAAAAACw==",
+    "AAAAAQAAAAAAAAAAAAAAEEFubnVhbGl6ZWRSZXdhcmQAAAACAAAAAAAAAAZhbW91bnQAAAAAABAAAAAAAAAABWFzc2V0AAAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAGUFubnVhbGl6ZWRSZXdhcmRzUmVzcG9uc2UAAAAAAAABAAAAAAAAAAdyZXdhcmRzAAAAA+oAAAfQAAAAEEFubnVhbGl6ZWRSZXdhcmQ=",
+    "AAAAAQAAAAAAAAAAAAAAEldpdGhkcmF3YWJsZVJld2FyZAAAAAAAAgAAAAAAAAAOcmV3YXJkX2FkZHJlc3MAAAAAABMAAAAAAAAADXJld2FyZF9hbW91bnQAAAAAAAAK",
+    "AAAAAQAAAAAAAAAAAAAAG1dpdGhkcmF3YWJsZVJld2FyZHNSZXNwb25zZQAAAAABAAAAQUFtb3VudCBvZiByZXdhcmRzIGFzc2lnbmVkIGZvciB3aXRoZHJhd2FsIGZyb20gdGhlIGdpdmVuIGFkZHJlc3MuAAAAAAAAB3Jld2FyZHMAAAAD6gAAB9AAAAASV2l0aGRyYXdhYmxlUmV3YXJkAAA=",
+    "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABgAAAAAAAAAIbHBfdG9rZW4AAAATAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAsAAAAAAAAABW93bmVyAAAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAABVN0YWtlAAAAAAAAAgAAABtUaGUgYW1vdW50IG9mIHN0YWtlZCB0b2tlbnMAAAAABXN0YWtlAAAAAAAACwAAACVUaGUgdGltZXN0YW1wIHdoZW4gdGhlIHN0YWtlIHdhcyBtYWRlAAAAAAAAD3N0YWtlX3RpbWVzdGFtcAAAAAAG",
+    "AAAAAQAAAAAAAAAAAAAAC0JvbmRpbmdJbmZvAAAAAAQAAAAnTGFzdCB0aW1lIHdoZW4gdXNlciBoYXMgY2xhaW1lZCByZXdhcmRzAAAAABBsYXN0X3Jld2FyZF90aW1lAAAABgAAAZpUaGUgcmV3YXJkcyBkZWJ0IGlzIGEgbWVjaGFuaXNtIHRvIGRldGVybWluZSBob3cgbXVjaCBhIHVzZXIgaGFzIGFscmVhZHkgYmVlbiBjcmVkaXRlZCBpbiB0ZXJtcyBvZiBzdGFraW5nIHJld2FyZHMuCldoZW5ldmVyIGEgdXNlciBkZXBvc2l0cyBvciB3aXRoZHJhd3Mgc3Rha2VkIHRva2VucyB0byB0aGUgcG9vbCwgdGhlIHJld2FyZHMgZm9yIHRoZSB1c2VyIGlzIHVwZGF0ZWQgYmFzZWQgb24gdGhlCmFjY3VtdWxhdGVkIHJld2FyZHMgcGVyIHNoYXJlLCBhbmQgdGhlIGRpZmZlcmVuY2UgaXMgc3RvcmVkIGFzIHJld2FyZCBkZWJ0LiBXaGVuIGNsYWltaW5nIHJld2FyZHMsIHRoaXMgcmV3YXJkIGRlYnQKaXMgdXNlZCB0byBkZXRlcm1pbmUgaG93IG11Y2ggcmV3YXJkcyBhIHVzZXIgY2FuIGFjdHVhbGx5IGNsYWltLgAAAAAAC3Jld2FyZF9kZWJ0AAAAAAoAAAAnVmVjIG9mIHN0YWtlcyBzb3J0ZWQgYnkgc3Rha2UgdGltZXN0YW1wAAAAAAZzdGFrZXMAAAAAA+oAAAfQAAAABVN0YWtlAAAAAAAAHVRvdGFsIGFtb3VudCBvZiBzdGFrZWQgdG9rZW5zAAAAAAAAC3RvdGFsX3N0YWtlAAAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+    "AAAAAQAAAAAAAAAAAAAAC0FkbWluQ2hhbmdlAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAG",
+    "AAAAAQAAAAAAAAAAAAAAD0F1dG9VbnN0YWtlSW5mbwAAAAACAAAAAAAAAAxzdGFrZV9hbW91bnQAAAALAAAAAAAAAA9zdGFrZV90aW1lc3RhbXAAAAAABg==",
+    "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ=="
+  ]
+}

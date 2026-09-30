@@ -1,3 +1,4 @@
+/** Brand used for Stellar amount strings that have already been validated. */
 export type StellarAmount = string & { __brand: "StellarAmount" };
 
 /**
