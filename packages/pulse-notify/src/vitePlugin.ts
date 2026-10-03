@@ -41,6 +41,13 @@ if (typeof globalThis.EventSource === "undefined") {
 }
 `;
 
+/**
+ * Shape of the object returned by `pulseNotifyVitePlugin()`.
+ *
+ * Vite plugin hook types are kept loose on purpose so this package does not
+ * have to take a dependency on `vite`; the object is structurally compatible
+ * with Vite's `Plugin` type.
+ */
 export interface PulseNotifyVitePlugin {
   name: string;
   // Vite plugin hook types kept loose to avoid requiring "vite" as a dep.

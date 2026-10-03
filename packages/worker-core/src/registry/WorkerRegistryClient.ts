@@ -106,10 +106,15 @@ export class WorkerRegistryClient {
    * found or on error.
    */
   async listOfferingsForOperator(operatorId: string): Promise<WorkerOfferingRecord[]> {
-    const res = await fetch(`${this.baseUrl}/operators/${operatorId}/offerings.json`);
-    if (!res.ok) return [];
-
-    const json = await res.json();
+    let res: Response;
+    let json: unknown;
+    try {
+      res = await fetch(`${this.baseUrl}/operators/${operatorId}/offerings.json`);
+      if (!res.ok) return [];
+      json = await res.json();
+    } catch {
+      return [];
+    }
     if (!Array.isArray(json)) return [];
 
     const valid: WorkerOfferingRecord[] = [];

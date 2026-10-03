@@ -20,6 +20,7 @@ export type DeadLetterEntry = {
   replayedAt?: number | null;
 };
 
+/** Filter for {@link DeadLetterStore.list}: by URL, failure time window, and page size. */
 export type DeadLetterFilter = {
   url?: string;
   since?: number;

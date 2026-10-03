@@ -32,19 +32,26 @@ Evidence (re-verified against the repo):
   These are not closable from this repository; their state lives on the tracker.
 - **≥25 verified schemas leg — counted, NOT MET.** Rows in the registry source
   (`packages/abi-registry/specs/well-known/index.json`) = **5** published specs
-  (SAC interface, native XLM wrapper, USDC, EURC, AQUA). There are no additional
-  community-registered verified schemas in this checkout. `5 < 25`, so this leg
-  fails. The on-chain registered/verified count is not readable from this
-  checkout — confirm via a registry read — but the local published-spec count
-  alone is below target.
+  (SAC interface, native XLM wrapper, USDC, EURC, AQUA). Four of those five
+  (native XLM wrapper, USDC, EURC, AQUA) are the bundled seeded SAC specs from
+  `contracts/deployed.testnet.json`'s `seededSpecs` — `ROADMAP.md` Wave 2.4's
+  verification pipeline (cross-checking a submitted schema against on-chain
+  `contractspec`) has not shipped, so these four are **unverifiable in this
+  checkout and do not count** toward the verified-schema total. That leaves no
+  more than the single generic SAC-interface entry as a candidate, and even it
+  has not gone through a verification pipeline. `0 < 25` (at best `1 < 25`),
+  so this leg fails regardless. See milestone
+  [Worker gate 1 - 25 verified schemas](https://github.com/orbital-stellar/orbital_stellar/milestone/15)
+  for the tracked target.
 - **Deploy leg — MET (repo moved past the PRD).**
-  `contracts/deployed.testnet.json` (deployedAt `2026-08-11`) contains a live
-  `registry` contract (`CDSCV5WBIK74OXFQLJMBMJHBWYBNEFGQGEG2YBKVKJSIWKP676AJF2QA`)
+  `contracts/deployed.testnet.json` (deployedAt `2026-09-06`) contains a live
+  `registry` contract (`CDJGK3KJMLQK6EVGOMIOQT35IFT2BTDVWC4ICEAXR7WBFTDGOP7FGXCV`)
   and `demoEmitter`. The "deploy to testnet" blocker from `ROADMAP.md` Wave 2.0
   is resolved in this checkout.
 
 **Verdict: NOT MET** — blocked by the open Phase 2 issues and by the
-`5 < 25` verified-schema count.
+verified-schema count (0-1, seeded SACs unverifiable, vs. the `≥25` target);
+see milestone [Worker gate 1 - 25 verified schemas](https://github.com/orbital-stellar/orbital_stellar/milestone/15).
 
 ### Gate 2 — Publication (`v1.0.0` + `@orbital-stellar/anchor-sdk` on npm)
 
@@ -52,15 +59,15 @@ Evidence (re-verified against the repo):
 
 Evidence:
 
-- `v1.0.0`: **NOT MET.** No `v1.0.0` git tag exists (`git tag` shows no
-  `v1.0.0`; `v0.1.0` is the only versioned release). `ROADMAP.md` Phase 1 is
-  still "in progress" (Waves 1.4–1.5 outstanding).
-- `@orbital-stellar/anchor-sdk` publication: **NOT MET.** The package exists at
-  `packages/anchor-sdk` but its `package.json` `version` is `0.1.0` and the gate
-  requires it published to npm (Phase 3 release gate: "`anchor-sdk` on npm").
-  Not published under this repo's release flow yet.
+- `v1.0.0`: **NOT MET.** No `v1.0.0` git tag exists (`v0.1.0` and `v0.2.0` are
+  the only versioned releases). `ROADMAP.md` Phase 1 is still "in progress"
+  (Waves 1.4–1.5 outstanding).
+- `@orbital-stellar/anchor-sdk` publication: **MET.** `packages/anchor-sdk`'s
+  `package.json` `version` is `0.2.0`, and `@orbital-stellar/anchor-sdk@0.2.0`
+  is published on npm (Phase 3 release gate: "`anchor-sdk` on npm").
 
-**Verdict: NOT MET.**
+**Verdict: NOT MET** — `anchor-sdk@0.2.0` is on npm, but `v1.0.0` is still
+outstanding (no `v1.0.0` git tag exists yet).
 
 ### Gate 3 — Named counterparty (binding constraint, §D.2)
 
@@ -106,8 +113,8 @@ Evidence:
 
 | Gate | Status | One-line evidence |
 |---|---|---|
-| 1 — Phase 2 closed | ❌ NOT MET | #908/#913/#915 open; 5 verified specs (`<25`); registry deployed ✅ |
-| 2 — Publication | ❌ NOT MET | no `v1.0.0` tag; `anchor-sdk` not on npm |
+| 1 — Phase 2 closed | ❌ NOT MET | #908/#913/#915 open; 4 of 5 specs are unverifiable seeded SACs, 0-1 verified (`<25`); registry deployed ✅ |
+| 2 — Publication | ❌ NOT MET | no `v1.0.0` tag; `anchor-sdk@0.2.0` on npm ✅ |
 | 3 — Counterparty | ⚠️ NAMED, not cleared | Aether Settlement named (#1036); `W3` sign-off pending (binding) |
 | 4 — §D.5 go/no-go | ❌ NOT MET | Nectar Network status not in repo; input outstanding |
 

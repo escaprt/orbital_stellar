@@ -77,6 +77,25 @@ describe("generateContractArtifacts - canonical ContractSpec path", () => {
     expect(artifacts.schemas).toContain("export const TransferEventSchema = z.object({");
   });
 
+  it("maps the generic val type to unknown in declarations and zod schemas", () => {
+    const spec: ContractSpec = {
+      version: "1.0.0",
+      name: "Test",
+      functions: [
+        {
+          name: "get_info",
+          params: [{ name: "extra", type: "val" }],
+          returns: "val",
+        },
+      ],
+      events: [],
+      types: {},
+    };
+    const artifacts = generateContractArtifacts(spec);
+    expect(artifacts.declarations).toContain("extra: unknown;");
+    expect(artifacts.declarations).toContain("export type GetInfoReturns = unknown;");
+  });
+
   it("generates struct, enum, and union UDT declarations", () => {
     const spec: ContractSpec = {
       version: "1.0.0",

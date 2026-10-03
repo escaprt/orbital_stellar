@@ -1,0 +1,787 @@
+{
+  "contractId": "CCLZQDL5LY2DBPNNFBRKPSROGFGTT7Y7AI2SM6QUI3SUTTKA672X4PDF",
+  "description": "Aquarius (AquaToken soroban-amm) stableswap liquidity pool on Stellar mainnet, pairing USDC and USDx. Representative instance: all Aquarius stable pools share this WASM.",
+  "events": [],
+  "functions": [
+    { "name": "a", "params": [], "returns": "u128" },
+    {
+      "name": "swap",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "in_idx", "type": "u32" },
+        { "name": "out_idx", "type": "u32" },
+        { "name": "in_amount", "type": "u128" },
+        { "name": "out_min", "type": "u128" }
+      ],
+      "returns": "u128"
+    },
+    { "name": "claim", "params": [{ "name": "user", "type": "address" }], "returns": "u128" },
+    {
+      "name": "ramp_a",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "future_a", "type": "u128" },
+        { "name": "future_time", "type": "u64" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "deposit",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "amounts", "type": { "item": "u128", "type": "vec" } },
+        { "name": "min_shares", "type": "u128" }
+      ],
+      "returns": { "elements": [{ "item": "u128", "type": "vec" }, "u128"], "type": "tuple" }
+    },
+    { "name": "version", "params": [], "returns": "u32" },
+    {
+      "name": "get_info",
+      "params": [],
+      "returns": { "key": "symbol", "type": "map", "value": "val" }
+    },
+    { "name": "share_id", "params": [], "returns": "address" },
+    {
+      "name": "withdraw",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "share_amount", "type": "u128" },
+        { "name": "min_amounts", "type": { "item": "u128", "type": "vec" } }
+      ],
+      "returns": { "item": "u128", "type": "vec" }
+    },
+    {
+      "name": "gauge_add",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "gauge_address", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    { "name": "kill_swap", "params": [{ "name": "admin", "type": "address" }], "returns": "void" },
+    { "name": "pool_type", "params": [], "returns": "symbol" },
+    {
+      "name": "get_gauges",
+      "params": [],
+      "returns": { "key": "address", "type": "map", "value": "address" }
+    },
+    { "name": "get_tokens", "params": [], "returns": { "item": "address", "type": "vec" } },
+    {
+      "name": "initialize",
+      "params": [
+        { "name": "admin", "type": "address" },
+        {
+          "name": "privileged_addrs",
+          "type": {
+            "elements": [
+              "address",
+              "address",
+              "address",
+              "address",
+              { "item": "address", "type": "vec" },
+              "address"
+            ],
+            "type": "tuple"
+          }
+        },
+        { "name": "router", "type": "address" },
+        { "name": "token_wasm_hash", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "tokens", "type": { "item": "address", "type": "vec" } },
+        { "name": "amp", "type": "u128" },
+        { "name": "fees_config", "type": { "elements": ["u32", "u32"], "type": "tuple" } }
+      ],
+      "returns": "void"
+    },
+    { "name": "kill_claim", "params": [{ "name": "admin", "type": "address" }], "returns": "void" },
+    {
+      "name": "stop_ramp_a",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "unkill_swap",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "gauge_remove",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "reward_token", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "gauges_claim",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": { "key": "address", "type": "map", "value": "u128" }
+    },
+    { "name": "get_decimals", "params": [], "returns": { "item": "u32", "type": "vec" } },
+    { "name": "get_reserves", "params": [], "returns": { "item": "u128", "type": "vec" } },
+    {
+      "name": "kill_deposit",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "unkill_claim",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "apply_new_fee",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "apply_upgrade",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": {
+        "elements": [
+          { "size": 32, "type": "bytes_n" },
+          { "size": 32, "type": "bytes_n" }
+        ],
+        "type": "tuple"
+      }
+    },
+    { "name": "contract_name", "params": [], "returns": "symbol" },
+    {
+      "name": "estimate_swap",
+      "params": [
+        { "name": "in_idx", "type": "u32" },
+        { "name": "out_idx", "type": "u32" },
+        { "name": "in_amount", "type": "u128" }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "commit_new_fee",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "new_fee", "type": "u32" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "commit_upgrade",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "new_wasm_hash", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "token_new_wasm_hash", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "gauges_new_wasm_hash", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "initialize_all",
+      "params": [
+        { "name": "admin", "type": "address" },
+        {
+          "name": "privileged_addrs",
+          "type": {
+            "elements": [
+              "address",
+              "address",
+              "address",
+              "address",
+              { "item": "address", "type": "vec" },
+              "address"
+            ],
+            "type": "tuple"
+          }
+        },
+        { "name": "router", "type": "address" },
+        { "name": "token_wasm_hash", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "coins", "type": { "item": "address", "type": "vec" } },
+        { "name": "amp", "type": "u128" },
+        { "name": "fees_config", "type": { "elements": ["u32", "u32"], "type": "tuple" } },
+        {
+          "name": "reward_config",
+          "type": { "elements": ["address", "address", "address"], "type": "tuple" }
+        },
+        { "name": "plane", "type": "address" },
+        { "name": "config_storage", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "revert_upgrade",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "unkill_deposit",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    { "name": "get_pools_plane", "params": [], "returns": "address" },
+    {
+      "name": "get_user_reward",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": "u128"
+    },
+    {
+      "name": "get_user_shares",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": "u128"
+    },
+    {
+      "name": "set_pools_plane",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "plane", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "estimate_deposit",
+      "params": [{ "name": "amounts", "type": { "item": "u128", "type": "vec" } }],
+      "returns": "u128"
+    },
+    { "name": "get_fee_fraction", "params": [], "returns": "u32" },
+    {
+      "name": "get_rewards_info",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": { "key": "symbol", "type": "map", "value": "i128" }
+    },
+    { "name": "get_total_shares", "params": [], "returns": "u128" },
+    {
+      "name": "init_pools_plane",
+      "params": [{ "name": "plane", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "calc_token_amount",
+      "params": [
+        { "name": "amounts", "type": { "item": "u128", "type": "vec" } },
+        { "name": "deposit", "type": "bool" }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "checkpoint_reward",
+      "params": [
+        { "name": "token_contract", "type": "address" },
+        { "name": "user", "type": "address" },
+        { "name": "user_shares", "type": "u128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "get_protocol_fees", "params": [], "returns": { "item": "u128", "type": "vec" } },
+    {
+      "name": "get_rewards_state",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": "bool"
+    },
+    { "name": "get_unused_reward", "params": [], "returns": "u128" },
+    { "name": "get_virtual_price", "params": [], "returns": "u128" },
+    {
+      "name": "kill_gauges_claim",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "set_rewards_state",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "state", "type": "bool" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "withdraw_one_coin",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "share_amount", "type": "u128" },
+        { "name": "i", "type": "u32" },
+        { "name": "min_amount", "type": "u128" }
+      ],
+      "returns": { "item": "u128", "type": "vec" }
+    },
+    { "name": "get_emergency_mode", "params": [], "returns": "bool" },
+    {
+      "name": "get_future_address",
+      "params": [{ "name": "role_name", "type": "symbol" }],
+      "returns": "address"
+    },
+    { "name": "get_is_killed_swap", "params": [], "returns": "bool" },
+    {
+      "name": "set_emergency_mode",
+      "params": [
+        { "name": "emergency_admin", "type": "address" },
+        { "name": "value", "type": "bool" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_rewards_config",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "expired_at", "type": "u64" },
+        { "name": "tps", "type": "u128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "backfill_plane_data", "params": [], "returns": "void" },
+    {
+      "name": "claim_protocol_fees",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "destination", "type": "address" }
+      ],
+      "returns": { "item": "u128", "type": "vec" }
+    },
+    { "name": "get_is_killed_claim", "params": [], "returns": "bool" },
+    {
+      "name": "init_config_storage",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "config_storage", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "swap_strict_receive",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "in_idx", "type": "u32" },
+        { "name": "out_idx", "type": "u32" },
+        { "name": "out_amount", "type": "u128" },
+        { "name": "in_max", "type": "u128" }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "unkill_gauges_claim",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "get_privileged_addrs",
+      "params": [],
+      "returns": { "key": "symbol", "type": "map", "value": { "item": "address", "type": "vec" } }
+    },
+    {
+      "name": "return_unused_reward",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "u128"
+    },
+    {
+      "name": "set_privileged_addrs",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "rewards_admin", "type": "address" },
+        { "name": "operations_admin", "type": "address" },
+        { "name": "pause_admin", "type": "address" },
+        { "name": "emergency_pause_admins", "type": { "item": "address", "type": "vec" } },
+        { "name": "system_fee_admin", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "gauge_schedule_reward",
+      "params": [
+        { "name": "router", "type": "address" },
+        { "name": "distributor", "type": "address" },
+        { "name": "gauge", "type": "address" },
+        { "name": "start_at", "type": { "inner": "u64", "type": "option" } },
+        { "name": "duration", "type": "u64" },
+        { "name": "tps", "type": "u128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "get_is_killed_deposit", "params": [], "returns": "bool" },
+    {
+      "name": "revert_new_parameters",
+      "params": [{ "name": "admin", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "calc_withdraw_one_coin",
+      "params": [
+        { "name": "share_amount", "type": "u128" },
+        { "name": "i", "type": "u32" }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "gauges_get_reward_info",
+      "params": [{ "name": "user", "type": "address" }],
+      "returns": {
+        "key": "address",
+        "type": "map",
+        "value": { "key": "symbol", "type": "map", "value": "i128" }
+      }
+    },
+    {
+      "name": "admin_set_rewards_state",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "user", "type": "address" },
+        { "name": "state", "type": "bool" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "initialize_boost_config",
+      "params": [
+        { "name": "reward_boost_token", "type": "address" },
+        { "name": "reward_boost_feed", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_reward_boost_config",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "reward_boost_token", "type": "address" },
+        { "name": "reward_boost_feed", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "apply_transfer_ownership",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "role_name", "type": "symbol" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "estimate_working_balance",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "new_user_shares", "type": "u128" }
+      ],
+      "returns": { "elements": ["u128", "u128"], "type": "tuple" }
+    },
+    { "name": "get_total_claimed_reward", "params": [], "returns": "u128" },
+    {
+      "name": "commit_transfer_ownership",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "role_name", "type": "symbol" },
+        { "name": "new_address", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    { "name": "get_protocol_fee_fraction", "params": [], "returns": "u32" },
+    { "name": "get_total_excluded_shares", "params": [], "returns": "u128" },
+    {
+      "name": "initialize_rewards_config",
+      "params": [{ "name": "reward_token", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "revert_transfer_ownership",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "role_name", "type": "symbol" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_protocol_fee_fraction",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "new_fraction", "type": "u32" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "checkpoint_working_balance",
+      "params": [
+        { "name": "token_contract", "type": "address" },
+        { "name": "user", "type": "address" },
+        { "name": "user_shares", "type": "u128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "remove_liquidity_imbalance",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "amounts", "type": { "item": "u128", "type": "vec" } },
+        { "name": "max_burn_amount", "type": "u128" }
+      ],
+      "returns": "u128"
+    },
+    { "name": "get_total_configured_reward", "params": [], "returns": "u128" },
+    {
+      "name": "estimate_swap_strict_receive",
+      "params": [
+        { "name": "in_idx", "type": "u32" },
+        { "name": "out_idx", "type": "u32" },
+        { "name": "out_amount", "type": "u128" }
+      ],
+      "returns": "u128"
+    },
+    { "name": "get_total_accumulated_reward", "params": [], "returns": "u128" },
+    {
+      "name": "adjust_total_accumulated_reward",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "diff", "type": "i128" }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "Aquarius Stableswap Pool (USDC/USDx)",
+  "network": "mainnet",
+  "types": {
+    "AccessControlError": {
+      "kind": "enum",
+      "name": "AccessControlError",
+      "variants": [
+        { "discriminant": 101, "name": "RoleNotFound" },
+        { "discriminant": 102, "name": "Unauthorized" },
+        { "discriminant": 103, "name": "AdminAlreadySet" },
+        { "discriminant": 104, "name": "BadRoleUsage" },
+        { "discriminant": 2906, "name": "AnotherActionActive" },
+        { "discriminant": 2907, "name": "NoActionActive" },
+        { "discriminant": 2908, "name": "ActionNotReadyYet" }
+      ]
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        { "discriminant": 2906, "name": "AnotherActionActive" },
+        { "discriminant": 2907, "name": "NoActionActive" },
+        { "discriminant": 2908, "name": "ActionNotReadyYet" }
+      ]
+    },
+    "GaugeError": {
+      "kind": "enum",
+      "name": "GaugeError",
+      "variants": [
+        { "discriminant": 207, "name": "ClaimKilled" },
+        { "discriminant": 305, "name": "GaugesOverMax" },
+        { "discriminant": 401, "name": "GaugeAlreadyExists" },
+        { "discriminant": 404, "name": "GaugeNotFound" }
+      ]
+    },
+    "LiquidityPoolError": {
+      "kind": "enum",
+      "name": "LiquidityPoolError",
+      "variants": [
+        { "discriminant": 201, "name": "AlreadyInitialized" },
+        { "discriminant": 202, "name": "PlaneAlreadyInitialized" },
+        { "discriminant": 203, "name": "RewardsAlreadyInitialized" },
+        { "discriminant": 204, "name": "InvariantDoesNotHold" },
+        { "discriminant": 205, "name": "PoolDepositKilled" },
+        { "discriminant": 206, "name": "PoolSwapKilled" },
+        { "discriminant": 207, "name": "PoolClaimKilled" },
+        { "discriminant": 208, "name": "FutureShareIdNotSet" },
+        { "discriminant": 209, "name": "MaxIterationsReached" },
+        { "discriminant": 210, "name": "ZeroTokenNotAllowed" },
+        { "discriminant": 2902, "name": "RampTooEarly" },
+        { "discriminant": 2903, "name": "RampTimeLessThanMinimum" },
+        { "discriminant": 2904, "name": "RampOverMax" },
+        { "discriminant": 2905, "name": "RampTooFast" },
+        { "discriminant": 2906, "name": "AnotherActionActive" },
+        { "discriminant": 2907, "name": "NoActionActive" },
+        { "discriminant": 2908, "name": "ActionNotReadyYet" }
+      ]
+    },
+    "LiquidityPoolValidationError": {
+      "kind": "enum",
+      "name": "LiquidityPoolValidationError",
+      "variants": [
+        { "discriminant": 2001, "name": "WrongInputVecSize" },
+        { "discriminant": 2003, "name": "FeeOutOfBounds" },
+        { "discriminant": 2004, "name": "AllCoinsRequired" },
+        { "discriminant": 2005, "name": "InMinNotSatisfied" },
+        { "discriminant": 2006, "name": "OutMinNotSatisfied" },
+        { "discriminant": 2007, "name": "CannotSwapSameToken" },
+        { "discriminant": 2008, "name": "InTokenOutOfBounds" },
+        { "discriminant": 2009, "name": "OutTokenOutOfBounds" },
+        { "discriminant": 2010, "name": "EmptyPool" },
+        { "discriminant": 2011, "name": "InvalidDepositAmount" },
+        { "discriminant": 2012, "name": "AdminFeeOutOfBounds" },
+        { "discriminant": 2013, "name": "UnknownPoolType" },
+        { "discriminant": 2014, "name": "ZeroSharesBurned" },
+        { "discriminant": 2015, "name": "TooManySharesBurned" },
+        { "discriminant": 2017, "name": "CannotComparePools" },
+        { "discriminant": 2018, "name": "ZeroAmount" },
+        { "discriminant": 2019, "name": "InsufficientBalance" },
+        { "discriminant": 2020, "name": "InMaxNotSatisfied" }
+      ]
+    },
+    "MathError": {
+      "kind": "enum",
+      "name": "MathError",
+      "variants": [{ "discriminant": 510, "name": "NumberOverflow" }]
+    },
+    "PoolRewardConfig": {
+      "fields": [
+        { "name": "expired_at", "type": "u64" },
+        { "name": "tps", "type": "u128" }
+      ],
+      "kind": "struct",
+      "name": "PoolRewardConfig"
+    },
+    "PoolRewardData": {
+      "fields": [
+        { "name": "accumulated", "type": "u128" },
+        { "name": "block", "type": "u64" },
+        { "name": "claimed", "type": "u128" },
+        { "name": "last_time", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "PoolRewardData"
+    },
+    "RewardConfig": {
+      "fields": [
+        { "name": "expired_at", "type": "u64" },
+        { "name": "start_at", "type": "u64" },
+        { "name": "tps", "type": "u128" }
+      ],
+      "kind": "struct",
+      "name": "RewardConfig"
+    },
+    "RewardsError": {
+      "kind": "enum",
+      "name": "RewardsError",
+      "variants": [
+        { "discriminant": 701, "name": "PastTimeNotAllowed" },
+        { "discriminant": 702, "name": "SameRewardsConfig" }
+      ]
+    },
+    "StorageError": {
+      "kind": "enum",
+      "name": "StorageError",
+      "variants": [
+        { "discriminant": 201, "name": "AlreadyInitialized" },
+        { "discriminant": 501, "name": "ValueNotInitialized" },
+        { "discriminant": 502, "name": "ValueMissing" },
+        { "discriminant": 503, "name": "ValueConversionError" }
+      ]
+    },
+    "UserRewardData": {
+      "fields": [
+        { "name": "last_block", "type": "u64" },
+        { "name": "pool_accumulated", "type": "u128" },
+        { "name": "to_claim", "type": "u128" }
+      ],
+      "kind": "struct",
+      "name": "UserRewardData"
+    },
+    "WASMDataKey": {
+      "cases": [
+        { "fields": [], "name": "TokenHash" },
+        { "fields": [], "name": "TokenFutureWASM" },
+        { "fields": [], "name": "GaugeWASM" },
+        { "fields": [], "name": "FutureGaugeWASM" },
+        { "fields": [], "name": "ConstantPoolHash" },
+        { "fields": [], "name": "StableSwapPoolHash" }
+      ],
+      "kind": "union",
+      "name": "WASMDataKey"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAAEkxpcXVpZGl0eVBvb2xFcnJvcgAAAAAAEQAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAADJAAAAAAAAABdQbGFuZUFscmVhZHlJbml0aWFsaXplZAAAAADKAAAAAAAAABlSZXdhcmRzQWxyZWFkeUluaXRpYWxpemVkAAAAAAAAywAAAAAAAAAUSW52YXJpYW50RG9lc05vdEhvbGQAAADMAAAAAAAAABFQb29sRGVwb3NpdEtpbGxlZAAAAAAAAM0AAAAAAAAADlBvb2xTd2FwS2lsbGVkAAAAAADOAAAAAAAAAA9Qb29sQ2xhaW1LaWxsZWQAAAAAzwAAAAAAAAATRnV0dXJlU2hhcmVJZE5vdFNldAAAAADQAAAAAAAAABRNYXhJdGVyYXRpb25zUmVhY2hlZAAAANEAAAAAAAAAE1plcm9Ub2tlbk5vdEFsbG93ZWQAAAAA0gAAAAAAAAAMUmFtcFRvb0Vhcmx5AAALVgAAAAAAAAAXUmFtcFRpbWVMZXNzVGhhbk1pbmltdW0AAAALVwAAAAAAAAALUmFtcE92ZXJNYXgAAAALWAAAAAAAAAALUmFtcFRvb0Zhc3QAAAALWQAAAAAAAAATQW5vdGhlckFjdGlvbkFjdGl2ZQAAAAtaAAAAAAAAAA5Ob0FjdGlvbkFjdGl2ZQAAAAALWwAAAAAAAAARQWN0aW9uTm90UmVhZHlZZXQAAAAAAAtc",
+    "AAAAAAAAAAAAAAABYQAAAAAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAEc3dhcAAAAAUAAAAAAAAABHVzZXIAAAATAAAAAAAAAAZpbl9pZHgAAAAAAAQAAAAAAAAAB291dF9pZHgAAAAABAAAAAAAAAAJaW5fYW1vdW50AAAAAAAACgAAAAAAAAAHb3V0X21pbgAAAAAKAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAFY2xhaW0AAAAAAAABAAAAAAAAAAR1c2VyAAAAEwAAAAEAAAAK",
+    "AAAAAAAAAAAAAAAGcmFtcF9hAAAAAAADAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAACGZ1dHVyZV9hAAAACgAAAAAAAAALZnV0dXJlX3RpbWUAAAAABgAAAAA=",
+    "AAAAAAAAAAAAAAAHZGVwb3NpdAAAAAADAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAHYW1vdW50cwAAAAPqAAAACgAAAAAAAAAKbWluX3NoYXJlcwAAAAAACgAAAAEAAAPtAAAAAgAAA+oAAAAKAAAACg==",
+    "AAAAAAAAAAAAAAAHdmVyc2lvbgAAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAIZ2V0X2luZm8AAAAAAAAAAQAAA+wAAAARAAAAAA==",
+    "AAAAAAAAAAAAAAAIc2hhcmVfaWQAAAAAAAAAAQAAABM=",
+    "AAAAAAAAAAAAAAAId2l0aGRyYXcAAAADAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAMc2hhcmVfYW1vdW50AAAACgAAAAAAAAALbWluX2Ftb3VudHMAAAAD6gAAAAoAAAABAAAD6gAAAAo=",
+    "AAAAAAAAAAAAAAAJZ2F1Z2VfYWRkAAAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAA1nYXVnZV9hZGRyZXNzAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAJa2lsbF9zd2FwAAAAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAJcG9vbF90eXBlAAAAAAAAAAAAAAEAAAAR",
+    "AAAAAAAAAAAAAAAKZ2V0X2dhdWdlcwAAAAAAAAAAAAEAAAPsAAAAEwAAABM=",
+    "AAAAAAAAAAAAAAAKZ2V0X3Rva2VucwAAAAAAAAAAAAEAAAPqAAAAEw==",
+    "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABBwcml2aWxlZ2VkX2FkZHJzAAAD7QAAAAYAAAATAAAAEwAAABMAAAATAAAD6gAAABMAAAATAAAAAAAAAAZyb3V0ZXIAAAAAABMAAAAAAAAAD3Rva2VuX3dhc21faGFzaAAAAAPuAAAAIAAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAADYW1wAAAAAAoAAAAAAAAAC2ZlZXNfY29uZmlnAAAAA+0AAAACAAAABAAAAAQAAAAA",
+    "AAAAAAAAAAAAAAAKa2lsbF9jbGFpbQAAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAALc3RvcF9yYW1wX2EAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAALdW5raWxsX3N3YXAAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAMZ2F1Z2VfcmVtb3ZlAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAxyZXdhcmRfdG9rZW4AAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAMZ2F1Z2VzX2NsYWltAAAAAQAAAAAAAAAEdXNlcgAAABMAAAABAAAD7AAAABMAAAAK",
+    "AAAAAAAAAAAAAAAMZ2V0X2RlY2ltYWxzAAAAAAAAAAEAAAPqAAAABA==",
+    "AAAAAAAAAAAAAAAMZ2V0X3Jlc2VydmVzAAAAAAAAAAEAAAPqAAAACg==",
+    "AAAAAAAAAAAAAAAMa2lsbF9kZXBvc2l0AAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAMdW5raWxsX2NsYWltAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAANYXBwbHlfbmV3X2ZlZQAAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAANYXBwbHlfdXBncmFkZQAAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAEAAAPtAAAAAgAAA+4AAAAgAAAD7gAAACA=",
+    "AAAAAAAAAAAAAAANY29udHJhY3RfbmFtZQAAAAAAAAAAAAABAAAAEQ==",
+    "AAAAAAAAAAAAAAANZXN0aW1hdGVfc3dhcAAAAAAAAAMAAAAAAAAABmluX2lkeAAAAAAABAAAAAAAAAAHb3V0X2lkeAAAAAAEAAAAAAAAAAlpbl9hbW91bnQAAAAAAAAKAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAOY29tbWl0X25ld19mZWUAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAHbmV3X2ZlZQAAAAAEAAAAAA==",
+    "AAAAAAAAAAAAAAAOY29tbWl0X3VwZ3JhZGUAAAAAAAQAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANbmV3X3dhc21faGFzaAAAAAAAA+4AAAAgAAAAAAAAABN0b2tlbl9uZXdfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAABRnYXVnZXNfbmV3X3dhc21faGFzaAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAOaW5pdGlhbGl6ZV9hbGwAAAAAAAoAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAQcHJpdmlsZWdlZF9hZGRycwAAA+0AAAAGAAAAEwAAABMAAAATAAAAEwAAA+oAAAATAAAAEwAAAAAAAAAGcm91dGVyAAAAAAATAAAAAAAAAA90b2tlbl93YXNtX2hhc2gAAAAD7gAAACAAAAAAAAAABWNvaW5zAAAAAAAD6gAAABMAAAAAAAAAA2FtcAAAAAAKAAAAAAAAAAtmZWVzX2NvbmZpZwAAAAPtAAAAAgAAAAQAAAAEAAAAAAAAAA1yZXdhcmRfY29uZmlnAAAAAAAD7QAAAAMAAAATAAAAEwAAABMAAAAAAAAABXBsYW5lAAAAAAAAEwAAAAAAAAAOY29uZmlnX3N0b3JhZ2UAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAOcmV2ZXJ0X3VwZ3JhZGUAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAOdW5raWxsX2RlcG9zaXQAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAPZ2V0X3Bvb2xzX3BsYW5lAAAAAAAAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAPZ2V0X3VzZXJfcmV3YXJkAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAPZ2V0X3VzZXJfc2hhcmVzAAAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAPc2V0X3Bvb2xzX3BsYW5lAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAFcGxhbmUAAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAQZXN0aW1hdGVfZGVwb3NpdAAAAAEAAAAAAAAAB2Ftb3VudHMAAAAD6gAAAAoAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAQZ2V0X2ZlZV9mcmFjdGlvbgAAAAAAAAABAAAABA==",
+    "AAAAAAAAAAAAAAAQZ2V0X3Jld2FyZHNfaW5mbwAAAAEAAAAAAAAABHVzZXIAAAATAAAAAQAAA+wAAAARAAAACw==",
+    "AAAAAAAAAAAAAAAQZ2V0X3RvdGFsX3NoYXJlcwAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAQaW5pdF9wb29sc19wbGFuZQAAAAEAAAAAAAAABXBsYW5lAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAARY2FsY190b2tlbl9hbW91bnQAAAAAAAACAAAAAAAAAAdhbW91bnRzAAAAA+oAAAAKAAAAAAAAAAdkZXBvc2l0AAAAAAEAAAABAAAACg==",
+    "AAAAAAAAAAAAAAARY2hlY2twb2ludF9yZXdhcmQAAAAAAAADAAAAAAAAAA50b2tlbl9jb250cmFjdAAAAAAAEwAAAAAAAAAEdXNlcgAAABMAAAAAAAAAC3VzZXJfc2hhcmVzAAAAAAoAAAAA",
+    "AAAAAAAAAAAAAAARZ2V0X3Byb3RvY29sX2ZlZXMAAAAAAAAAAAAAAQAAA+oAAAAK",
+    "AAAAAAAAAAAAAAARZ2V0X3Jld2FyZHNfc3RhdGUAAAAAAAABAAAAAAAAAAR1c2VyAAAAEwAAAAEAAAAB",
+    "AAAAAAAAAAAAAAARZ2V0X3VudXNlZF9yZXdhcmQAAAAAAAAAAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAARZ2V0X3ZpcnR1YWxfcHJpY2UAAAAAAAAAAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAARa2lsbF9nYXVnZXNfY2xhaW0AAAAAAAABAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAARc2V0X3Jld2FyZHNfc3RhdGUAAAAAAAACAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAFc3RhdGUAAAAAAAABAAAAAA==",
+    "AAAAAAAAAAAAAAARd2l0aGRyYXdfb25lX2NvaW4AAAAAAAAEAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAMc2hhcmVfYW1vdW50AAAACgAAAAAAAAABaQAAAAAAAAQAAAAAAAAACm1pbl9hbW91bnQAAAAAAAoAAAABAAAD6gAAAAo=",
+    "AAAAAAAAAAAAAAASZ2V0X2VtZXJnZW5jeV9tb2RlAAAAAAAAAAAAAQAAAAE=",
+    "AAAAAAAAAAAAAAASZ2V0X2Z1dHVyZV9hZGRyZXNzAAAAAAABAAAAAAAAAAlyb2xlX25hbWUAAAAAAAARAAAAAQAAABM=",
+    "AAAAAAAAAAAAAAASZ2V0X2lzX2tpbGxlZF9zd2FwAAAAAAAAAAAAAQAAAAE=",
+    "AAAAAAAAAAAAAAASc2V0X2VtZXJnZW5jeV9tb2RlAAAAAAACAAAAAAAAAA9lbWVyZ2VuY3lfYWRtaW4AAAAAEwAAAAAAAAAFdmFsdWUAAAAAAAABAAAAAA==",
+    "AAAAAAAAAAAAAAASc2V0X3Jld2FyZHNfY29uZmlnAAAAAAADAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAACmV4cGlyZWRfYXQAAAAAAAYAAAAAAAAAA3RwcwAAAAAKAAAAAA==",
+    "AAAAAAAAAAAAAAATYmFja2ZpbGxfcGxhbmVfZGF0YQAAAAAAAAAAAA==",
+    "AAAAAAAAAAAAAAATY2xhaW1fcHJvdG9jb2xfZmVlcwAAAAACAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAAC2Rlc3RpbmF0aW9uAAAAABMAAAABAAAD6gAAAAo=",
+    "AAAAAAAAAAAAAAATZ2V0X2lzX2tpbGxlZF9jbGFpbQAAAAAAAAAAAQAAAAE=",
+    "AAAAAAAAAAAAAAATaW5pdF9jb25maWdfc3RvcmFnZQAAAAACAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAADmNvbmZpZ19zdG9yYWdlAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAATc3dhcF9zdHJpY3RfcmVjZWl2ZQAAAAAFAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGaW5faWR4AAAAAAAEAAAAAAAAAAdvdXRfaWR4AAAAAAQAAAAAAAAACm91dF9hbW91bnQAAAAAAAoAAAAAAAAABmluX21heAAAAAAACgAAAAEAAAAK",
+    "AAAAAAAAAAAAAAATdW5raWxsX2dhdWdlc19jbGFpbQAAAAABAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAUZ2V0X3ByaXZpbGVnZWRfYWRkcnMAAAAAAAAAAQAAA+wAAAARAAAD6gAAABM=",
+    "AAAAAAAAAAAAAAAUcmV0dXJuX3VudXNlZF9yZXdhcmQAAAABAAAAAAAAAAVhZG1pbgAAAAAAABMAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAUc2V0X3ByaXZpbGVnZWRfYWRkcnMAAAAGAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAADXJld2FyZHNfYWRtaW4AAAAAAAATAAAAAAAAABBvcGVyYXRpb25zX2FkbWluAAAAEwAAAAAAAAALcGF1c2VfYWRtaW4AAAAAEwAAAAAAAAAWZW1lcmdlbmN5X3BhdXNlX2FkbWlucwAAAAAD6gAAABMAAAAAAAAAEHN5c3RlbV9mZWVfYWRtaW4AAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAVZ2F1Z2Vfc2NoZWR1bGVfcmV3YXJkAAAAAAAABgAAAAAAAAAGcm91dGVyAAAAAAATAAAAAAAAAAtkaXN0cmlidXRvcgAAAAATAAAAAAAAAAVnYXVnZQAAAAAAABMAAAAAAAAACHN0YXJ0X2F0AAAD6AAAAAYAAAAAAAAACGR1cmF0aW9uAAAABgAAAAAAAAADdHBzAAAAAAoAAAAA",
+    "AAAAAAAAAAAAAAAVZ2V0X2lzX2tpbGxlZF9kZXBvc2l0AAAAAAAAAAAAAAEAAAAB",
+    "AAAAAAAAAAAAAAAVcmV2ZXJ0X25ld19wYXJhbWV0ZXJzAAAAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAWY2FsY193aXRoZHJhd19vbmVfY29pbgAAAAAAAgAAAAAAAAAMc2hhcmVfYW1vdW50AAAACgAAAAAAAAABaQAAAAAAAAQAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAWZ2F1Z2VzX2dldF9yZXdhcmRfaW5mbwAAAAAAAQAAAAAAAAAEdXNlcgAAABMAAAABAAAD7AAAABMAAAPsAAAAEQAAAAs=",
+    "AAAAAAAAAAAAAAAXYWRtaW5fc2V0X3Jld2FyZHNfc3RhdGUAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAFc3RhdGUAAAAAAAABAAAAAA==",
+    "AAAAAAAAAAAAAAAXaW5pdGlhbGl6ZV9ib29zdF9jb25maWcAAAAAAgAAAAAAAAAScmV3YXJkX2Jvb3N0X3Rva2VuAAAAAAATAAAAAAAAABFyZXdhcmRfYm9vc3RfZmVlZAAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAXc2V0X3Jld2FyZF9ib29zdF9jb25maWcAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJyZXdhcmRfYm9vc3RfdG9rZW4AAAAAABMAAAAAAAAAEXJld2FyZF9ib29zdF9mZWVkAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAYYXBwbHlfdHJhbnNmZXJfb3duZXJzaGlwAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAlyb2xlX25hbWUAAAAAAAARAAAAAA==",
+    "AAAAAAAAAAAAAAAYZXN0aW1hdGVfd29ya2luZ19iYWxhbmNlAAAAAgAAAAAAAAAEdXNlcgAAABMAAAAAAAAAD25ld191c2VyX3NoYXJlcwAAAAAKAAAAAQAAA+0AAAACAAAACgAAAAo=",
+    "AAAAAAAAAAAAAAAYZ2V0X3RvdGFsX2NsYWltZWRfcmV3YXJkAAAAAAAAAAEAAAAK",
+    "AAAAAAAAAAAAAAAZY29tbWl0X3RyYW5zZmVyX293bmVyc2hpcAAAAAAAAAMAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAJcm9sZV9uYW1lAAAAAAAAEQAAAAAAAAALbmV3X2FkZHJlc3MAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAZZ2V0X3Byb3RvY29sX2ZlZV9mcmFjdGlvbgAAAAAAAAAAAAABAAAABA==",
+    "AAAAAAAAAAAAAAAZZ2V0X3RvdGFsX2V4Y2x1ZGVkX3NoYXJlcwAAAAAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAZaW5pdGlhbGl6ZV9yZXdhcmRzX2NvbmZpZwAAAAAAAAEAAAAAAAAADHJld2FyZF90b2tlbgAAABMAAAAA",
+    "AAAAAAAAAAAAAAAZcmV2ZXJ0X3RyYW5zZmVyX293bmVyc2hpcAAAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAJcm9sZV9uYW1lAAAAAAAAEQAAAAA=",
+    "AAAAAAAAAAAAAAAZc2V0X3Byb3RvY29sX2ZlZV9mcmFjdGlvbgAAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAMbmV3X2ZyYWN0aW9uAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAaY2hlY2twb2ludF93b3JraW5nX2JhbGFuY2UAAAAAAAMAAAAAAAAADnRva2VuX2NvbnRyYWN0AAAAAAATAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAALdXNlcl9zaGFyZXMAAAAACgAAAAA=",
+    "AAAAAAAAAAAAAAAacmVtb3ZlX2xpcXVpZGl0eV9pbWJhbGFuY2UAAAAAAAMAAAAAAAAABHVzZXIAAAATAAAAAAAAAAdhbW91bnRzAAAAA+oAAAAKAAAAAAAAAA9tYXhfYnVybl9hbW91bnQAAAAACgAAAAEAAAAK",
+    "AAAAAAAAAAAAAAAbZ2V0X3RvdGFsX2NvbmZpZ3VyZWRfcmV3YXJkAAAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAcZXN0aW1hdGVfc3dhcF9zdHJpY3RfcmVjZWl2ZQAAAAMAAAAAAAAABmluX2lkeAAAAAAABAAAAAAAAAAHb3V0X2lkeAAAAAAEAAAAAAAAAApvdXRfYW1vdW50AAAAAAAKAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAcZ2V0X3RvdGFsX2FjY3VtdWxhdGVkX3Jld2FyZAAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAfYWRqdXN0X3RvdGFsX2FjY3VtdWxhdGVkX3Jld2FyZAAAAAACAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAABGRpZmYAAAALAAAAAA==",
+    "AAAABAAAAAAAAAAAAAAAEkFjY2Vzc0NvbnRyb2xFcnJvcgAAAAAABwAAAAAAAAAMUm9sZU5vdEZvdW5kAAAAZQAAAAAAAAAMVW5hdXRob3JpemVkAAAAZgAAAAAAAAAPQWRtaW5BbHJlYWR5U2V0AAAAAGcAAAAAAAAADEJhZFJvbGVVc2FnZQAAAGgAAAAAAAAAE0Fub3RoZXJBY3Rpb25BY3RpdmUAAAALWgAAAAAAAAAOTm9BY3Rpb25BY3RpdmUAAAAAC1sAAAAAAAAAEUFjdGlvbk5vdFJlYWR5WWV0AAAAAAALXA==",
+    "AAAABAAAAAAAAAAAAAAACkdhdWdlRXJyb3IAAAAAAAQAAAAAAAAAC0NsYWltS2lsbGVkAAAAAM8AAAAAAAAADUdhdWdlc092ZXJNYXgAAAAAAAExAAAAAAAAABJHYXVnZUFscmVhZHlFeGlzdHMAAAAAAZEAAAAAAAAADUdhdWdlTm90Rm91bmQAAAAAAAGU",
+    "AAAAAQAAAAAAAAAAAAAADFJld2FyZENvbmZpZwAAAAMAAAAAAAAACmV4cGlyZWRfYXQAAAAAAAYAAAAAAAAACHN0YXJ0X2F0AAAABgAAAAAAAAADdHBzAAAAAAo=",
+    "AAAAAgAAAAAAAAAAAAAAC1dBU01EYXRhS2V5AAAAAAYAAAAAAAAAAAAAAAlUb2tlbkhhc2gAAAAAAAAAAAAAAAAAAA9Ub2tlbkZ1dHVyZVdBU00AAAAAAAAAAAAAAAAJR2F1Z2VXQVNNAAAAAAAAAAAAAAAAAAAPRnV0dXJlR2F1Z2VXQVNNAAAAAAAAAAAAAAAAEENvbnN0YW50UG9vbEhhc2gAAAAAAAAAAAAAABJTdGFibGVTd2FwUG9vbEhhc2gAAA==",
+    "AAAABAAAAAAAAAAAAAAAHExpcXVpZGl0eVBvb2xWYWxpZGF0aW9uRXJyb3IAAAASAAAAAAAAABFXcm9uZ0lucHV0VmVjU2l6ZQAAAAAAB9EAAAAAAAAADkZlZU91dE9mQm91bmRzAAAAAAfTAAAAAAAAABBBbGxDb2luc1JlcXVpcmVkAAAH1AAAAAAAAAARSW5NaW5Ob3RTYXRpc2ZpZWQAAAAAAAfVAAAAAAAAABJPdXRNaW5Ob3RTYXRpc2ZpZWQAAAAAB9YAAAAAAAAAE0Nhbm5vdFN3YXBTYW1lVG9rZW4AAAAH1wAAAAAAAAASSW5Ub2tlbk91dE9mQm91bmRzAAAAAAfYAAAAAAAAABNPdXRUb2tlbk91dE9mQm91bmRzAAAAB9kAAAAAAAAACUVtcHR5UG9vbAAAAAAAB9oAAAAAAAAAFEludmFsaWREZXBvc2l0QW1vdW50AAAH2wAAAAAAAAATQWRtaW5GZWVPdXRPZkJvdW5kcwAAAAfcAAAAAAAAAA9Vbmtub3duUG9vbFR5cGUAAAAH3QAAAAAAAAAQWmVyb1NoYXJlc0J1cm5lZAAAB94AAAAAAAAAE1Rvb01hbnlTaGFyZXNCdXJuZWQAAAAH3wAAAAAAAAASQ2Fubm90Q29tcGFyZVBvb2xzAAAAAAfhAAAAAAAAAApaZXJvQW1vdW50AAAAAAfiAAAAAAAAABNJbnN1ZmZpY2llbnRCYWxhbmNlAAAAB+MAAAAAAAAAEUluTWF4Tm90U2F0aXNmaWVkAAAAAAAH5A==",
+    "AAAABAAAAAAAAAAAAAAADFJld2FyZHNFcnJvcgAAAAIAAAAAAAAAElBhc3RUaW1lTm90QWxsb3dlZAAAAAACvQAAAAAAAAARU2FtZVJld2FyZHNDb25maWcAAAAAAAK+",
+    "AAAAAQAAAAAAAAAAAAAADlBvb2xSZXdhcmREYXRhAAAAAAAEAAAAAAAAAAthY2N1bXVsYXRlZAAAAAAKAAAAAAAAAAVibG9jawAAAAAAAAYAAAAAAAAAB2NsYWltZWQAAAAACgAAAAAAAAAJbGFzdF90aW1lAAAAAAAABg==",
+    "AAAAAQAAAAAAAAAAAAAADlVzZXJSZXdhcmREYXRhAAAAAAADAAAAAAAAAApsYXN0X2Jsb2NrAAAAAAAGAAAAAAAAABBwb29sX2FjY3VtdWxhdGVkAAAACgAAAAAAAAAIdG9fY2xhaW0AAAAK",
+    "AAAAAQAAAAAAAAAAAAAAEFBvb2xSZXdhcmRDb25maWcAAAACAAAAAAAAAApleHBpcmVkX2F0AAAAAAAGAAAAAAAAAAN0cHMAAAAACg==",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAAwAAAAAAAAATQW5vdGhlckFjdGlvbkFjdGl2ZQAAAAtaAAAAAAAAAA5Ob0FjdGlvbkFjdGl2ZQAAAAALWwAAAAAAAAARQWN0aW9uTm90UmVhZHlZZXQAAAAAAAtc",
+    "AAAABAAAAAAAAAAAAAAACU1hdGhFcnJvcgAAAAAAAAEAAAAAAAAADk51bWJlck92ZXJmbG93AAAAAAH+",
+    "AAAABAAAAAAAAAAAAAAADFN0b3JhZ2VFcnJvcgAAAAQAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAyQAAAAAAAAATVmFsdWVOb3RJbml0aWFsaXplZAAAAAH1AAAAAAAAAAxWYWx1ZU1pc3NpbmcAAAH2AAAAAAAAABRWYWx1ZUNvbnZlcnNpb25FcnJvcgAAAfc="
+  ]
+}

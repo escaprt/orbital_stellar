@@ -1,0 +1,523 @@
+{
+  "contractId": "CBKGPWGKSKZF52CFHMTRR23TBWTPMRDIYZ4O2P5VS65BMHYH4DXMCJZC",
+  "description": "Reflector foreign-exchange oracle on Stellar mainnet serving fiat currency rates over the SEP-40 oracle interface, operated by the Reflector DAO node cluster.",
+  "events": [
+    {
+      "data": [
+        {
+          "name": "update_data",
+          "type": {
+            "item": {
+              "elements": ["val", "i128"],
+              "type": "tuple"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "name": "UpdateEvent",
+      "topics": [
+        {
+          "doc": "Fixed prefix topic, always \"REFLECTOR\".",
+          "name": "event_name",
+          "type": "symbol"
+        },
+        {
+          "doc": "Fixed prefix topic, always \"update\".",
+          "name": "prefix_topic_1",
+          "type": "symbol"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "functions": [
+    {
+      "name": "base",
+      "params": [],
+      "returns": {
+        "name": "Asset",
+        "type": "named"
+      }
+    },
+    {
+      "name": "admin",
+      "params": [],
+      "returns": {
+        "inner": "address",
+        "type": "option"
+      }
+    },
+    {
+      "name": "price",
+      "params": [
+        {
+          "name": "asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "inner": {
+          "name": "PriceData",
+          "type": "named"
+        },
+        "type": "option"
+      }
+    },
+    {
+      "name": "assets",
+      "params": [],
+      "returns": {
+        "item": {
+          "name": "Asset",
+          "type": "named"
+        },
+        "type": "vec"
+      }
+    },
+    {
+      "name": "config",
+      "params": [
+        {
+          "name": "config",
+          "type": {
+            "name": "ConfigData",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "prices",
+      "params": [
+        {
+          "name": "asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "name": "records",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "inner": {
+          "item": {
+            "name": "PriceData",
+            "type": "named"
+          },
+          "type": "vec"
+        },
+        "type": "option"
+      }
+    },
+    {
+      "name": "expires",
+      "params": [
+        {
+          "name": "asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "inner": "u64",
+        "type": "option"
+      }
+    },
+    {
+      "name": "version",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "decimals",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "lastprice",
+      "params": [
+        {
+          "name": "asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "inner": {
+          "name": "PriceData",
+          "type": "named"
+        },
+        "type": "option"
+      }
+    },
+    {
+      "name": "set_price",
+      "params": [
+        {
+          "name": "updates",
+          "type": {
+            "name": "PriceUpdate",
+            "type": "named"
+          }
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "add_assets",
+      "params": [
+        {
+          "name": "assets",
+          "type": {
+            "item": {
+              "name": "Asset",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "cache_size",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "fee_config",
+      "params": [],
+      "returns": {
+        "name": "FeeConfig",
+        "type": "named"
+      }
+    },
+    {
+      "name": "resolution",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "last_timestamp",
+      "params": [],
+      "returns": "u64"
+    },
+    {
+      "name": "set_cache_size",
+      "params": [
+        {
+          "name": "cache_size",
+          "type": "u32"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_fee_config",
+      "params": [
+        {
+          "name": "fee_config",
+          "type": {
+            "name": "FeeConfig",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "update_contract",
+      "params": [
+        {
+          "name": "wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "extend_asset_ttl",
+      "params": [
+        {
+          "name": "sponsor",
+          "type": "address"
+        },
+        {
+          "name": "asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": "u64"
+    },
+    {
+      "name": "estimate_retention_cost",
+      "params": [
+        {
+          "name": "period",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "elements": ["address", "i128"],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "history_retention_period",
+      "params": [],
+      "returns": {
+        "inner": "u64",
+        "type": "option"
+      }
+    },
+    {
+      "name": "set_history_retention_period",
+      "params": [
+        {
+          "name": "period",
+          "type": "u64"
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "Reflector Fiat FX Oracle",
+  "network": "mainnet",
+  "types": {
+    "Asset": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "Stellar"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "symbol"
+            }
+          ],
+          "name": "Other"
+        }
+      ],
+      "kind": "union",
+      "name": "Asset"
+    },
+    "ConfigData": {
+      "fields": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "assets",
+          "type": {
+            "item": {
+              "name": "Asset",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "base_asset",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "name": "cache_size",
+          "type": "u32"
+        },
+        {
+          "name": "decimals",
+          "type": "u32"
+        },
+        {
+          "name": "fee_config",
+          "type": {
+            "name": "FeeConfig",
+            "type": "named"
+          }
+        },
+        {
+          "name": "history_retention_period",
+          "type": "u64"
+        },
+        {
+          "name": "resolution",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "ConfigData"
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 1,
+          "name": "Unauthorized"
+        },
+        {
+          "discriminant": 2,
+          "name": "AssetMissing"
+        },
+        {
+          "discriminant": 3,
+          "name": "AssetAlreadyExists"
+        },
+        {
+          "discriminant": 4,
+          "name": "InvalidConfig"
+        },
+        {
+          "discriminant": 5,
+          "name": "InvalidTimestamp"
+        },
+        {
+          "discriminant": 6,
+          "name": "AssetLimitExceeded"
+        },
+        {
+          "discriminant": 7,
+          "name": "InvalidAmount"
+        },
+        {
+          "discriminant": 8,
+          "name": "InvalidPricesUpdate"
+        }
+      ]
+    },
+    "FeeConfig": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": {
+                "elements": ["address", "i128"],
+                "type": "tuple"
+              }
+            }
+          ],
+          "name": "Some"
+        },
+        {
+          "fields": [],
+          "name": "None"
+        }
+      ],
+      "kind": "union",
+      "name": "FeeConfig"
+    },
+    "PriceData": {
+      "fields": [
+        {
+          "name": "price",
+          "type": "i128"
+        },
+        {
+          "name": "timestamp",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceData"
+    },
+    "PriceUpdate": {
+      "fields": [
+        {
+          "name": "mask",
+          "type": "bytes"
+        },
+        {
+          "name": "prices",
+          "type": {
+            "item": "i128",
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "PriceUpdate"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAAEYmFzZQAAAAAAAAABAAAH0AAAAAVBc3NldAAAAA==",
+    "AAAAAAAAAAAAAAAFYWRtaW4AAAAAAAAAAAAAAQAAA+gAAAAT",
+    "AAAAAAAAAAAAAAAFcHJpY2UAAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAB9AAAAAFQXNzZXQAAAAAAAAAAAAACXRpbWVzdGFtcAAAAAAAAAYAAAABAAAD6AAAB9AAAAAJUHJpY2VEYXRhAAAA",
+    "AAAAAAAAAAAAAAAGYXNzZXRzAAAAAAAAAAAAAQAAA+oAAAfQAAAABUFzc2V0AAAA",
+    "AAAAAAAAAAAAAAAGY29uZmlnAAAAAAABAAAAAAAAAAZjb25maWcAAAAAB9AAAAAKQ29uZmlnRGF0YQAAAAAAAA==",
+    "AAAAAAAAAAAAAAAGcHJpY2VzAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAB9AAAAAFQXNzZXQAAAAAAAAAAAAAB3JlY29yZHMAAAAABAAAAAEAAAPoAAAD6gAAB9AAAAAJUHJpY2VEYXRhAAAA",
+    "AAAAAAAAAAAAAAAHZXhwaXJlcwAAAAABAAAAAAAAAAVhc3NldAAAAAAAB9AAAAAFQXNzZXQAAAAAAAABAAAD6AAAAAY=",
+    "AAAAAAAAAAAAAAAHdmVyc2lvbgAAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAIZGVjaW1hbHMAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAJbGFzdHByaWNlAAAAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAfQAAAABUFzc2V0AAAAAAAAAQAAA+gAAAfQAAAACVByaWNlRGF0YQAAAA==",
+    "AAAAAAAAAAAAAAAJc2V0X3ByaWNlAAAAAAAAAgAAAAAAAAAHdXBkYXRlcwAAAAfQAAAAC1ByaWNlVXBkYXRlAAAAAAAAAAAJdGltZXN0YW1wAAAAAAAABgAAAAA=",
+    "AAAAAAAAAAAAAAAKYWRkX2Fzc2V0cwAAAAAAAQAAAAAAAAAGYXNzZXRzAAAAAAPqAAAH0AAAAAVBc3NldAAAAAAAAAA=",
+    "AAAAAAAAAAAAAAAKY2FjaGVfc2l6ZQAAAAAAAAAAAAEAAAAE",
+    "AAAAAAAAAAAAAAAKZmVlX2NvbmZpZwAAAAAAAAAAAAEAAAfQAAAACUZlZUNvbmZpZwAAAA==",
+    "AAAAAAAAAAAAAAAKcmVzb2x1dGlvbgAAAAAAAAAAAAEAAAAE",
+    "AAAAAAAAAAAAAAAObGFzdF90aW1lc3RhbXAAAAAAAAAAAAABAAAABg==",
+    "AAAAAAAAAAAAAAAOc2V0X2NhY2hlX3NpemUAAAAAAAEAAAAAAAAACmNhY2hlX3NpemUAAAAAAAQAAAAA",
+    "AAAAAAAAAAAAAAAOc2V0X2ZlZV9jb25maWcAAAAAAAEAAAAAAAAACmZlZV9jb25maWcAAAAAB9AAAAAJRmVlQ29uZmlnAAAAAAAAAA==",
+    "AAAAAAAAAAAAAAAPdXBkYXRlX2NvbnRyYWN0AAAAAAEAAAAAAAAACXdhc21faGFzaAAAAAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAQZXh0ZW5kX2Fzc2V0X3R0bAAAAAMAAAAAAAAAB3Nwb25zb3IAAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAfQAAAABUFzc2V0AAAAAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAABg==",
+    "AAAAAAAAAAAAAAAXZXN0aW1hdGVfcmV0ZW50aW9uX2Nvc3QAAAAAAQAAAAAAAAAGcGVyaW9kAAAAAAAGAAAAAQAAA+0AAAACAAAAEwAAAAs=",
+    "AAAAAAAAAAAAAAAYaGlzdG9yeV9yZXRlbnRpb25fcGVyaW9kAAAAAAAAAAEAAAPoAAAABg==",
+    "AAAAAAAAAAAAAAAcc2V0X2hpc3RvcnlfcmV0ZW50aW9uX3BlcmlvZAAAAAEAAAAAAAAABnBlcmlvZAAAAAAABgAAAAA=",
+    "AAAAAgAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAAAEAAAAAAAAAB1N0ZWxsYXIAAAAAAQAAABMAAAABAAAAAAAAAAVPdGhlcgAAAAAAAAEAAAAR",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAACQAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAAAAAAAAAAAAAAxVbmF1dGhvcml6ZWQAAAABAAAAAAAAAAxBc3NldE1pc3NpbmcAAAACAAAAAAAAABJBc3NldEFscmVhZHlFeGlzdHMAAAAAAAMAAAAAAAAADUludmFsaWRDb25maWcAAAAAAAAEAAAAAAAAABBJbnZhbGlkVGltZXN0YW1wAAAABQAAAAAAAAASQXNzZXRMaW1pdEV4Y2VlZGVkAAAAAAAGAAAAAAAAAA1JbnZhbGlkQW1vdW50AAAAAAAABwAAAAAAAAATSW52YWxpZFByaWNlc1VwZGF0ZQAAAAAI",
+    "AAAAAgAAAAAAAAAAAAAACUZlZUNvbmZpZwAAAAAAAAIAAAABAAAAAAAAAARTb21lAAAAAQAAA+0AAAACAAAAEwAAAAsAAAAAAAAAAAAAAAROb25l",
+    "AAAAAQAAAAAAAAAAAAAACVByaWNlRGF0YQAAAAAAAAIAAAAAAAAABXByaWNlAAAAAAAACwAAAAAAAAAJdGltZXN0YW1wAAAAAAAABg==",
+    "AAAAAQAAAAAAAAAAAAAACkNvbmZpZ0RhdGEAAAAAAAgAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAGYXNzZXRzAAAAAAPqAAAH0AAAAAVBc3NldAAAAAAAAAAAAAAKYmFzZV9hc3NldAAAAAAH0AAAAAVBc3NldAAAAAAAAAAAAAAKY2FjaGVfc2l6ZQAAAAAABAAAAAAAAAAIZGVjaW1hbHMAAAAEAAAAAAAAAApmZWVfY29uZmlnAAAAAAfQAAAACUZlZUNvbmZpZwAAAAAAAAAAAAAYaGlzdG9yeV9yZXRlbnRpb25fcGVyaW9kAAAABgAAAAAAAAAKcmVzb2x1dGlvbgAAAAAABA==",
+    "AAAAAQAAAAAAAAAAAAAAC1ByaWNlVXBkYXRlAAAAAAIAAAAAAAAABG1hc2sAAAAOAAAAAAAAAAZwcmljZXMAAAAAA+oAAAAL",
+    "AAAABQAAAAAAAAAAAAAAC1VwZGF0ZUV2ZW50AAAAAAIAAAAJUkVGTEVDVE9SAAAAAAAABnVwZGF0ZQAAAAAAAgAAAAAAAAAJdGltZXN0YW1wAAAAAAAABgAAAAEAAAAAAAAAC3VwZGF0ZV9kYXRhAAAAA+oAAAPtAAAAAgAAAAAAAAALAAAAAAAAAAI="
+  ]
+}

@@ -1,5 +1,6 @@
 import type { RetryQueue, RetryRecord } from "./RetryQueue.js";
 
+/** Options for {@link MemoryRetryQueue}: injectable clock and visibility timeout. */
 export type MemoryRetryQueueOptions = {
   /** Clock source, injectable for testing. Defaults to `Date.now`. */
   now?: () => number;

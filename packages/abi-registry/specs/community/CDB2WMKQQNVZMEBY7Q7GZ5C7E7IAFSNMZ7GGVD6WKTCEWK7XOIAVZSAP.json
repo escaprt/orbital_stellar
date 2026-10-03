@@ -1,0 +1,208 @@
+{
+  "contractId": "CDB2WMKQQNVZMEBY7Q7GZ5C7E7IAFSNMZ7GGVD6WKTCEWK7XOIAVZSAP",
+  "description": "DeFindex Blend strategy contract: allocates vault assets across Blend lending pools (supply, withdraw, harvest, reinvest) behind the DeFindexStrategyTrait interface.",
+  "events": [],
+  "functions": [
+    {
+      "doc": "Initializes the contract with the necessary configuration parameters.\n\n# Arguments\n\n* `e` - The execution environment, provided automatically when the contract is invoked.\n* `asset` - The address of the asset managed by the contract.\n* `init_args` - A vector of initialization arguments required for configuration.\n\n# Parameters in `init_args`\n\nThe `init_args` vector must contain the following, in order:\n\n1. `blend_pool_address: Address` - The address of the Blend pool where assets are deposited.\n2. `blend_token: Address` - The address of the reward token (e.g., BLND) issued by the Blend pool.\n3. `soroswap_router: Address` - The address of the Soroswap AMM router for asset swaps.\n4. `reward_threshold: i128` - The minimum reward amount that triggers reinvestment.\n5. `keeper: Address` - The address of the account that will be allowed to do harvest.\n\n# Behavior\n\nThis function:\n- Fetches the `reserve_id` from the Blend pool for the given `asset`.\n- Calculates `claim_ids` for the asset bTokens.\n- Stores all paramete",
+      "name": "__constructor",
+      "params": [
+        { "name": "asset", "type": "address" },
+        { "name": "init_args", "type": { "item": "val", "type": "vec" } }
+      ],
+      "returns": "void"
+    },
+    {
+      "doc": "Retrieves the asset address from the contract's stored configuration.\n\nThis function extends the contract's TTL and returns the asset address stored in the configuration.\nIt returns a `Result<Address, StrategyError>` where `Ok` contains the asset address and `Err` indicates an error.\n\n# Arguments\n* `e: Env` - The execution environment.\n\n# Returns\n* `Result<Address, StrategyError>` - The asset address or an error.",
+      "name": "asset",
+      "params": [],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Deposits a specified amount of the underlying asset into the strategy.\n\nThis function transfers the specified amount of the underlying asset from the `from` address\nto the strategy contract, supplies it to the Blend pool, and mints shares representing the\ndeposited amount.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n* `amount: i128` - The amount of the underlying asset to deposit.\n* `from: Address` - The address from which the asset is being transferred.\n\n# Returns\n\n* `Result<i128, StrategyError>` - The underlying balance of the vault (caller) after the deposit or an error.",
+      "name": "deposit",
+      "params": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Harvests rewards from the Blend pool and reinvests them into the strategy.\n\nThis function claims rewards from the Blend pool and reinvests them if the balance\nexceeds the reward threshold. It also emits a harvest event upon completion.\n\nTo comply with the Strategy Crate, this function requires a `from` argument,\nwhich is not strictly necessary in this context. However, the function enforces\nthat the caller (keeper) provides their own address for authorization.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n* `from: Address` - The address initiating the harvest (must be the keeper).\n\n# Returns\n\n* `Result<(), StrategyError>` - Returns `Ok(())` on success or a `StrategyError` on failure.",
+      "name": "harvest",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "data", "type": { "inner": "bytes", "type": "option" } }
+      ],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Withdraws a specified amount of the underlying asset from the strategy.\n\nThis function transfers the specified amount of the underlying asset from the strategy contract\nto the `to` address, burns the corresponding bTokens, and updates the reserves.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n* `amount: i128` - The amount of the underlying asset to withdraw.\n* `from: Address` - The address from which the asset is being withdrawn.\n* `to: Address` - The address to which the asset is being transferred.\n\n# Returns\n\n* `Result<i128, StrategyError>` - The remaining balance of the vault (caller) after the withdrawal or an error.",
+      "name": "withdraw",
+      "params": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the balance of the underlying asset for a given address.\n\nThis function calculates the balance of the underlying asset for the specified 'from' address\nby converting the 'from' shares to the underlying asset amount.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n* `from: Address` - The address for which the balance is being queried.\n\n# Returns\n\n* `Result<i128, StrategyError>` - The balance of the underlying asset or an error.\n",
+      "name": "balance",
+      "params": [{ "name": "from", "type": "address" }],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets a new keeper address for the strategy.\n\nThis function updates the keeper address stored in the contract's storage.\nOnly the current keeper can authorize this change.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n* `new_keeper: Address` - The new keeper address to set.\n\n# Returns\n\n* `Result<(), StrategyError>` - An empty result or an error.",
+      "name": "set_keeper",
+      "params": [{ "name": "new_keeper", "type": "address" }],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the current keeper address.\n\n# Arguments\n\n* `e: Env` - The execution environment.\n\n# Returns\n\n* `Result<Address, StrategyError>` - The current keeper address or an error.",
+      "name": "get_keeper",
+      "params": [],
+      "returns": {
+        "err": { "name": "StrategyError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    }
+  ],
+  "name": "DeFindex Blend strategy",
+  "network": "mainnet",
+  "types": {
+    "Config": {
+      "fields": [
+        { "name": "asset", "type": "address" },
+        { "name": "blend_token", "type": "address" },
+        { "name": "claim_ids", "type": { "item": "u32", "type": "vec" } },
+        { "name": "pool", "type": "address" },
+        { "name": "reserve_id", "type": "u32" },
+        { "name": "reward_threshold", "type": "i128" },
+        { "name": "router", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "Config"
+    },
+    "DataKey": {
+      "cases": [
+        { "fields": [], "name": "Config" },
+        { "fields": [], "name": "Reserves" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "VaultPos" },
+        { "fields": [], "name": "Keeper" }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "DepositEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "DepositEvent"
+    },
+    "HarvestEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" },
+        { "name": "price_per_share", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "HarvestEvent"
+    },
+    "StrategyError": {
+      "kind": "enum",
+      "name": "StrategyError",
+      "variants": [
+        { "discriminant": 401, "name": "NotInitialized" },
+        { "discriminant": 410, "name": "NegativeNotAllowed" },
+        { "discriminant": 411, "name": "InvalidArgument" },
+        { "discriminant": 412, "name": "InsufficientBalance" },
+        { "discriminant": 413, "name": "UnderflowOverflow" },
+        { "discriminant": 414, "name": "ArithmeticError" },
+        { "discriminant": 415, "name": "DivisionByZero" },
+        { "discriminant": 416, "name": "InvalidSharesMinted" },
+        { "discriminant": 417, "name": "OnlyPositiveAmountAllowed" },
+        { "discriminant": 418, "name": "NotAuthorized" },
+        { "discriminant": 420, "name": "ProtocolAddressNotFound" },
+        { "discriminant": 421, "name": "DeadlineExpired" },
+        { "discriminant": 422, "name": "ExternalError" },
+        { "discriminant": 423, "name": "SoroswapPairError" },
+        { "discriminant": 451, "name": "AmountBelowMinDust" },
+        { "discriminant": 452, "name": "UnderlyingAmountBelowMin" },
+        { "discriminant": 453, "name": "BTokensAmountBelowMin" },
+        { "discriminant": 454, "name": "InternalSwapError" },
+        { "discriminant": 455, "name": "SupplyNotFound" }
+      ]
+    },
+    "StrategyReserves": {
+      "fields": [
+        { "doc": "The reserve's last bRate", "name": "b_rate", "type": "i128" },
+        {
+          "doc": "The total bToken deposits owned by the strategy depositors.",
+          "name": "total_b_tokens",
+          "type": "i128"
+        },
+        {
+          "doc": "The total deposited amount of the underlying asset",
+          "name": "total_shares",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "StrategyReserves"
+    },
+    "WithdrawEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "WithdrawEvent"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAQAAAAAAAAAAAAAAEFN0cmF0ZWd5UmVzZXJ2ZXMAAAADAAAAGFRoZSByZXNlcnZlJ3MgbGFzdCBiUmF0ZQAAAAZiX3JhdGUAAAAAAAsAAAA7VGhlIHRvdGFsIGJUb2tlbiBkZXBvc2l0cyBvd25lZCBieSB0aGUgc3RyYXRlZ3kgZGVwb3NpdG9ycy4AAAAADnRvdGFsX2JfdG9rZW5zAAAAAAALAAAAMlRoZSB0b3RhbCBkZXBvc2l0ZWQgYW1vdW50IG9mIHRoZSB1bmRlcmx5aW5nIGFzc2V0AAAAAAAMdG90YWxfc2hhcmVzAAAACw==",
+    "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAABwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAtibGVuZF90b2tlbgAAAAATAAAAAAAAAAljbGFpbV9pZHMAAAAAAAPqAAAABAAAAAAAAAAEcG9vbAAAABMAAAAAAAAACnJlc2VydmVfaWQAAAAAAAQAAAAAAAAAEHJld2FyZF90aHJlc2hvbGQAAAALAAAAAAAAAAZyb3V0ZXIAAAAAABM=",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABAAAAAAAAAAAAAAABkNvbmZpZwAAAAAAAAAAAAAAAAAIUmVzZXJ2ZXMAAAABAAAAAAAAAAhWYXVsdFBvcwAAAAEAAAATAAAAAAAAAAAAAAAGS2VlcGVyAAA=",
+    "AAAAAAAABABJbml0aWFsaXplcyB0aGUgY29udHJhY3Qgd2l0aCB0aGUgbmVjZXNzYXJ5IGNvbmZpZ3VyYXRpb24gcGFyYW1ldGVycy4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIFRoZSBleGVjdXRpb24gZW52aXJvbm1lbnQsIHByb3ZpZGVkIGF1dG9tYXRpY2FsbHkgd2hlbiB0aGUgY29udHJhY3QgaXMgaW52b2tlZC4KKiBgYXNzZXRgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIGFzc2V0IG1hbmFnZWQgYnkgdGhlIGNvbnRyYWN0LgoqIGBpbml0X2FyZ3NgIC0gQSB2ZWN0b3Igb2YgaW5pdGlhbGl6YXRpb24gYXJndW1lbnRzIHJlcXVpcmVkIGZvciBjb25maWd1cmF0aW9uLgoKIyBQYXJhbWV0ZXJzIGluIGBpbml0X2FyZ3NgCgpUaGUgYGluaXRfYXJnc2AgdmVjdG9yIG11c3QgY29udGFpbiB0aGUgZm9sbG93aW5nLCBpbiBvcmRlcjoKCjEuIGBibGVuZF9wb29sX2FkZHJlc3M6IEFkZHJlc3NgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIEJsZW5kIHBvb2wgd2hlcmUgYXNzZXRzIGFyZSBkZXBvc2l0ZWQuCjIuIGBibGVuZF90b2tlbjogQWRkcmVzc2AgLSBUaGUgYWRkcmVzcyBvZiB0aGUgcmV3YXJkIHRva2VuIChlLmcuLCBCTE5EKSBpc3N1ZWQgYnkgdGhlIEJsZW5kIHBvb2wuCjMuIGBzb3Jvc3dhcF9yb3V0ZXI6IEFkZHJlc3NgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIFNvcm9zd2FwIEFNTSByb3V0ZXIgZm9yIGFzc2V0IHN3YXBzLgo0LiBgcmV3YXJkX3RocmVzaG9sZDogaTEyOGAgLSBUaGUgbWluaW11bSByZXdhcmQgYW1vdW50IHRoYXQgdHJpZ2dlcnMgcmVpbnZlc3RtZW50Lgo1LiBga2VlcGVyOiBBZGRyZXNzYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBhY2NvdW50IHRoYXQgd2lsbCBiZSBhbGxvd2VkIHRvIGRvIGhhcnZlc3QuCgojIEJlaGF2aW9yCgpUaGlzIGZ1bmN0aW9uOgotIEZldGNoZXMgdGhlIGByZXNlcnZlX2lkYCBmcm9tIHRoZSBCbGVuZCBwb29sIGZvciB0aGUgZ2l2ZW4gYGFzc2V0YC4KLSBDYWxjdWxhdGVzIGBjbGFpbV9pZHNgIGZvciB0aGUgYXNzZXQgYlRva2Vucy4KLSBTdG9yZXMgYWxsIHBhcmFtZXRlAAAADV9fY29uc3RydWN0b3IAAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAACWluaXRfYXJncwAAAAAAA+oAAAAAAAAAAA==",
+    "AAAAAAAAAaBSZXRyaWV2ZXMgdGhlIGFzc2V0IGFkZHJlc3MgZnJvbSB0aGUgY29udHJhY3QncyBzdG9yZWQgY29uZmlndXJhdGlvbi4KClRoaXMgZnVuY3Rpb24gZXh0ZW5kcyB0aGUgY29udHJhY3QncyBUVEwgYW5kIHJldHVybnMgdGhlIGFzc2V0IGFkZHJlc3Mgc3RvcmVkIGluIHRoZSBjb25maWd1cmF0aW9uLgpJdCByZXR1cm5zIGEgYFJlc3VsdDxBZGRyZXNzLCBTdHJhdGVneUVycm9yPmAgd2hlcmUgYE9rYCBjb250YWlucyB0aGUgYXNzZXQgYWRkcmVzcyBhbmQgYEVycmAgaW5kaWNhdGVzIGFuIGVycm9yLgoKIyBBcmd1bWVudHMKKiBgZTogRW52YCAtIFRoZSBleGVjdXRpb24gZW52aXJvbm1lbnQuCgojIFJldHVybnMKKiBgUmVzdWx0PEFkZHJlc3MsIFN0cmF0ZWd5RXJyb3I+YCAtIFRoZSBhc3NldCBhZGRyZXNzIG9yIGFuIGVycm9yLgAAAAVhc3NldAAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADVN0cmF0ZWd5RXJyb3IAAAA=",
+    "AAAAAAAAAk5EZXBvc2l0cyBhIHNwZWNpZmllZCBhbW91bnQgb2YgdGhlIHVuZGVybHlpbmcgYXNzZXQgaW50byB0aGUgc3RyYXRlZ3kuCgpUaGlzIGZ1bmN0aW9uIHRyYW5zZmVycyB0aGUgc3BlY2lmaWVkIGFtb3VudCBvZiB0aGUgdW5kZXJseWluZyBhc3NldCBmcm9tIHRoZSBgZnJvbWAgYWRkcmVzcwp0byB0aGUgc3RyYXRlZ3kgY29udHJhY3QsIHN1cHBsaWVzIGl0IHRvIHRoZSBCbGVuZCBwb29sLCBhbmQgbWludHMgc2hhcmVzIHJlcHJlc2VudGluZyB0aGUKZGVwb3NpdGVkIGFtb3VudC4KCiMgQXJndW1lbnRzCgoqIGBlOiBFbnZgIC0gVGhlIGV4ZWN1dGlvbiBlbnZpcm9ubWVudC4KKiBgYW1vdW50OiBpMTI4YCAtIFRoZSBhbW91bnQgb2YgdGhlIHVuZGVybHlpbmcgYXNzZXQgdG8gZGVwb3NpdC4KKiBgZnJvbTogQWRkcmVzc2AgLSBUaGUgYWRkcmVzcyBmcm9tIHdoaWNoIHRoZSBhc3NldCBpcyBiZWluZyB0cmFuc2ZlcnJlZC4KCiMgUmV0dXJucwoKKiBgUmVzdWx0PGkxMjgsIFN0cmF0ZWd5RXJyb3I+YCAtIFRoZSB1bmRlcmx5aW5nIGJhbGFuY2Ugb2YgdGhlIHZhdWx0IChjYWxsZXIpIGFmdGVyIHRoZSBkZXBvc2l0IG9yIGFuIGVycm9yLgAAAAAAB2RlcG9zaXQAAAAAAgAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAARmcm9tAAAAEwAAAAEAAAPpAAAACwAAB9AAAAANU3RyYXRlZ3lFcnJvcgAAAA==",
+    "AAAAAAAAArxIYXJ2ZXN0cyByZXdhcmRzIGZyb20gdGhlIEJsZW5kIHBvb2wgYW5kIHJlaW52ZXN0cyB0aGVtIGludG8gdGhlIHN0cmF0ZWd5LgoKVGhpcyBmdW5jdGlvbiBjbGFpbXMgcmV3YXJkcyBmcm9tIHRoZSBCbGVuZCBwb29sIGFuZCByZWludmVzdHMgdGhlbSBpZiB0aGUgYmFsYW5jZQpleGNlZWRzIHRoZSByZXdhcmQgdGhyZXNob2xkLiBJdCBhbHNvIGVtaXRzIGEgaGFydmVzdCBldmVudCB1cG9uIGNvbXBsZXRpb24uCgpUbyBjb21wbHkgd2l0aCB0aGUgU3RyYXRlZ3kgQ3JhdGUsIHRoaXMgZnVuY3Rpb24gcmVxdWlyZXMgYSBgZnJvbWAgYXJndW1lbnQsCndoaWNoIGlzIG5vdCBzdHJpY3RseSBuZWNlc3NhcnkgaW4gdGhpcyBjb250ZXh0LiBIb3dldmVyLCB0aGUgZnVuY3Rpb24gZW5mb3JjZXMKdGhhdCB0aGUgY2FsbGVyIChrZWVwZXIpIHByb3ZpZGVzIHRoZWlyIG93biBhZGRyZXNzIGZvciBhdXRob3JpemF0aW9uLgoKIyBBcmd1bWVudHMKCiogYGU6IEVudmAgLSBUaGUgZXhlY3V0aW9uIGVudmlyb25tZW50LgoqIGBmcm9tOiBBZGRyZXNzYCAtIFRoZSBhZGRyZXNzIGluaXRpYXRpbmcgdGhlIGhhcnZlc3QgKG11c3QgYmUgdGhlIGtlZXBlcikuCgojIFJldHVybnMKCiogYFJlc3VsdDwoKSwgU3RyYXRlZ3lFcnJvcj5gIC0gUmV0dXJucyBgT2soKCkpYCBvbiBzdWNjZXNzIG9yIGEgYFN0cmF0ZWd5RXJyb3JgIG9uIGZhaWx1cmUuAAAAB2hhcnZlc3QAAAAAAgAAAAAAAAAEZnJvbQAAABMAAAAAAAAABGRhdGEAAAPoAAAADgAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADVN0cmF0ZWd5RXJyb3IAAAA=",
+    "AAAAAAAAAn1XaXRoZHJhd3MgYSBzcGVjaWZpZWQgYW1vdW50IG9mIHRoZSB1bmRlcmx5aW5nIGFzc2V0IGZyb20gdGhlIHN0cmF0ZWd5LgoKVGhpcyBmdW5jdGlvbiB0cmFuc2ZlcnMgdGhlIHNwZWNpZmllZCBhbW91bnQgb2YgdGhlIHVuZGVybHlpbmcgYXNzZXQgZnJvbSB0aGUgc3RyYXRlZ3kgY29udHJhY3QKdG8gdGhlIGB0b2AgYWRkcmVzcywgYnVybnMgdGhlIGNvcnJlc3BvbmRpbmcgYlRva2VucywgYW5kIHVwZGF0ZXMgdGhlIHJlc2VydmVzLgoKIyBBcmd1bWVudHMKCiogYGU6IEVudmAgLSBUaGUgZXhlY3V0aW9uIGVudmlyb25tZW50LgoqIGBhbW91bnQ6IGkxMjhgIC0gVGhlIGFtb3VudCBvZiB0aGUgdW5kZXJseWluZyBhc3NldCB0byB3aXRoZHJhdy4KKiBgZnJvbTogQWRkcmVzc2AgLSBUaGUgYWRkcmVzcyBmcm9tIHdoaWNoIHRoZSBhc3NldCBpcyBiZWluZyB3aXRoZHJhd24uCiogYHRvOiBBZGRyZXNzYCAtIFRoZSBhZGRyZXNzIHRvIHdoaWNoIHRoZSBhc3NldCBpcyBiZWluZyB0cmFuc2ZlcnJlZC4KCiMgUmV0dXJucwoKKiBgUmVzdWx0PGkxMjgsIFN0cmF0ZWd5RXJyb3I+YCAtIFRoZSByZW1haW5pbmcgYmFsYW5jZSBvZiB0aGUgdmF1bHQgKGNhbGxlcikgYWZ0ZXIgdGhlIHdpdGhkcmF3YWwgb3IgYW4gZXJyb3IuAAAAAAAACHdpdGhkcmF3AAAAAwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAARmcm9tAAAAEwAAAAAAAAACdG8AAAAAABMAAAABAAAD6QAAAAsAAAfQAAAADVN0cmF0ZWd5RXJyb3IAAAA=",
+    "AAAAAAAAAb1SZXR1cm5zIHRoZSBiYWxhbmNlIG9mIHRoZSB1bmRlcmx5aW5nIGFzc2V0IGZvciBhIGdpdmVuIGFkZHJlc3MuCgpUaGlzIGZ1bmN0aW9uIGNhbGN1bGF0ZXMgdGhlIGJhbGFuY2Ugb2YgdGhlIHVuZGVybHlpbmcgYXNzZXQgZm9yIHRoZSBzcGVjaWZpZWQgJ2Zyb20nIGFkZHJlc3MKYnkgY29udmVydGluZyB0aGUgJ2Zyb20nIHNoYXJlcyB0byB0aGUgdW5kZXJseWluZyBhc3NldCBhbW91bnQuCgojIEFyZ3VtZW50cwoKKiBgZTogRW52YCAtIFRoZSBleGVjdXRpb24gZW52aXJvbm1lbnQuCiogYGZyb206IEFkZHJlc3NgIC0gVGhlIGFkZHJlc3MgZm9yIHdoaWNoIHRoZSBiYWxhbmNlIGlzIGJlaW5nIHF1ZXJpZWQuCgojIFJldHVybnMKCiogYFJlc3VsdDxpMTI4LCBTdHJhdGVneUVycm9yPmAgLSBUaGUgYmFsYW5jZSBvZiB0aGUgdW5kZXJseWluZyBhc3NldCBvciBhbiBlcnJvci4KAAAAAAAAB2JhbGFuY2UAAAAAAQAAAAAAAAAEZnJvbQAAABMAAAABAAAD6QAAAAsAAAfQAAAADVN0cmF0ZWd5RXJyb3IAAAA=",
+    "AAAAAAAAAWJTZXRzIGEgbmV3IGtlZXBlciBhZGRyZXNzIGZvciB0aGUgc3RyYXRlZ3kuCgpUaGlzIGZ1bmN0aW9uIHVwZGF0ZXMgdGhlIGtlZXBlciBhZGRyZXNzIHN0b3JlZCBpbiB0aGUgY29udHJhY3QncyBzdG9yYWdlLgpPbmx5IHRoZSBjdXJyZW50IGtlZXBlciBjYW4gYXV0aG9yaXplIHRoaXMgY2hhbmdlLgoKIyBBcmd1bWVudHMKCiogYGU6IEVudmAgLSBUaGUgZXhlY3V0aW9uIGVudmlyb25tZW50LgoqIGBuZXdfa2VlcGVyOiBBZGRyZXNzYCAtIFRoZSBuZXcga2VlcGVyIGFkZHJlc3MgdG8gc2V0LgoKIyBSZXR1cm5zCgoqIGBSZXN1bHQ8KCksIFN0cmF0ZWd5RXJyb3I+YCAtIEFuIGVtcHR5IHJlc3VsdCBvciBhbiBlcnJvci4AAAAAAApzZXRfa2VlcGVyAAAAAAABAAAAAAAAAApuZXdfa2VlcGVyAAAAAAATAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANU3RyYXRlZ3lFcnJvcgAAAA==",
+    "AAAAAAAAALJSZXR1cm5zIHRoZSBjdXJyZW50IGtlZXBlciBhZGRyZXNzLgoKIyBBcmd1bWVudHMKCiogYGU6IEVudmAgLSBUaGUgZXhlY3V0aW9uIGVudmlyb25tZW50LgoKIyBSZXR1cm5zCgoqIGBSZXN1bHQ8QWRkcmVzcywgU3RyYXRlZ3lFcnJvcj5gIC0gVGhlIGN1cnJlbnQga2VlcGVyIGFkZHJlc3Mgb3IgYW4gZXJyb3IuAAAAAAAKZ2V0X2tlZXBlcgAAAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANU3RyYXRlZ3lFcnJvcgAAAA==",
+    "AAAABAAAAAAAAAAAAAAADVN0cmF0ZWd5RXJyb3IAAAAAAAATAAAAAAAAAA5Ob3RJbml0aWFsaXplZAAAAAABkQAAAAAAAAASTmVnYXRpdmVOb3RBbGxvd2VkAAAAAAGaAAAAAAAAAA9JbnZhbGlkQXJndW1lbnQAAAABmwAAAAAAAAATSW5zdWZmaWNpZW50QmFsYW5jZQAAAAGcAAAAAAAAABFVbmRlcmZsb3dPdmVyZmxvdwAAAAAAAZ0AAAAAAAAAD0FyaXRobWV0aWNFcnJvcgAAAAGeAAAAAAAAAA5EaXZpc2lvbkJ5WmVybwAAAAABnwAAAAAAAAATSW52YWxpZFNoYXJlc01pbnRlZAAAAAGgAAAAAAAAABlPbmx5UG9zaXRpdmVBbW91bnRBbGxvd2VkAAAAAAABoQAAAAAAAAANTm90QXV0aG9yaXplZAAAAAAAAaIAAAAAAAAAF1Byb3RvY29sQWRkcmVzc05vdEZvdW5kAAAAAaQAAAAAAAAAD0RlYWRsaW5lRXhwaXJlZAAAAAGlAAAAAAAAAA1FeHRlcm5hbEVycm9yAAAAAAABpgAAAAAAAAARU29yb3N3YXBQYWlyRXJyb3IAAAAAAAGnAAAAAAAAABJBbW91bnRCZWxvd01pbkR1c3QAAAAAAcMAAAAAAAAAGFVuZGVybHlpbmdBbW91bnRCZWxvd01pbgAAAcQAAAAAAAAAFUJUb2tlbnNBbW91bnRCZWxvd01pbgAAAAAAAcUAAAAAAAAAEUludGVybmFsU3dhcEVycm9yAAAAAAABxgAAAAAAAAAOU3VwcGx5Tm90Rm91bmQAAAAAAcc=",
+    "AAAAAQAAAAAAAAAAAAAADERlcG9zaXRFdmVudAAAAAIAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAEZnJvbQAAABM=",
+    "AAAAAQAAAAAAAAAAAAAADEhhcnZlc3RFdmVudAAAAAMAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAEZnJvbQAAABMAAAAAAAAAD3ByaWNlX3Blcl9zaGFyZQAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAADVdpdGhkcmF3RXZlbnQAAAAAAAACAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAABGZyb20AAAAT"
+  ]
+}

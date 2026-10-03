@@ -1,0 +1,423 @@
+{
+  "contractId": "CBQ6GW7QCFFE252QEVENUNG45KYHHBRO4IZIWFJOXEFANHPQUXX5NFWV",
+  "description": "Allbridge Core bridge contract on Stellar (Soroban): cross-chain stablecoin bridge entry point for swaps and transfers between chains. Allbridge documents it as a deprecated main bridge contract, as pool-based transfers were discontinued.",
+  "events": [],
+  "functions": [
+    {
+      "name": "initialize",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "messenger", "type": "address" },
+        { "name": "gas_oracle", "type": "address" },
+        { "name": "native_token", "type": "address" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "swap_and_bridge",
+      "params": [
+        { "name": "sender", "type": "address" },
+        { "name": "token", "type": "address" },
+        { "name": "amount", "type": "u128" },
+        { "name": "recipient", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "destination_chain_id", "type": "u32" },
+        { "name": "receive_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "nonce", "type": "u256" },
+        { "name": "gas_amount", "type": "u128" },
+        { "name": "fee_token_amount", "type": "u128" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "receive_tokens",
+      "params": [
+        { "name": "sender", "type": "address" },
+        { "name": "amount", "type": "u128" },
+        { "name": "recipient", "type": "address" },
+        { "name": "source_chain_id", "type": "u32" },
+        { "name": "receive_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "nonce", "type": "u256" },
+        { "name": "receive_amount_min", "type": "u128" },
+        { "name": "extra_gas", "type": { "inner": "u128", "type": "option" } }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "swap",
+      "params": [
+        { "name": "sender", "type": "address" },
+        { "name": "amount", "type": "u128" },
+        { "name": "token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "receive_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "recipient", "type": "address" },
+        { "name": "receive_amount_min", "type": "u128" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "stop_swap",
+      "params": [],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "start_swap",
+      "params": [],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "set_gas_oracle",
+      "params": [{ "name": "new_address", "type": "address" }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "set_stop_authority",
+      "params": [{ "name": "stop_authority", "type": "address" }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "set_rebalancer",
+      "params": [{ "name": "rebalancer", "type": "address" }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "set_messenger",
+      "params": [{ "name": "messenger", "type": "address" }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "set_gas_usage",
+      "params": [
+        { "name": "chain_id", "type": "u32" },
+        { "name": "gas_usage", "type": "u128" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "register_bridge",
+      "params": [
+        { "name": "chain_id", "type": "u32" },
+        { "name": "bridge_address", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "add_bridge_token",
+      "params": [
+        { "name": "chain_id", "type": "u32" },
+        { "name": "token_address", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "remove_bridge_token",
+      "params": [
+        { "name": "chain_id", "type": "u32" },
+        { "name": "token_address", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "add_pool",
+      "params": [
+        { "name": "pool", "type": "address" },
+        { "name": "token", "type": "address" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "withdraw_gas_tokens",
+      "params": [
+        { "name": "sender", "type": "address" },
+        { "name": "amount", "type": "u128" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "withdraw_bridging_fee_in_tokens",
+      "params": [
+        { "name": "sender", "type": "address" },
+        { "name": "token_address", "type": "address" }
+      ],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "has_processed_message",
+      "params": [{ "name": "message", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": { "err": "error", "ok": "bool", "type": "result" }
+    },
+    {
+      "name": "has_received_message",
+      "params": [{ "name": "message", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": { "err": "error", "ok": "bool", "type": "result" }
+    },
+    {
+      "name": "get_pool_address",
+      "params": [{ "name": "token_address", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": { "err": "error", "ok": "address", "type": "result" }
+    },
+    {
+      "name": "get_config",
+      "params": [],
+      "returns": { "err": "error", "ok": { "name": "Bridge", "type": "named" }, "type": "result" }
+    },
+    {
+      "name": "get_stop_authority",
+      "params": [],
+      "returns": { "err": "error", "ok": "address", "type": "result" }
+    },
+    {
+      "name": "get_transaction_cost",
+      "params": [{ "name": "chain_id", "type": "u32" }],
+      "returns": { "err": "error", "ok": "u128", "type": "result" }
+    },
+    {
+      "name": "get_gas_usage",
+      "params": [{ "name": "chain_id", "type": "u32" }],
+      "returns": { "err": "error", "ok": "u128", "type": "result" }
+    },
+    {
+      "name": "get_admin",
+      "params": [],
+      "returns": { "err": "error", "ok": "address", "type": "result" }
+    },
+    {
+      "name": "get_gas_oracle",
+      "params": [],
+      "returns": { "err": "error", "ok": "address", "type": "result" }
+    },
+    {
+      "name": "get_another_bridge",
+      "params": [{ "name": "chain_id", "type": "u32" }],
+      "returns": {
+        "err": "error",
+        "ok": { "name": "AnotherBridge", "type": "named" },
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_admin",
+      "params": [{ "name": "new_admin", "type": "address" }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    },
+    {
+      "name": "upgrade",
+      "params": [{ "name": "new_wasm_hash", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": { "err": "error", "ok": "void", "type": "result" }
+    }
+  ],
+  "name": "Allbridge Core Bridge",
+  "network": "mainnet",
+  "types": {
+    "Admin": { "fields": [{ "name": "0", "type": "address" }], "kind": "struct", "name": "Admin" },
+    "AnotherBridge": {
+      "fields": [
+        { "name": "address", "type": { "size": 32, "type": "bytes_n" } },
+        {
+          "name": "tokens",
+          "type": { "key": { "size": 32, "type": "bytes_n" }, "type": "map", "value": "bool" }
+        }
+      ],
+      "kind": "struct",
+      "name": "AnotherBridge"
+    },
+    "Bridge": {
+      "fields": [
+        {
+          "doc": "precomputed values of the scaling factor required for paying the bridging fee with stable tokens",
+          "name": "bridging_fee_conversion_factor",
+          "type": { "key": "address", "type": "map", "value": "u128" }
+        },
+        { "name": "can_swap", "type": "bool" },
+        {
+          "doc": "precomputed values to divide by to change the precision from the Gas Oracle precision to the token precision",
+          "name": "from_gas_oracle_factor",
+          "type": { "key": "address", "type": "map", "value": "u128" }
+        },
+        { "name": "messenger", "type": "address" },
+        {
+          "name": "pools",
+          "type": { "key": { "size": 32, "type": "bytes_n" }, "type": "map", "value": "address" }
+        },
+        { "name": "rebalancer", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "Bridge"
+    },
+    "BridgingFeeFromTokens": {
+      "fields": [
+        { "name": "fee_token_amount", "type": "u128" },
+        { "name": "gas", "type": "u128" }
+      ],
+      "kind": "struct",
+      "name": "BridgingFeeFromTokens"
+    },
+    "DataKey": {
+      "cases": [
+        { "fields": [{ "name": "_0", "type": "u32" }], "name": "OtherBridge" },
+        {
+          "fields": [{ "name": "_0", "type": { "size": 32, "type": "bytes_n" } }],
+          "name": "SentMessage"
+        },
+        {
+          "fields": [{ "name": "_0", "type": { "size": 32, "type": "bytes_n" } }],
+          "name": "ReceivedMessage"
+        }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        { "discriminant": 0, "name": "Unimplemented" },
+        { "discriminant": 1, "name": "Initialized" },
+        { "discriminant": 2, "name": "Uninitialized" },
+        { "discriminant": 3, "name": "Unauthorized" },
+        { "discriminant": 4, "name": "InvalidArg" },
+        { "discriminant": 5, "name": "InvalidChainId" },
+        { "discriminant": 6, "name": "InvalidOtherChainId" },
+        { "discriminant": 7, "name": "GasUsageNotSet" },
+        { "discriminant": 8, "name": "BrokenAddress" },
+        { "discriminant": 9, "name": "NotFound" },
+        { "discriminant": 10, "name": "TokenInsufficientBalance" },
+        { "discriminant": 11, "name": "CastFailed" },
+        { "discriminant": 103, "name": "ZeroAmount" },
+        { "discriminant": 104, "name": "PoolOverflow" },
+        { "discriminant": 105, "name": "ZeroChanges" },
+        { "discriminant": 106, "name": "ReservesExhausted" },
+        { "discriminant": 107, "name": "InsufficientReceivedAmount" },
+        { "discriminant": 108, "name": "BalanceRatioExceeded" },
+        { "discriminant": 109, "name": "Forbidden" },
+        { "discriminant": 203, "name": "UnauthorizedStopAuthority" },
+        { "discriminant": 204, "name": "SwapProhibited" },
+        { "discriminant": 205, "name": "AmountTooLowForFee" },
+        { "discriminant": 206, "name": "BridgeToTheZeroAddress" },
+        { "discriminant": 207, "name": "EmptyRecipient" },
+        { "discriminant": 208, "name": "SourceNotRegistered" },
+        { "discriminant": 209, "name": "WrongDestinationChain" },
+        { "discriminant": 210, "name": "UnknownAnotherChain" },
+        { "discriminant": 211, "name": "TokensAlreadySent" },
+        { "discriminant": 212, "name": "MessageProcessed" },
+        { "discriminant": 214, "name": "NotEnoughFee" },
+        { "discriminant": 215, "name": "NoMessage" },
+        { "discriminant": 216, "name": "NoReceivePool" },
+        { "discriminant": 217, "name": "NoPool" },
+        { "discriminant": 218, "name": "UnknownAnotherToken" },
+        { "discriminant": 300, "name": "WrongByteLength" },
+        { "discriminant": 301, "name": "HasMessage" },
+        { "discriminant": 302, "name": "InvalidPrimarySignature" },
+        { "discriminant": 303, "name": "InvalidSecondarySignature" },
+        { "discriminant": 400, "name": "NoGasDataForChain" }
+      ]
+    },
+    "GasOracleAddress": {
+      "fields": [{ "name": "0", "type": "address" }],
+      "kind": "struct",
+      "name": "GasOracleAddress"
+    },
+    "GasUsage": {
+      "fields": [{ "name": "0", "type": { "key": "u32", "type": "map", "value": "u128" } }],
+      "kind": "struct",
+      "name": "GasUsage"
+    },
+    "NativeToken": {
+      "fields": [{ "name": "0", "type": "address" }],
+      "kind": "struct",
+      "name": "NativeToken"
+    },
+    "ReceiveFee": {
+      "fields": [
+        { "name": "bridge_transaction_cost", "type": "u128" },
+        { "name": "extra_gas", "type": "u128" },
+        { "name": "message_transaction_cost", "type": "u128" }
+      ],
+      "kind": "struct",
+      "name": "ReceiveFee"
+    },
+    "StopAuthority": {
+      "fields": [{ "name": "0", "type": "address" }],
+      "kind": "struct",
+      "name": "StopAuthority"
+    },
+    "Swapped": {
+      "fields": [
+        { "name": "receive_amount", "type": "u128" },
+        { "name": "receive_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "recipient", "type": "address" },
+        { "name": "send_amount", "type": "u128" },
+        { "name": "send_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "sender", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "Swapped"
+    },
+    "TokensReceived": {
+      "fields": [
+        { "name": "amount", "type": "u128" },
+        { "name": "message", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "nonce", "type": "u256" },
+        { "name": "recipient", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "kind": "struct",
+      "name": "TokensReceived"
+    },
+    "TokensSent": {
+      "fields": [
+        { "name": "amount", "type": "u128" },
+        { "name": "destination_chain_id", "type": "u32" },
+        { "name": "nonce", "type": "u256" },
+        { "name": "receive_token", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "recipient", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "kind": "struct",
+      "name": "TokensSent"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAAKaW5pdGlhbGl6ZQAAAAAABAAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAltZXNzZW5nZXIAAAAAAAATAAAAAAAAAApnYXNfb3JhY2xlAAAAAAATAAAAAAAAAAxuYXRpdmVfdG9rZW4AAAATAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAPc3dhcF9hbmRfYnJpZGdlAAAAAAkAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAoAAAAAAAAACXJlY2lwaWVudAAAAAAAA+4AAAAgAAAAAAAAABRkZXN0aW5hdGlvbl9jaGFpbl9pZAAAAAQAAAAAAAAADXJlY2VpdmVfdG9rZW4AAAAAAAPuAAAAIAAAAAAAAAAFbm9uY2UAAAAAAAAMAAAAAAAAAApnYXNfYW1vdW50AAAAAAAKAAAAAAAAABBmZWVfdG9rZW5fYW1vdW50AAAACgAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAOcmVjZWl2ZV90b2tlbnMAAAAAAAgAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAAKAAAAAAAAAAlyZWNpcGllbnQAAAAAAAATAAAAAAAAAA9zb3VyY2VfY2hhaW5faWQAAAAABAAAAAAAAAANcmVjZWl2ZV90b2tlbgAAAAAAA+4AAAAgAAAAAAAAAAVub25jZQAAAAAAAAwAAAAAAAAAEnJlY2VpdmVfYW1vdW50X21pbgAAAAAACgAAAAAAAAAJZXh0cmFfZ2FzAAAAAAAD6AAAAAoAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAAEc3dhcAAAAAYAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAAKAAAAAAAAAAV0b2tlbgAAAAAAA+4AAAAgAAAAAAAAAA1yZWNlaXZlX3Rva2VuAAAAAAAD7gAAACAAAAAAAAAACXJlY2lwaWVudAAAAAAAABMAAAAAAAAAEnJlY2VpdmVfYW1vdW50X21pbgAAAAAACgAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAJc3RvcF9zd2FwAAAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAKc3RhcnRfc3dhcAAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAOc2V0X2dhc19vcmFjbGUAAAAAAAEAAAAAAAAAC25ld19hZGRyZXNzAAAAABMAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAASc2V0X3N0b3BfYXV0aG9yaXR5AAAAAAABAAAAAAAAAA5zdG9wX2F1dGhvcml0eQAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAOc2V0X3JlYmFsYW5jZXIAAAAAAAEAAAAAAAAACnJlYmFsYW5jZXIAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAANc2V0X21lc3NlbmdlcgAAAAAAAAEAAAAAAAAACW1lc3NlbmdlcgAAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAAAAAAAAAAANc2V0X2dhc191c2FnZQAAAAAAAAIAAAAAAAAACGNoYWluX2lkAAAABAAAAAAAAAAJZ2FzX3VzYWdlAAAAAAAACgAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAPcmVnaXN0ZXJfYnJpZGdlAAAAAAIAAAAAAAAACGNoYWluX2lkAAAABAAAAAAAAAAOYnJpZGdlX2FkZHJlc3MAAAAAA+4AAAAgAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAQYWRkX2JyaWRnZV90b2tlbgAAAAIAAAAAAAAACGNoYWluX2lkAAAABAAAAAAAAAANdG9rZW5fYWRkcmVzcwAAAAAAA+4AAAAgAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAATcmVtb3ZlX2JyaWRnZV90b2tlbgAAAAACAAAAAAAAAAhjaGFpbl9pZAAAAAQAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAPuAAAAIAAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAIYWRkX3Bvb2wAAAACAAAAAAAAAARwb29sAAAAEwAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAATd2l0aGRyYXdfZ2FzX3Rva2VucwAAAAACAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAABmFtb3VudAAAAAAACgAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAfd2l0aGRyYXdfYnJpZGdpbmdfZmVlX2luX3Rva2VucwAAAAACAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAATAAAAAQAAA+kAAAPtAAAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAVaGFzX3Byb2Nlc3NlZF9tZXNzYWdlAAAAAAAAAQAAAAAAAAAHbWVzc2FnZQAAAAPuAAAAIAAAAAEAAAPpAAAAAQAAAAM=",
+    "AAAAAAAAAAAAAAAUaGFzX3JlY2VpdmVkX21lc3NhZ2UAAAABAAAAAAAAAAdtZXNzYWdlAAAAA+4AAAAgAAAAAQAAA+kAAAABAAAAAw==",
+    "AAAAAAAAAAAAAAAQZ2V0X3Bvb2xfYWRkcmVzcwAAAAEAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAPuAAAAIAAAAAEAAAPpAAAAEwAAAAM=",
+    "AAAAAAAAAAAAAAAKZ2V0X2NvbmZpZwAAAAAAAAAAAAEAAAPpAAAH0AAAAAZCcmlkZ2UAAAAAAAM=",
+    "AAAAAAAAAAAAAAASZ2V0X3N0b3BfYXV0aG9yaXR5AAAAAAAAAAAAAQAAA+kAAAATAAAAAw==",
+    "AAAAAAAAAAAAAAAUZ2V0X3RyYW5zYWN0aW9uX2Nvc3QAAAABAAAAAAAAAAhjaGFpbl9pZAAAAAQAAAABAAAD6QAAAAoAAAAD",
+    "AAAAAAAAAAAAAAANZ2V0X2dhc191c2FnZQAAAAAAAAEAAAAAAAAACGNoYWluX2lkAAAABAAAAAEAAAPpAAAACgAAAAM=",
+    "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAPpAAAAEwAAAAM=",
+    "AAAAAAAAAAAAAAAOZ2V0X2dhc19vcmFjbGUAAAAAAAAAAAABAAAD6QAAABMAAAAD",
+    "AAAAAAAAAAAAAAASZ2V0X2Fub3RoZXJfYnJpZGdlAAAAAAABAAAAAAAAAAhjaGFpbl9pZAAAAAQAAAABAAAD6QAAB9AAAAANQW5vdGhlckJyaWRnZQAAAAAAAAM=",
+    "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAAD",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAAAw==",
+    "AAAAAQAAAAAAAAAAAAAAB1N3YXBwZWQAAAAABgAAAAAAAAAOcmVjZWl2ZV9hbW91bnQAAAAAAAoAAAAAAAAADXJlY2VpdmVfdG9rZW4AAAAAAAPuAAAAIAAAAAAAAAAJcmVjaXBpZW50AAAAAAAAEwAAAAAAAAALc2VuZF9hbW91bnQAAAAACgAAAAAAAAAKc2VuZF90b2tlbgAAAAAD7gAAACAAAAAAAAAABnNlbmRlcgAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAClRva2Vuc1NlbnQAAAAAAAUAAAAAAAAABmFtb3VudAAAAAAACgAAAAAAAAAUZGVzdGluYXRpb25fY2hhaW5faWQAAAAEAAAAAAAAAAVub25jZQAAAAAAAAwAAAAAAAAADXJlY2VpdmVfdG9rZW4AAAAAAAPuAAAAIAAAAAAAAAAJcmVjaXBpZW50AAAAAAAD7gAAACA=",
+    "AAAAAQAAAAAAAAAAAAAADlRva2Vuc1JlY2VpdmVkAAAAAAAEAAAAAAAAAAZhbW91bnQAAAAAAAoAAAAAAAAAB21lc3NhZ2UAAAAD7gAAACAAAAAAAAAABW5vbmNlAAAAAAAADAAAAAAAAAAJcmVjaXBpZW50AAAAAAAD7gAAACA=",
+    "AAAAAQAAAAAAAAAAAAAAClJlY2VpdmVGZWUAAAAAAAMAAAAAAAAAF2JyaWRnZV90cmFuc2FjdGlvbl9jb3N0AAAAAAoAAAAAAAAACWV4dHJhX2dhcwAAAAAAAAoAAAAAAAAAGG1lc3NhZ2VfdHJhbnNhY3Rpb25fY29zdAAAAAo=",
+    "AAAAAQAAAAAAAAAAAAAAFUJyaWRnaW5nRmVlRnJvbVRva2VucwAAAAAAAAIAAAAAAAAAEGZlZV90b2tlbl9hbW91bnQAAAAKAAAAAAAAAANnYXMAAAAACg==",
+    "AAAAAQAAAAAAAAAAAAAADUFub3RoZXJCcmlkZ2UAAAAAAAACAAAAAAAAAAdhZGRyZXNzAAAAA+4AAAAgAAAAAAAAAAZ0b2tlbnMAAAAAA+wAAAPuAAAAIAAAAAE=",
+    "AAAAAQAAAAAAAAAAAAAABkJyaWRnZQAAAAAABgAAAGBwcmVjb21wdXRlZCB2YWx1ZXMgb2YgdGhlIHNjYWxpbmcgZmFjdG9yIHJlcXVpcmVkIGZvciBwYXlpbmcgdGhlIGJyaWRnaW5nIGZlZSB3aXRoIHN0YWJsZSB0b2tlbnMAAAAeYnJpZGdpbmdfZmVlX2NvbnZlcnNpb25fZmFjdG9yAAAAAAPsAAAAEwAAAAoAAAAAAAAACGNhbl9zd2FwAAAAAQAAAGxwcmVjb21wdXRlZCB2YWx1ZXMgdG8gZGl2aWRlIGJ5IHRvIGNoYW5nZSB0aGUgcHJlY2lzaW9uIGZyb20gdGhlIEdhcyBPcmFjbGUgcHJlY2lzaW9uIHRvIHRoZSB0b2tlbiBwcmVjaXNpb24AAAAWZnJvbV9nYXNfb3JhY2xlX2ZhY3RvcgAAAAAD7AAAABMAAAAKAAAAAAAAAAltZXNzZW5nZXIAAAAAAAATAAAAAAAAAAVwb29scwAAAAAAA+wAAAPuAAAAIAAAABMAAAAAAAAACnJlYmFsYW5jZXIAAAAAABM=",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAAAwAAAAEAAAAAAAAAC090aGVyQnJpZGdlAAAAAAEAAAAEAAAAAQAAAAAAAAALU2VudE1lc3NhZ2UAAAAAAQAAA+4AAAAgAAAAAQAAAAAAAAAPUmVjZWl2ZWRNZXNzYWdlAAAAAAEAAAPuAAAAIA==",
+    "AAAAAQAAAAAAAAAAAAAABUFkbWluAAAAAAAAAQAAAAAAAAABMAAAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAEEdhc09yYWNsZUFkZHJlc3MAAAABAAAAAAAAAAEwAAAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAACEdhc1VzYWdlAAAAAQAAAAAAAAABMAAAAAAAA+wAAAAEAAAACg==",
+    "AAAAAQAAAAAAAAAAAAAAC05hdGl2ZVRva2VuAAAAAAEAAAAAAAAAATAAAAAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAADVN0b3BBdXRob3JpdHkAAAAAAAABAAAAAAAAAAEwAAAAAAAAEw==",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAJwAAAAAAAAANVW5pbXBsZW1lbnRlZAAAAAAAAAAAAAAAAAAAC0luaXRpYWxpemVkAAAAAAEAAAAAAAAADVVuaW5pdGlhbGl6ZWQAAAAAAAACAAAAAAAAAAxVbmF1dGhvcml6ZWQAAAADAAAAAAAAAApJbnZhbGlkQXJnAAAAAAAEAAAAAAAAAA5JbnZhbGlkQ2hhaW5JZAAAAAAABQAAAAAAAAATSW52YWxpZE90aGVyQ2hhaW5JZAAAAAAGAAAAAAAAAA5HYXNVc2FnZU5vdFNldAAAAAAABwAAAAAAAAANQnJva2VuQWRkcmVzcwAAAAAAAAgAAAAAAAAACE5vdEZvdW5kAAAACQAAAAAAAAAYVG9rZW5JbnN1ZmZpY2llbnRCYWxhbmNlAAAACgAAAAAAAAAKQ2FzdEZhaWxlZAAAAAAACwAAAAAAAAAKWmVyb0Ftb3VudAAAAAAAZwAAAAAAAAAMUG9vbE92ZXJmbG93AAAAaAAAAAAAAAALWmVyb0NoYW5nZXMAAAAAaQAAAAAAAAARUmVzZXJ2ZXNFeGhhdXN0ZWQAAAAAAABqAAAAAAAAABpJbnN1ZmZpY2llbnRSZWNlaXZlZEFtb3VudAAAAAAAawAAAAAAAAAUQmFsYW5jZVJhdGlvRXhjZWVkZWQAAABsAAAAAAAAAAlGb3JiaWRkZW4AAAAAAABtAAAAAAAAABlVbmF1dGhvcml6ZWRTdG9wQXV0aG9yaXR5AAAAAAAAywAAAAAAAAAOU3dhcFByb2hpYml0ZWQAAAAAAMwAAAAAAAAAEkFtb3VudFRvb0xvd0ZvckZlZQAAAAAAzQAAAAAAAAAWQnJpZGdlVG9UaGVaZXJvQWRkcmVzcwAAAAAAzgAAAAAAAAAORW1wdHlSZWNpcGllbnQAAAAAAM8AAAAAAAAAE1NvdXJjZU5vdFJlZ2lzdGVyZWQAAAAA0AAAAAAAAAAVV3JvbmdEZXN0aW5hdGlvbkNoYWluAAAAAAAA0QAAAAAAAAATVW5rbm93bkFub3RoZXJDaGFpbgAAAADSAAAAAAAAABFUb2tlbnNBbHJlYWR5U2VudAAAAAAAANMAAAAAAAAAEE1lc3NhZ2VQcm9jZXNzZWQAAADUAAAAAAAAAAxOb3RFbm91Z2hGZWUAAADWAAAAAAAAAAlOb01lc3NhZ2UAAAAAAADXAAAAAAAAAA1Ob1JlY2VpdmVQb29sAAAAAAAA2AAAAAAAAAAGTm9Qb29sAAAAAADZAAAAAAAAABNVbmtub3duQW5vdGhlclRva2VuAAAAANoAAAAAAAAAD1dyb25nQnl0ZUxlbmd0aAAAAAEsAAAAAAAAAApIYXNNZXNzYWdlAAAAAAEtAAAAAAAAABdJbnZhbGlkUHJpbWFyeVNpZ25hdHVyZQAAAAEuAAAAAAAAABlJbnZhbGlkU2Vjb25kYXJ5U2lnbmF0dXJlAAAAAAABLwAAAAAAAAARTm9HYXNEYXRhRm9yQ2hhaW4AAAAAAAGQ"
+  ]
+}

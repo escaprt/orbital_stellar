@@ -1,0 +1,1885 @@
+{
+  "contractId": "CBQDHNBFBZYE4MKPWBSJOPIYLW4SFSXAXUTSXJN76GNKYVYPCKWC6QUK",
+  "description": "Aquarius AMM Router (mainnet): entry-point contract for pool creation, discovery, swaps along optimal paths and liquidity deposits across Aquarius pools.",
+  "events": [],
+  "functions": [
+    {
+      "name": "swap",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "token_out",
+          "type": "address"
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "in_amount",
+          "type": "u128"
+        },
+        {
+          "name": "out_min",
+          "type": "u128"
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "claim",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "deposit",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "desired_amounts",
+          "type": {
+            "item": "u128",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "min_shares",
+          "type": "u128"
+        }
+      ],
+      "returns": {
+        "elements": [
+          {
+            "item": "u128",
+            "type": "vec"
+          },
+          "u128"
+        ],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "version",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "get_info",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "key": "symbol",
+        "type": "map",
+        "value": "val"
+      }
+    },
+    {
+      "name": "get_pool",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "address"
+    },
+    {
+      "name": "share_id",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "address"
+    },
+    {
+      "name": "withdraw",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "share_amount",
+          "type": "u128"
+        },
+        {
+          "name": "min_amounts",
+          "type": {
+            "item": "u128",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "item": "u128",
+        "type": "vec"
+      }
+    },
+    {
+      "name": "get_plane",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "get_pools",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "key": {
+          "size": 32,
+          "type": "bytes_n"
+        },
+        "type": "map",
+        "value": "address"
+      }
+    },
+    {
+      "name": "pool_type",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "symbol"
+    },
+    {
+      "name": "get_tokens",
+      "params": [
+        {
+          "name": "index",
+          "type": "u128"
+        }
+      ],
+      "returns": {
+        "item": "address",
+        "type": "vec"
+      }
+    },
+    {
+      "name": "init_admin",
+      "params": [
+        {
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "remove_pool",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_reserves",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "item": "u128",
+        "type": "vec"
+      }
+    },
+    {
+      "name": "swap_chained",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "swaps_chain",
+          "type": {
+            "item": {
+              "elements": [
+                {
+                  "item": "address",
+                  "type": "vec"
+                },
+                {
+                  "size": 32,
+                  "type": "bytes_n"
+                },
+                "address"
+              ],
+              "type": "tuple"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "in_amount",
+          "type": "u128"
+        },
+        {
+          "name": "out_min",
+          "type": "u128"
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "apply_upgrade",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "size": 32,
+        "type": "bytes_n"
+      }
+    },
+    {
+      "name": "contract_name",
+      "params": [],
+      "returns": "symbol"
+    },
+    {
+      "name": "estimate_swap",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "token_out",
+          "type": "address"
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "in_amount",
+          "type": "u128"
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "get_liquidity",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u256"
+    },
+    {
+      "name": "set_pool_hash",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "commit_upgrade",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "fill_liquidity",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "revert_upgrade",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_token_hash",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_user_reward",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "set_pools_plane",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "plane",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_rewards_info",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "key": "symbol",
+        "type": "map",
+        "value": "i128"
+      }
+    },
+    {
+      "name": "get_total_shares",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "set_reward_token",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "reward_token",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_emergency_mode",
+      "params": [],
+      "returns": "bool"
+    },
+    {
+      "name": "get_future_address",
+      "params": [
+        {
+          "name": "role_name",
+          "type": "symbol"
+        }
+      ],
+      "returns": "address"
+    },
+    {
+      "name": "get_rewards_config",
+      "params": [],
+      "returns": {
+        "key": "symbol",
+        "type": "map",
+        "value": "i128"
+      }
+    },
+    {
+      "name": "init_standard_pool",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "fee_fraction",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "elements": [
+          {
+            "size": 32,
+            "type": "bytes_n"
+          },
+          "address"
+        ],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "set_emergency_mode",
+      "params": [
+        {
+          "name": "emergency_admin",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "type": "bool"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "config_pool_rewards",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "get_total_liquidity",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "u256"
+    },
+    {
+      "name": "init_config_storage",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "config_storage",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_privileged_addrs",
+      "params": [],
+      "returns": {
+        "key": "symbol",
+        "type": "map",
+        "value": {
+          "item": "address",
+          "type": "vec"
+        }
+      }
+    },
+    {
+      "name": "init_stableswap_pool",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "fee_fraction",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "elements": [
+          {
+            "size": 32,
+            "type": "bytes_n"
+          },
+          "address"
+        ],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "set_privileged_addrs",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "rewards_admin",
+          "type": "address"
+        },
+        {
+          "name": "operations_admin",
+          "type": "address"
+        },
+        {
+          "name": "pause_admin",
+          "type": "address"
+        },
+        {
+          "name": "emergency_pause_admins",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "system_fee_admin",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "config_global_rewards",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "reward_tps",
+          "type": "u128"
+        },
+        {
+          "name": "expired_at",
+          "type": "u64"
+        },
+        {
+          "name": "tokens_votes",
+          "type": {
+            "item": {
+              "elements": [
+                {
+                  "item": "address",
+                  "type": "vec"
+                },
+                "u32"
+              ],
+              "type": "tuple"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_tokens_for_reward",
+      "params": [],
+      "returns": {
+        "key": {
+          "item": "address",
+          "type": "vec"
+        },
+        "type": "map",
+        "value": {
+          "elements": ["u32", "bool", "u256"],
+          "type": "tuple"
+        }
+      }
+    },
+    {
+      "name": "get_tokens_sets_count",
+      "params": [],
+      "returns": "u128"
+    },
+    {
+      "name": "init_concentrated_pool",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "fee",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "elements": [
+          {
+            "size": 32,
+            "type": "bytes_n"
+          },
+          "address"
+        ],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "set_rewards_gauge_hash",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "pool_gauge_switch_token",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_reward_boost_config",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "reward_boost_token",
+          "type": "address"
+        },
+        {
+          "name": "reward_boost_feed",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "apply_transfer_ownership",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "role_name",
+          "type": "symbol"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_liquidity_calculator",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "get_total_claimed_reward",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "pool_gauge_token_enabled",
+      "params": [
+        {
+          "name": "token",
+          "type": "address"
+        }
+      ],
+      "returns": "bool"
+    },
+    {
+      "name": "set_liquidity_calculator",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "calculator",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_stableswap_pool_hash",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "commit_transfer_ownership",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "role_name",
+          "type": "symbol"
+        },
+        {
+          "name": "new_address",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_protocol_fee_fraction",
+      "params": [],
+      "returns": "u32"
+    },
+    {
+      "name": "revert_transfer_ownership",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "role_name",
+          "type": "symbol"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_protocol_fee_fraction",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_fraction",
+          "type": "u32"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_pools_for_tokens_range",
+      "params": [
+        {
+          "name": "start",
+          "type": "u128"
+        },
+        {
+          "name": "end",
+          "type": "u128"
+        }
+      ],
+      "returns": {
+        "item": {
+          "elements": [
+            {
+              "item": "address",
+              "type": "vec"
+            },
+            {
+              "key": {
+                "size": 32,
+                "type": "bytes_n"
+              },
+              "type": "map",
+              "value": "address"
+            }
+          ],
+          "type": "tuple"
+        },
+        "type": "vec"
+      }
+    },
+    {
+      "name": "pool_gauge_schedule_reward",
+      "params": [
+        {
+          "name": "distributor",
+          "type": "address"
+        },
+        {
+          "name": "pool_tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "distribute_token",
+          "type": "address"
+        },
+        {
+          "name": "tps",
+          "type": "u128"
+        },
+        {
+          "name": "start_at",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "duration",
+          "type": "u64"
+        },
+        {
+          "name": "swaps_chain_proof",
+          "type": {
+            "item": {
+              "elements": [
+                {
+                  "item": "address",
+                  "type": "vec"
+                },
+                {
+                  "size": 32,
+                  "type": "bytes_n"
+                },
+                "address"
+              ],
+              "type": "tuple"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "address"
+    },
+    {
+      "name": "set_concentrated_pool_hash",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "new_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "configure_init_pool_payment",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "name": "standard_pool_amount",
+          "type": "u128"
+        },
+        {
+          "name": "stable_pool_amount",
+          "type": "u128"
+        },
+        {
+          "name": "concentrated_pool_amount",
+          "type": "u128"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "get_init_pool_payment_token",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "get_total_configured_reward",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "pool_gauge_get_min_duration",
+      "params": [],
+      "returns": "u64"
+    },
+    {
+      "name": "swap_chained_strict_receive",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "swaps_chain",
+          "type": {
+            "item": {
+              "elements": [
+                {
+                  "item": "address",
+                  "type": "vec"
+                },
+                {
+                  "size": 32,
+                  "type": "bytes_n"
+                },
+                "address"
+              ],
+              "type": "tuple"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "out_amount",
+          "type": "u128"
+        },
+        {
+          "name": "max_in",
+          "type": "u128"
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "get_conc_pool_payment_amount",
+      "params": [],
+      "returns": "u128"
+    },
+    {
+      "name": "get_total_accumulated_reward",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "get_total_outstanding_reward",
+      "params": [
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "distribute_outstanding_reward",
+      "params": [
+        {
+          "name": "user",
+          "type": "address"
+        },
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "tokens",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "pool_index",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "u128"
+    },
+    {
+      "name": "get_init_pool_payment_address",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "get_stable_pool_payment_amount",
+      "params": [],
+      "returns": "u128"
+    },
+    {
+      "name": "pool_gauge_get_min_daily_amount",
+      "params": [],
+      "returns": "u128"
+    },
+    {
+      "name": "get_standard_pool_payment_amount",
+      "params": [],
+      "returns": "u128"
+    },
+    {
+      "name": "pool_gauge_set_reward_thresholds",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "min_reward_equivalent_day",
+          "type": "u128"
+        },
+        {
+          "name": "min_duration_seconds",
+          "type": "u64"
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "Aquarius AMM Router",
+  "network": "mainnet",
+  "types": {
+    "AccessControlError": {
+      "kind": "enum",
+      "name": "AccessControlError",
+      "variants": [
+        {
+          "discriminant": 101,
+          "name": "RoleNotFound"
+        },
+        {
+          "discriminant": 102,
+          "name": "Unauthorized"
+        },
+        {
+          "discriminant": 103,
+          "name": "AdminAlreadySet"
+        },
+        {
+          "discriminant": 104,
+          "name": "BadRoleUsage"
+        },
+        {
+          "discriminant": 2906,
+          "name": "AnotherActionActive"
+        },
+        {
+          "discriminant": 2907,
+          "name": "NoActionActive"
+        },
+        {
+          "discriminant": 2908,
+          "name": "ActionNotReadyYet"
+        }
+      ]
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        {
+          "discriminant": 2906,
+          "name": "AnotherActionActive"
+        },
+        {
+          "discriminant": 2907,
+          "name": "NoActionActive"
+        },
+        {
+          "discriminant": 2908,
+          "name": "ActionNotReadyYet"
+        }
+      ]
+    },
+    "GlobalRewardsConfig": {
+      "fields": [
+        {
+          "name": "expired_at",
+          "type": "u64"
+        },
+        {
+          "name": "tps",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "GlobalRewardsConfig"
+    },
+    "LiquidityPoolData": {
+      "fields": [
+        {
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "name": "pool_type",
+          "type": {
+            "name": "LiquidityPoolType",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidityPoolData"
+    },
+    "LiquidityPoolRewardInfo": {
+      "fields": [
+        {
+          "name": "processed",
+          "type": "bool"
+        },
+        {
+          "name": "total_liquidity",
+          "type": "u256"
+        },
+        {
+          "name": "voting_share",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidityPoolRewardInfo"
+    },
+    "LiquidityPoolRouterError": {
+      "kind": "enum",
+      "name": "LiquidityPoolRouterError",
+      "variants": [
+        {
+          "discriminant": 301,
+          "name": "PoolNotFound"
+        },
+        {
+          "discriminant": 302,
+          "name": "BadFee"
+        },
+        {
+          "discriminant": 303,
+          "name": "StableswapHashMissing"
+        },
+        {
+          "discriminant": 305,
+          "name": "PoolsOverMax"
+        },
+        {
+          "discriminant": 306,
+          "name": "StableswapPoolsOverMax"
+        },
+        {
+          "discriminant": 307,
+          "name": "PathIsEmpty"
+        },
+        {
+          "discriminant": 308,
+          "name": "TokensAreNotForReward"
+        },
+        {
+          "discriminant": 309,
+          "name": "LiquidityNotFilled"
+        },
+        {
+          "discriminant": 310,
+          "name": "LiquidityAlreadyFilled"
+        },
+        {
+          "discriminant": 311,
+          "name": "VotingShareExceedsMax"
+        },
+        {
+          "discriminant": 312,
+          "name": "LiquidityCalculationError"
+        },
+        {
+          "discriminant": 313,
+          "name": "RewardsNotConfigured"
+        },
+        {
+          "discriminant": 314,
+          "name": "RewardsAlreadyConfigured"
+        },
+        {
+          "discriminant": 315,
+          "name": "DuplicatesNotAllowed"
+        },
+        {
+          "discriminant": 316,
+          "name": "InvalidPoolType"
+        },
+        {
+          "discriminant": 317,
+          "name": "RewardDurationTooShort"
+        },
+        {
+          "discriminant": 318,
+          "name": "RewardAmountTooLow"
+        },
+        {
+          "discriminant": 319,
+          "name": "GaugeRewardsDisabledForPool"
+        },
+        {
+          "discriminant": 320,
+          "name": "UnsupportedTokensNum"
+        },
+        {
+          "discriminant": 321,
+          "name": "PathMustEndWithRewardToken"
+        },
+        {
+          "discriminant": 322,
+          "name": "ConcentratedPoolsOverMax"
+        },
+        {
+          "discriminant": 323,
+          "name": "RewardTokenChangeWhileActive"
+        },
+        {
+          "discriminant": 324,
+          "name": "SwapChainAmountIsZero"
+        },
+        {
+          "discriminant": 2002,
+          "name": "TokensNotSorted"
+        },
+        {
+          "discriminant": 2020,
+          "name": "InMaxNotSatisfied"
+        }
+      ]
+    },
+    "LiquidityPoolType": {
+      "kind": "enum",
+      "name": "LiquidityPoolType",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "MissingPool"
+        },
+        {
+          "discriminant": 1,
+          "name": "ConstantProduct"
+        },
+        {
+          "discriminant": 2,
+          "name": "StableSwap"
+        },
+        {
+          "discriminant": 3,
+          "name": "Concentrated"
+        }
+      ]
+    },
+    "MathError": {
+      "kind": "enum",
+      "name": "MathError",
+      "variants": [
+        {
+          "discriminant": 510,
+          "name": "NumberOverflow"
+        }
+      ]
+    },
+    "PoolError": {
+      "kind": "enum",
+      "name": "PoolError",
+      "variants": [
+        {
+          "discriminant": 401,
+          "name": "PoolAlreadyExists"
+        },
+        {
+          "discriminant": 404,
+          "name": "PoolNotFound"
+        }
+      ]
+    },
+    "PoolRewardConfig": {
+      "fields": [
+        {
+          "name": "expired_at",
+          "type": "u64"
+        },
+        {
+          "name": "tps",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "PoolRewardConfig"
+    },
+    "PoolRewardData": {
+      "fields": [
+        {
+          "name": "accumulated",
+          "type": "u128"
+        },
+        {
+          "name": "block",
+          "type": "u64"
+        },
+        {
+          "name": "claimed",
+          "type": "u128"
+        },
+        {
+          "name": "last_time",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "PoolRewardData"
+    },
+    "RewardsError": {
+      "kind": "enum",
+      "name": "RewardsError",
+      "variants": [
+        {
+          "discriminant": 701,
+          "name": "PastTimeNotAllowed"
+        },
+        {
+          "discriminant": 702,
+          "name": "SameRewardsConfig"
+        }
+      ]
+    },
+    "StorageError": {
+      "kind": "enum",
+      "name": "StorageError",
+      "variants": [
+        {
+          "discriminant": 201,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 501,
+          "name": "ValueNotInitialized"
+        },
+        {
+          "discriminant": 502,
+          "name": "ValueMissing"
+        },
+        {
+          "discriminant": 503,
+          "name": "ValueConversionError"
+        }
+      ]
+    },
+    "UserRewardData": {
+      "fields": [
+        {
+          "name": "last_block",
+          "type": "u64"
+        },
+        {
+          "name": "pool_accumulated",
+          "type": "u128"
+        },
+        {
+          "name": "to_claim",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "UserRewardData"
+    },
+    "WASMDataKey": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "TokenHash"
+        },
+        {
+          "fields": [],
+          "name": "TokenFutureWASM"
+        },
+        {
+          "fields": [],
+          "name": "GaugeWASM"
+        },
+        {
+          "fields": [],
+          "name": "FutureGaugeWASM"
+        },
+        {
+          "fields": [],
+          "name": "ConstantPoolHash"
+        },
+        {
+          "fields": [],
+          "name": "StableSwapPoolHash"
+        }
+      ],
+      "kind": "union",
+      "name": "WASMDataKey"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAAGExpcXVpZGl0eVBvb2xSb3V0ZXJFcnJvcgAAABkAAAAAAAAADFBvb2xOb3RGb3VuZAAAAS0AAAAAAAAABkJhZEZlZQAAAAABLgAAAAAAAAAVU3RhYmxlc3dhcEhhc2hNaXNzaW5nAAAAAAABLwAAAAAAAAAMUG9vbHNPdmVyTWF4AAABMQAAAAAAAAAWU3RhYmxlc3dhcFBvb2xzT3Zlck1heAAAAAABMgAAAAAAAAALUGF0aElzRW1wdHkAAAABMwAAAAAAAAAVVG9rZW5zQXJlTm90Rm9yUmV3YXJkAAAAAAABNAAAAAAAAAASTGlxdWlkaXR5Tm90RmlsbGVkAAAAAAE1AAAAAAAAABZMaXF1aWRpdHlBbHJlYWR5RmlsbGVkAAAAAAE2AAAAAAAAABVWb3RpbmdTaGFyZUV4Y2VlZHNNYXgAAAAAAAE3AAAAAAAAABlMaXF1aWRpdHlDYWxjdWxhdGlvbkVycm9yAAAAAAABOAAAAAAAAAAUUmV3YXJkc05vdENvbmZpZ3VyZWQAAAE5AAAAAAAAABhSZXdhcmRzQWxyZWFkeUNvbmZpZ3VyZWQAAAE6AAAAAAAAABREdXBsaWNhdGVzTm90QWxsb3dlZAAAATsAAAAAAAAAD0ludmFsaWRQb29sVHlwZQAAAAE8AAAAAAAAABZSZXdhcmREdXJhdGlvblRvb1Nob3J0AAAAAAE9AAAAAAAAABJSZXdhcmRBbW91bnRUb29Mb3cAAAAAAT4AAAAAAAAAG0dhdWdlUmV3YXJkc0Rpc2FibGVkRm9yUG9vbAAAAAE/AAAAAAAAABRVbnN1cHBvcnRlZFRva2Vuc051bQAAAUAAAAAAAAAAGlBhdGhNdXN0RW5kV2l0aFJld2FyZFRva2VuAAAAAAFBAAAAAAAAABhDb25jZW50cmF0ZWRQb29sc092ZXJNYXgAAAFCAAAAAAAAABxSZXdhcmRUb2tlbkNoYW5nZVdoaWxlQWN0aXZlAAABQwAAAAAAAAAVU3dhcENoYWluQW1vdW50SXNaZXJvAAAAAAABRAAAAAAAAAAPVG9rZW5zTm90U29ydGVkAAAAB9IAAAAAAAAAEUluTWF4Tm90U2F0aXNmaWVkAAAAAAAH5A==",
+    "AAAABAAAAAAAAAAAAAAACVBvb2xFcnJvcgAAAAAAAAIAAAAAAAAAEVBvb2xBbHJlYWR5RXhpc3RzAAAAAAABkQAAAAAAAAAMUG9vbE5vdEZvdW5kAAABlA==",
+    "AAAAAQAAAAAAAAAAAAAAEUxpcXVpZGl0eVBvb2xEYXRhAAAAAAAAAgAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAAAAAAlwb29sX3R5cGUAAAAAAAfQAAAAEUxpcXVpZGl0eVBvb2xUeXBlAAAA",
+    "AAAAAwAAAAAAAAAAAAAAEUxpcXVpZGl0eVBvb2xUeXBlAAAAAAAABAAAAAAAAAALTWlzc2luZ1Bvb2wAAAAAAAAAAAAAAAAPQ29uc3RhbnRQcm9kdWN0AAAAAAEAAAAAAAAAClN0YWJsZVN3YXAAAAAAAAIAAAAAAAAADENvbmNlbnRyYXRlZAAAAAM=",
+    "AAAAAQAAAAAAAAAAAAAAE0dsb2JhbFJld2FyZHNDb25maWcAAAAAAgAAAAAAAAAKZXhwaXJlZF9hdAAAAAAABgAAAAAAAAADdHBzAAAAAAo=",
+    "AAAAAQAAAAAAAAAAAAAAF0xpcXVpZGl0eVBvb2xSZXdhcmRJbmZvAAAAAAMAAAAAAAAACXByb2Nlc3NlZAAAAAAAAAEAAAAAAAAAD3RvdGFsX2xpcXVpZGl0eQAAAAAMAAAAAAAAAAx2b3Rpbmdfc2hhcmUAAAAE",
+    "AAAAAAAAAAAAAAAEc3dhcAAAAAcAAAAAAAAABHVzZXIAAAATAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACXRva2VuX291dAAAAAAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAAAAAAlpbl9hbW91bnQAAAAAAAAKAAAAAAAAAAdvdXRfbWluAAAAAAoAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAFY2xhaW0AAAAAAAADAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAHZGVwb3NpdAAAAAAFAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAAAAAAAD2Rlc2lyZWRfYW1vdW50cwAAAAPqAAAACgAAAAAAAAAKbWluX3NoYXJlcwAAAAAACgAAAAEAAAPtAAAAAgAAA+oAAAAKAAAACg==",
+    "AAAAAAAAAAAAAAAHdmVyc2lvbgAAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAIZ2V0X2luZm8AAAACAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAApwb29sX2luZGV4AAAAAAPuAAAAIAAAAAEAAAPsAAAAEQAAAAA=",
+    "AAAAAAAAAAAAAAAIZ2V0X3Bvb2wAAAACAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAApwb29sX2luZGV4AAAAAAPuAAAAIAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAIc2hhcmVfaWQAAAACAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAApwb29sX2luZGV4AAAAAAPuAAAAIAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAId2l0aGRyYXcAAAAFAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAAAAAAADHNoYXJlX2Ftb3VudAAAAAoAAAAAAAAAC21pbl9hbW91bnRzAAAAA+oAAAAKAAAAAQAAA+oAAAAK",
+    "AAAAAAAAAAAAAAAJZ2V0X3BsYW5lAAAAAAAAAAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAJZ2V0X3Bvb2xzAAAAAAAAAQAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAEAAAPsAAAD7gAAACAAAAAT",
+    "AAAAAAAAAAAAAAAJcG9vbF90eXBlAAAAAAAAAgAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAABAAAAEQ==",
+    "AAAAAAAAAAAAAAAKZ2V0X3Rva2VucwAAAAAAAQAAAAAAAAAFaW5kZXgAAAAAAAAKAAAAAQAAA+oAAAAT",
+    "AAAAAAAAAAAAAAAKaW5pdF9hZG1pbgAAAAAAAQAAAAAAAAAHYWNjb3VudAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAALcmVtb3ZlX3Bvb2wAAAAAAwAAAAAAAAAEdXNlcgAAABMAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACXBvb2xfaGFzaAAAAAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAMZ2V0X3Jlc2VydmVzAAAAAgAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAABAAAD6gAAAAo=",
+    "AAAAAAAAAAAAAAAMc3dhcF9jaGFpbmVkAAAABQAAAAAAAAAEdXNlcgAAABMAAAAAAAAAC3N3YXBzX2NoYWluAAAAA+oAAAPtAAAAAwAAA+oAAAATAAAD7gAAACAAAAATAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACWluX2Ftb3VudAAAAAAAAAoAAAAAAAAAB291dF9taW4AAAAACgAAAAEAAAAK",
+    "AAAAAAAAAAAAAAANYXBwbHlfdXBncmFkZQAAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAEAAAPuAAAAIA==",
+    "AAAAAAAAAAAAAAANY29udHJhY3RfbmFtZQAAAAAAAAAAAAABAAAAEQ==",
+    "AAAAAAAAAAAAAAANZXN0aW1hdGVfc3dhcAAAAAAAAAUAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACHRva2VuX2luAAAAEwAAAAAAAAAJdG9rZW5fb3V0AAAAAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAAAAAAACWluX2Ftb3VudAAAAAAAAAoAAAABAAAACg==",
+    "AAAAAAAAAAAAAAANZ2V0X2xpcXVpZGl0eQAAAAAAAAIAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAw=",
+    "AAAAAAAAAAAAAAANc2V0X3Bvb2xfaGFzaAAAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAIbmV3X2hhc2gAAAPuAAAAIAAAAAA=",
+    "AAAAAAAAAAAAAAAOY29tbWl0X3VwZ3JhZGUAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAANbmV3X3dhc21faGFzaAAAAAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAOZmlsbF9saXF1aWRpdHkAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAOcmV2ZXJ0X3VwZ3JhZGUAAAAAAAEAAAAAAAAABWFkbWluAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAOc2V0X3Rva2VuX2hhc2gAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAIbmV3X2hhc2gAAAPuAAAAIAAAAAA=",
+    "AAAAAAAAAAAAAAAPZ2V0X3VzZXJfcmV3YXJkAAAAAAMAAAAAAAAABHVzZXIAAAATAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAApwb29sX2luZGV4AAAAAAPuAAAAIAAAAAEAAAAK",
+    "AAAAAAAAAAAAAAAPc2V0X3Bvb2xzX3BsYW5lAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAFcGxhbmUAAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAQZ2V0X3Jld2FyZHNfaW5mbwAAAAMAAAAAAAAABHVzZXIAAAATAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAAAAAApwb29sX2luZGV4AAAAAAPuAAAAIAAAAAEAAAPsAAAAEQAAAAs=",
+    "AAAAAAAAAAAAAAAQZ2V0X3RvdGFsX3NoYXJlcwAAAAIAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAQc2V0X3Jld2FyZF90b2tlbgAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAMcmV3YXJkX3Rva2VuAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAASZ2V0X2VtZXJnZW5jeV9tb2RlAAAAAAAAAAAAAQAAAAE=",
+    "AAAAAAAAAAAAAAASZ2V0X2Z1dHVyZV9hZGRyZXNzAAAAAAABAAAAAAAAAAlyb2xlX25hbWUAAAAAAAARAAAAAQAAABM=",
+    "AAAAAAAAAAAAAAASZ2V0X3Jld2FyZHNfY29uZmlnAAAAAAAAAAAAAQAAA+wAAAARAAAACw==",
+    "AAAAAAAAAAAAAAASaW5pdF9zdGFuZGFyZF9wb29sAAAAAAADAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAMZmVlX2ZyYWN0aW9uAAAABAAAAAEAAAPtAAAAAgAAA+4AAAAgAAAAEw==",
+    "AAAAAAAAAAAAAAASc2V0X2VtZXJnZW5jeV9tb2RlAAAAAAACAAAAAAAAAA9lbWVyZ2VuY3lfYWRtaW4AAAAAEwAAAAAAAAAFdmFsdWUAAAAAAAABAAAAAA==",
+    "AAAAAAAAAAAAAAATY29uZmlnX3Bvb2xfcmV3YXJkcwAAAAADAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAATZ2V0X3RvdGFsX2xpcXVpZGl0eQAAAAABAAAAAAAAAAZ0b2tlbnMAAAAAA+oAAAATAAAAAQAAAAw=",
+    "AAAAAAAAAAAAAAATaW5pdF9jb25maWdfc3RvcmFnZQAAAAACAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAADmNvbmZpZ19zdG9yYWdlAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAUZ2V0X3ByaXZpbGVnZWRfYWRkcnMAAAAAAAAAAQAAA+wAAAARAAAD6gAAABM=",
+    "AAAAAAAAAAAAAAAUaW5pdF9zdGFibGVzd2FwX3Bvb2wAAAADAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAMZmVlX2ZyYWN0aW9uAAAABAAAAAEAAAPtAAAAAgAAA+4AAAAgAAAAEw==",
+    "AAAAAAAAAAAAAAAUc2V0X3ByaXZpbGVnZWRfYWRkcnMAAAAGAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAADXJld2FyZHNfYWRtaW4AAAAAAAATAAAAAAAAABBvcGVyYXRpb25zX2FkbWluAAAAEwAAAAAAAAALcGF1c2VfYWRtaW4AAAAAEwAAAAAAAAAWZW1lcmdlbmN5X3BhdXNlX2FkbWlucwAAAAAD6gAAABMAAAAAAAAAEHN5c3RlbV9mZWVfYWRtaW4AAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAVY29uZmlnX2dsb2JhbF9yZXdhcmRzAAAAAAAABAAAAAAAAAAEdXNlcgAAABMAAAAAAAAACnJld2FyZF90cHMAAAAAAAoAAAAAAAAACmV4cGlyZWRfYXQAAAAAAAYAAAAAAAAADHRva2Vuc192b3RlcwAAA+oAAAPtAAAAAgAAA+oAAAATAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAVZ2V0X3Rva2Vuc19mb3JfcmV3YXJkAAAAAAAAAAAAAAEAAAPsAAAD6gAAABMAAAPtAAAAAwAAAAQAAAABAAAADA==",
+    "AAAAAAAAAAAAAAAVZ2V0X3Rva2Vuc19zZXRzX2NvdW50AAAAAAAAAAAAAAEAAAAK",
+    "AAAAAAAAAAAAAAAWaW5pdF9jb25jZW50cmF0ZWRfcG9vbAAAAAAAAwAAAAAAAAAEdXNlcgAAABMAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAAA2ZlZQAAAAAEAAAAAQAAA+0AAAACAAAD7gAAACAAAAAT",
+    "AAAAAAAAAAAAAAAWc2V0X3Jld2FyZHNfZ2F1Z2VfaGFzaAAAAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhuZXdfaGFzaAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAXcG9vbF9nYXVnZV9zd2l0Y2hfdG9rZW4AAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAV0b2tlbgAAAAAAABMAAAAAAAAAB2VuYWJsZWQAAAAAAQAAAAA=",
+    "AAAAAAAAAAAAAAAXc2V0X3Jld2FyZF9ib29zdF9jb25maWcAAAAAAwAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAABJyZXdhcmRfYm9vc3RfdG9rZW4AAAAAABMAAAAAAAAAEXJld2FyZF9ib29zdF9mZWVkAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAYYXBwbHlfdHJhbnNmZXJfb3duZXJzaGlwAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAlyb2xlX25hbWUAAAAAAAARAAAAAA==",
+    "AAAAAAAAAAAAAAAYZ2V0X2xpcXVpZGl0eV9jYWxjdWxhdG9yAAAAAAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAYZ2V0X3RvdGFsX2NsYWltZWRfcmV3YXJkAAAAAgAAAAAAAAAGdG9rZW5zAAAAAAPqAAAAEwAAAAAAAAAKcG9vbF9pbmRleAAAAAAD7gAAACAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAYcG9vbF9nYXVnZV90b2tlbl9lbmFibGVkAAAAAQAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAQAAAAE=",
+    "AAAAAAAAAAAAAAAYc2V0X2xpcXVpZGl0eV9jYWxjdWxhdG9yAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAApjYWxjdWxhdG9yAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAYc2V0X3N0YWJsZXN3YXBfcG9vbF9oYXNoAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAhuZXdfaGFzaAAAA+4AAAAgAAAAAA==",
+    "AAAAAAAAAAAAAAAZY29tbWl0X3RyYW5zZmVyX293bmVyc2hpcAAAAAAAAAMAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAJcm9sZV9uYW1lAAAAAAAAEQAAAAAAAAALbmV3X2FkZHJlc3MAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAAZZ2V0X3Byb3RvY29sX2ZlZV9mcmFjdGlvbgAAAAAAAAAAAAABAAAABA==",
+    "AAAAAAAAAAAAAAAZcmV2ZXJ0X3RyYW5zZmVyX293bmVyc2hpcAAAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAJcm9sZV9uYW1lAAAAAAAAEQAAAAA=",
+    "AAAAAAAAAAAAAAAZc2V0X3Byb3RvY29sX2ZlZV9mcmFjdGlvbgAAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAMbmV3X2ZyYWN0aW9uAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAaZ2V0X3Bvb2xzX2Zvcl90b2tlbnNfcmFuZ2UAAAAAAAIAAAAAAAAABXN0YXJ0AAAAAAAACgAAAAAAAAADZW5kAAAAAAoAAAABAAAD6gAAA+0AAAACAAAD6gAAABMAAAPsAAAD7gAAACAAAAAT",
+    "AAAAAAAAAAAAAAAacG9vbF9nYXVnZV9zY2hlZHVsZV9yZXdhcmQAAAAAAAgAAAAAAAAAC2Rpc3RyaWJ1dG9yAAAAABMAAAAAAAAAC3Bvb2xfdG9rZW5zAAAAA+oAAAATAAAAAAAAAAlwb29sX2hhc2gAAAAAAAPuAAAAIAAAAAAAAAAQZGlzdHJpYnV0ZV90b2tlbgAAABMAAAAAAAAAA3RwcwAAAAAKAAAAAAAAAAhzdGFydF9hdAAAA+gAAAAGAAAAAAAAAAhkdXJhdGlvbgAAAAYAAAAAAAAAEXN3YXBzX2NoYWluX3Byb29mAAAAAAAD6gAAA+0AAAADAAAD6gAAABMAAAPuAAAAIAAAABMAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAac2V0X2NvbmNlbnRyYXRlZF9wb29sX2hhc2gAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAIbmV3X2hhc2gAAAPuAAAAIAAAAAA=",
+    "AAAAAAAAAAAAAAAbY29uZmlndXJlX2luaXRfcG9vbF9wYXltZW50AAAAAAYAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAAAAABRzdGFuZGFyZF9wb29sX2Ftb3VudAAAAAoAAAAAAAAAEnN0YWJsZV9wb29sX2Ftb3VudAAAAAAACgAAAAAAAAAYY29uY2VudHJhdGVkX3Bvb2xfYW1vdW50AAAACgAAAAAAAAACdG8AAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAbZ2V0X2luaXRfcG9vbF9wYXltZW50X3Rva2VuAAAAAAAAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAbZ2V0X3RvdGFsX2NvbmZpZ3VyZWRfcmV3YXJkAAAAAAIAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAbcG9vbF9nYXVnZV9nZXRfbWluX2R1cmF0aW9uAAAAAAAAAAABAAAABg==",
+    "AAAAAAAAAAAAAAAbc3dhcF9jaGFpbmVkX3N0cmljdF9yZWNlaXZlAAAAAAUAAAAAAAAABHVzZXIAAAATAAAAAAAAAAtzd2Fwc19jaGFpbgAAAAPqAAAD7QAAAAMAAAPqAAAAEwAAA+4AAAAgAAAAEwAAAAAAAAAIdG9rZW5faW4AAAATAAAAAAAAAApvdXRfYW1vdW50AAAAAAAKAAAAAAAAAAZtYXhfaW4AAAAAAAoAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAcZ2V0X2NvbmNfcG9vbF9wYXltZW50X2Ftb3VudAAAAAAAAAABAAAACg==",
+    "AAAAAAAAAAAAAAAcZ2V0X3RvdGFsX2FjY3VtdWxhdGVkX3Jld2FyZAAAAAIAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAcZ2V0X3RvdGFsX291dHN0YW5kaW5nX3Jld2FyZAAAAAIAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAdZGlzdHJpYnV0ZV9vdXRzdGFuZGluZ19yZXdhcmQAAAAAAAAEAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAAEZnJvbQAAABMAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAACnBvb2xfaW5kZXgAAAAAA+4AAAAgAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAdZ2V0X2luaXRfcG9vbF9wYXltZW50X2FkZHJlc3MAAAAAAAAAAAAAAQAAABM=",
+    "AAAAAAAAAAAAAAAeZ2V0X3N0YWJsZV9wb29sX3BheW1lbnRfYW1vdW50AAAAAAAAAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAfcG9vbF9nYXVnZV9nZXRfbWluX2RhaWx5X2Ftb3VudAAAAAAAAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAgZ2V0X3N0YW5kYXJkX3Bvb2xfcGF5bWVudF9hbW91bnQAAAAAAAAAAQAAAAo=",
+    "AAAAAAAAAAAAAAAgcG9vbF9nYXVnZV9zZXRfcmV3YXJkX3RocmVzaG9sZHMAAAADAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAAGW1pbl9yZXdhcmRfZXF1aXZhbGVudF9kYXkAAAAAAAAKAAAAAAAAABRtaW5fZHVyYXRpb25fc2Vjb25kcwAAAAYAAAAA",
+    "AAAABAAAAAAAAAAAAAAAEkFjY2Vzc0NvbnRyb2xFcnJvcgAAAAAABwAAAAAAAAAMUm9sZU5vdEZvdW5kAAAAZQAAAAAAAAAMVW5hdXRob3JpemVkAAAAZgAAAAAAAAAPQWRtaW5BbHJlYWR5U2V0AAAAAGcAAAAAAAAADEJhZFJvbGVVc2FnZQAAAGgAAAAAAAAAE0Fub3RoZXJBY3Rpb25BY3RpdmUAAAALWgAAAAAAAAAOTm9BY3Rpb25BY3RpdmUAAAAAC1sAAAAAAAAAEUFjdGlvbk5vdFJlYWR5WWV0AAAAAAALXA==",
+    "AAAAAgAAAAAAAAAAAAAAC1dBU01EYXRhS2V5AAAAAAYAAAAAAAAAAAAAAAlUb2tlbkhhc2gAAAAAAAAAAAAAAAAAAA9Ub2tlbkZ1dHVyZVdBU00AAAAAAAAAAAAAAAAJR2F1Z2VXQVNNAAAAAAAAAAAAAAAAAAAPRnV0dXJlR2F1Z2VXQVNNAAAAAAAAAAAAAAAAEENvbnN0YW50UG9vbEhhc2gAAAAAAAAAAAAAABJTdGFibGVTd2FwUG9vbEhhc2gAAA==",
+    "AAAABAAAAAAAAAAAAAAADFJld2FyZHNFcnJvcgAAAAIAAAAAAAAAElBhc3RUaW1lTm90QWxsb3dlZAAAAAACvQAAAAAAAAARU2FtZVJld2FyZHNDb25maWcAAAAAAAK+",
+    "AAAAAQAAAAAAAAAAAAAADlBvb2xSZXdhcmREYXRhAAAAAAAEAAAAAAAAAAthY2N1bXVsYXRlZAAAAAAKAAAAAAAAAAVibG9jawAAAAAAAAYAAAAAAAAAB2NsYWltZWQAAAAACgAAAAAAAAAJbGFzdF90aW1lAAAAAAAABg==",
+    "AAAAAQAAAAAAAAAAAAAADlVzZXJSZXdhcmREYXRhAAAAAAADAAAAAAAAAApsYXN0X2Jsb2NrAAAAAAAGAAAAAAAAABBwb29sX2FjY3VtdWxhdGVkAAAACgAAAAAAAAAIdG9fY2xhaW0AAAAK",
+    "AAAAAQAAAAAAAAAAAAAAEFBvb2xSZXdhcmRDb25maWcAAAACAAAAAAAAAApleHBpcmVkX2F0AAAAAAAGAAAAAAAAAAN0cHMAAAAACg==",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAAwAAAAAAAAATQW5vdGhlckFjdGlvbkFjdGl2ZQAAAAtaAAAAAAAAAA5Ob0FjdGlvbkFjdGl2ZQAAAAALWwAAAAAAAAARQWN0aW9uTm90UmVhZHlZZXQAAAAAAAtc",
+    "AAAABAAAAAAAAAAAAAAACU1hdGhFcnJvcgAAAAAAAAEAAAAAAAAADk51bWJlck92ZXJmbG93AAAAAAH+",
+    "AAAABAAAAAAAAAAAAAAADFN0b3JhZ2VFcnJvcgAAAAQAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAAAyQAAAAAAAAATVmFsdWVOb3RJbml0aWFsaXplZAAAAAH1AAAAAAAAAAxWYWx1ZU1pc3NpbmcAAAH2AAAAAAAAABRWYWx1ZUNvbnZlcnNpb25FcnJvcgAAAfc="
+  ]
+}

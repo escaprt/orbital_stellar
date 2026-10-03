@@ -1,0 +1,379 @@
+{
+  "contractId": "CDCART6WRSM2K4CKOAOB5YKUVBSJ6KLOVS7ZEJHA4OAQ2FXX7JOHLXIP",
+  "description": "FxDAO Locking pool (contracts/locking-pool) - the protocol's stablecoin and token locking/rewards pool contract. Allows users to lock supported assets/stablecoins to earn protocol rewards and manage locking positions on Stellar mainnet.",
+  "events": [],
+  "functions": [
+    {
+      "name": "init",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "name": "reward_asset",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "upgrade",
+      "params": [
+        {
+          "name": "hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_admin",
+      "params": [
+        {
+          "name": "address",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_manager",
+      "params": [
+        {
+          "name": "address",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "set_pool",
+      "params": [
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        },
+        {
+          "name": "lock_period",
+          "type": "u64"
+        },
+        {
+          "name": "min_deposit",
+          "type": "u128"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "clone_pool",
+      "params": [
+        {
+          "name": "existing_asset",
+          "type": "address"
+        },
+        {
+          "name": "new_asset",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "toggle_pool",
+      "params": [
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        },
+        {
+          "name": "status",
+          "type": "bool"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "remove_pool",
+      "params": [
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "migrate_deposits",
+      "params": [
+        {
+          "name": "old_asset",
+          "type": "address"
+        },
+        {
+          "name": "new_asset",
+          "type": "address"
+        },
+        {
+          "name": "depositors",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "deposit",
+      "params": [
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        },
+        {
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "u128"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "withdraw",
+      "params": [
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        },
+        {
+          "name": "caller",
+          "type": "address"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "distribute",
+      "params": [
+        {
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "name": "deposit_asset",
+          "type": "address"
+        },
+        {
+          "name": "amount",
+          "type": "u128"
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "FxDAO Locking Pool",
+  "network": "mainnet",
+  "types": {
+    "ContractErrors": {
+      "kind": "enum",
+      "name": "ContractErrors",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "NotStarted"
+        },
+        {
+          "discriminant": 1,
+          "name": "PoolDoesntExist"
+        },
+        {
+          "discriminant": 2,
+          "name": "InvalidDepositAmount"
+        },
+        {
+          "discriminant": 3,
+          "name": "DepositAlreadyExists"
+        },
+        {
+          "discriminant": 4,
+          "name": "FundsDepositFailed"
+        },
+        {
+          "discriminant": 5,
+          "name": "DepositDoesntExist"
+        },
+        {
+          "discriminant": 6,
+          "name": "DepositIsStillLocked"
+        },
+        {
+          "discriminant": 7,
+          "name": "RewardsWithdrawFailed"
+        },
+        {
+          "discriminant": 8,
+          "name": "FundsWithdrawFailed"
+        },
+        {
+          "discriminant": 9,
+          "name": "CantDistributeReward"
+        },
+        {
+          "discriminant": 10,
+          "name": "RewardsDepositFailed"
+        },
+        {
+          "discriminant": 11,
+          "name": "PoolDoesntAcceptDeposits"
+        },
+        {
+          "discriminant": 12,
+          "name": "PoolAlreadyExists"
+        },
+        {
+          "discriminant": 13,
+          "name": "PoolCanNotBeDeleted"
+        },
+        {
+          "discriminant": 14,
+          "name": "AlreadyStarted"
+        }
+      ]
+    },
+    "CoreDataKeys": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "Admin"
+        },
+        {
+          "fields": [],
+          "name": "Manager"
+        },
+        {
+          "fields": [],
+          "name": "RewardsAsset"
+        }
+      ],
+      "kind": "union",
+      "name": "CoreDataKeys"
+    },
+    "Deposit": {
+      "fields": [
+        {
+          "name": "amount",
+          "type": "u128"
+        },
+        {
+          "name": "snapshot",
+          "type": "u128"
+        },
+        {
+          "name": "unlocks_at",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "Deposit"
+    },
+    "DepositsStorageKeys": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": {
+                "elements": ["address", "address"],
+                "type": "tuple"
+              }
+            }
+          ],
+          "name": "Deposit"
+        }
+      ],
+      "kind": "union",
+      "name": "DepositsStorageKeys"
+    },
+    "Pool": {
+      "fields": [
+        {
+          "name": "active",
+          "type": "bool"
+        },
+        {
+          "name": "asset",
+          "type": "address"
+        },
+        {
+          "name": "balance",
+          "type": "u128"
+        },
+        {
+          "name": "deposits",
+          "type": "u64"
+        },
+        {
+          "name": "factor",
+          "type": "u128"
+        },
+        {
+          "name": "lock_period",
+          "type": "u64"
+        },
+        {
+          "name": "min_deposit",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "Pool"
+    },
+    "PoolDataKeys": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "address"
+            }
+          ],
+          "name": "Pool"
+        }
+      ],
+      "kind": "union",
+      "name": "PoolDataKeys"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAAEaW5pdAAAAAMAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAHbWFuYWdlcgAAAAATAAAAAAAAAAxyZXdhcmRfYXNzZXQAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAARoYXNoAAAD7gAAACAAAAAA",
+    "AAAAAAAAAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAALc2V0X21hbmFnZXIAAAAAAQAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAIc2V0X3Bvb2wAAAADAAAAAAAAAA1kZXBvc2l0X2Fzc2V0AAAAAAAAEwAAAAAAAAALbG9ja19wZXJpb2QAAAAABgAAAAAAAAALbWluX2RlcG9zaXQAAAAACgAAAAA=",
+    "AAAAAAAAAAAAAAAKY2xvbmVfcG9vbAAAAAAAAgAAAAAAAAAOZXhpc3RpbmdfYXNzZXQAAAAAABMAAAAAAAAACW5ld19hc3NldAAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAALdG9nZ2xlX3Bvb2wAAAAAAgAAAAAAAAANZGVwb3NpdF9hc3NldAAAAAAAABMAAAAAAAAABnN0YXR1cwAAAAAAAQAAAAA=",
+    "AAAAAAAAAAAAAAALcmVtb3ZlX3Bvb2wAAAAAAQAAAAAAAAANZGVwb3NpdF9hc3NldAAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAQbWlncmF0ZV9kZXBvc2l0cwAAAAMAAAAAAAAACW9sZF9hc3NldAAAAAAAABMAAAAAAAAACW5ld19hc3NldAAAAAAAABMAAAAAAAAACmRlcG9zaXRvcnMAAAAAA+oAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAHZGVwb3NpdAAAAAADAAAAAAAAAA1kZXBvc2l0X2Fzc2V0AAAAAAAAEwAAAAAAAAAGY2FsbGVyAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAoAAAAA",
+    "AAAAAAAAAAAAAAAId2l0aGRyYXcAAAACAAAAAAAAAA1kZXBvc2l0X2Fzc2V0AAAAAAAAEwAAAAAAAAAGY2FsbGVyAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAKZGlzdHJpYnV0ZQAAAAAAAwAAAAAAAAAGY2FsbGVyAAAAAAATAAAAAAAAAA1kZXBvc2l0X2Fzc2V0AAAAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAAKAAAAAA==",
+    "AAAABAAAAAAAAAAAAAAADkNvbnRyYWN0RXJyb3JzAAAAAAAPAAAAAAAAAApOb3RTdGFydGVkAAAAAAAAAAAAAAAAAA9Qb29sRG9lc250RXhpc3QAAAAAAQAAAAAAAAAUSW52YWxpZERlcG9zaXRBbW91bnQAAAACAAAAAAAAABREZXBvc2l0QWxyZWFkeUV4aXN0cwAAAAMAAAAAAAAAEkZ1bmRzRGVwb3NpdEZhaWxlZAAAAAAABAAAAAAAAAASRGVwb3NpdERvZXNudEV4aXN0AAAAAAAFAAAAAAAAABREZXBvc2l0SXNTdGlsbExvY2tlZAAAAAYAAAAAAAAAFVJld2FyZHNXaXRoZHJhd0ZhaWxlZAAAAAAAAAcAAAAAAAAAE0Z1bmRzV2l0aGRyYXdGYWlsZWQAAAAACAAAAAAAAAAUQ2FudERpc3RyaWJ1dGVSZXdhcmQAAAAJAAAAAAAAABRSZXdhcmRzRGVwb3NpdEZhaWxlZAAAAAoAAAAAAAAAGFBvb2xEb2VzbnRBY2NlcHREZXBvc2l0cwAAAAsAAAAAAAAAEVBvb2xBbHJlYWR5RXhpc3RzAAAAAAAADAAAAAAAAAATUG9vbENhbk5vdEJlRGVsZXRlZAAAAAANAAAAAAAAAA5BbHJlYWR5U3RhcnRlZAAAAAAADg==",
+    "AAAAAgAAAAAAAAAAAAAADENvcmVEYXRhS2V5cwAAAAMAAAAAAAAAAAAAAAVBZG1pbgAAAAAAAAAAAAAAAAAAB01hbmFnZXIAAAAAAAAAAAAAAAAMUmV3YXJkc0Fzc2V0",
+    "AAAAAQAAAAAAAAAAAAAAB0RlcG9zaXQAAAAAAwAAAAAAAAAGYW1vdW50AAAAAAAKAAAAAAAAAAhzbmFwc2hvdAAAAAoAAAAAAAAACnVubG9ja3NfYXQAAAAAAAY=",
+    "AAAAAgAAAAAAAAAAAAAAE0RlcG9zaXRzU3RvcmFnZUtleXMAAAAAAQAAAAEAAAAAAAAAB0RlcG9zaXQAAAAAAQAAA+0AAAACAAAAEwAAABM=",
+    "AAAAAQAAAAAAAAAAAAAABFBvb2wAAAAHAAAAAAAAAAZhY3RpdmUAAAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAAAAAAHYmFsYW5jZQAAAAAKAAAAAAAAAAhkZXBvc2l0cwAAAAYAAAAAAAAABmZhY3RvcgAAAAAACgAAAAAAAAALbG9ja19wZXJpb2QAAAAABgAAAAAAAAALbWluX2RlcG9zaXQAAAAACg==",
+    "AAAAAgAAAAAAAAAAAAAADFBvb2xEYXRhS2V5cwAAAAEAAAABAAAAAAAAAARQb29sAAAAAQAAABM="
+  ]
+}

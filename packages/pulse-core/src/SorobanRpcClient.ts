@@ -51,9 +51,15 @@ export function rpcSupportsUnifiedEvents(info: SorobanNetworkInfo | undefined): 
   return info?.protocolVersion !== undefined && info.protocolVersion >= CAP_67_MIN_PROTOCOL_VERSION;
 }
 
+/**
+ * Network information returned by the Soroban RPC `getNetwork` method.
+ */
 export type SorobanNetworkInfo = {
+  /** Optional friendbot URL for testnet/futurenet. */
   friendbotUrl?: string;
+  /** The network passphrase (e.g., "Public Global Stellar Network ; September 2015"). */
   passphrase: string;
+  /** Optional protocol version indicating CAP-67 unified events support. */
   protocolVersion?: number;
 };
 
@@ -149,51 +155,100 @@ export interface GetEventsOptions {
   signal?: AbortSignal;
 }
 
+/**
+ * XDR encoding format for Soroban events.
+ * - `"json"`: the RPC decodes XDR values into JSON objects.
+ * - `"base64"`: raw base64 strings are preserved.
+ */
 export type SorobanEventXdrFormat = "base64" | "json";
 
+/**
+ * Filter for querying Soroban events.
+ * Supports filtering by event type, contract IDs, topics, and topic filters.
+ */
 export type SorobanEventFilter = {
+  /** The type of event to filter for. */
   type?: "contract" | "system" | "diagnostic" | "contract.invoked" | "contract.emitted";
+  /** Contract IDs to filter events from. */
   contractIds?: string[];
+  /** Topic match patterns: each inner array is one pattern, segment by segment (`null` = wildcard). */
   topics?: Array<Array<string | null>>;
+  /** Single topic pattern, segment by segment (`null` = wildcard). */
   topicFilters?: Array<string | null>;
 };
 
+/**
+ * Parameters for the `getEvents` RPC call.
+ */
 export type SorobanGetEventsParams = {
+  /** Start fetching from this ledger sequence. */
   startLedger?: number;
+  /** Cursor to resume from a previous page. */
   cursor?: string;
+  /** Cursor to start from; what the positional `getEvents(startCursor, ...)` form sets. */
   startCursor?: string;
+  /** Event filters (up to 5). */
   filters?: SorobanEventFilter[] | ContractSubscriptionFilter[];
+  /** Maximum number of events to return. */
   limit?: number;
+  /** Pagination options. */
   pagination?: {
     cursor?: string;
     limit?: number;
   };
+  /** XDR format for this request. */
   xdrFormat?: SorobanEventXdrFormat;
 };
 
+/**
+ * Per-call options for Soroban RPC methods.
+ */
 export type SorobanRpcCallOptions = {
+  /** Optional AbortSignal for request cancellation. */
   signal?: AbortSignal;
 };
 
+/**
+ * Raw Soroban event record as returned by the RPC `getEvents` method.
+ */
 export type SorobanRpcEvent = {
+  /** Event type (e.g., "contract", "system"). */
   type: string;
+  /** Ledger sequence where the event was emitted. */
   ledger: number;
+  /** ISO timestamp of ledger close. */
   ledgerClosedAt?: string;
+  /** Contract ID that emitted the event (for contract events). */
   contractId?: string;
+  /** Unique event ID. */
   id: string;
+  /** Paging token for cursor-based pagination. */
   pagingToken?: string;
+  /** Legacy single topic field. */
   topic?: unknown[];
+  /** Full topic array (name + topic segments). */
   topics?: unknown[];
+  /** Event value: base64 XDR by default, decoded JSON when `xdrFormat` is `"json"`. */
   value?: unknown;
+  /** Transaction hash that produced this event. */
   txHash?: string;
+  /** Whether the event came from a successful contract call. */
   inSuccessfulContractCall?: boolean;
+  /** Catch-all for any additional RPC fields. */
   [key: string]: unknown;
 };
 
+/**
+ * Result of the `getEvents` RPC call.
+ */
 export type SorobanGetEventsResult = {
+  /** Array of events returned by the RPC. */
   events: SorobanRpcEvent[];
+  /** The latest ledger sequence at the time of the query. */
   latestLedger?: number;
+  /** Cursor for fetching the next page. */
   cursor?: string;
+  /** Additional properties from the RPC response. */
   [key: string]: unknown;
 };
 
@@ -235,6 +290,9 @@ export type SorobanGetTransactionResult = {
   latestLedger?: number;
 };
 
+/**
+ * Options for {@link SorobanRpcClient.pollTransaction}.
+ */
 export type PollTransactionOptions = SorobanRpcCallOptions & {
   /** How long to wait between polls. Defaults to 1000ms. */
   intervalMs?: number;
@@ -242,10 +300,17 @@ export type PollTransactionOptions = SorobanRpcCallOptions & {
   timeoutMs?: number;
 };
 
+/**
+ * Result of the `getLatestLedger` RPC call.
+ */
 export type SorobanLatestLedgerResult = {
+  /** Hash identifying the latest ledger. */
   id?: string;
+  /** Protocol version of the network. */
   protocolVersion?: number;
+  /** The latest ledger sequence number. */
   sequence: number;
+  /** Ledger close time as a Unix timestamp. */
   ledgerCloseTime?: number;
 };
 
@@ -261,12 +326,19 @@ export interface LedgerCloseTimeSource {
   getLatestLedgerCloseTime(options?: SorobanRpcCallOptions): Promise<number>;
 }
 
+/**
+ * Successful JSON-RPC 2.0 response.
+ * @typeParam T - The shape of the `result` field.
+ */
 export type JsonRpcSuccess<T> = {
   jsonrpc: "2.0";
   id: string | number | null;
   result: T;
 };
 
+/**
+ * Failed JSON-RPC 2.0 response.
+ */
 export type JsonRpcFailure = {
   jsonrpc: "2.0";
   id: string | number | null;
@@ -277,6 +349,10 @@ export type JsonRpcFailure = {
   };
 };
 
+/**
+ * JSON-RPC 2.0 response (success or failure).
+ * @typeParam T - The shape of the `result` field on success.
+ */
 export type JsonRpcResponse<T> = JsonRpcSuccess<T> | JsonRpcFailure;
 
 /** Maps an HTTP status code to a {@link SorobanRpcError} classification. */

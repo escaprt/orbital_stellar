@@ -50,8 +50,7 @@ existing as a product: if a worker holds the key, what is being sold is custody
 wearing a different name, and it should be evaluated — and regulated — as
 custody.
 
-> **On the numbering.** The custody gate, the PR template and
-> [`vault-pattern.md`](./vault-pattern.md) cite this rule as **§C.2 rule 3**,
+> **On the numbering.** The custody gate and the PR template cite this rule as **§C.2 rule 3**,
 > which is the PRD's numbering. This document orders the rules by *precedence*,
 > where it is rule 2. Same rule, and the `#c2-no-user-custody` anchor those
 > references point at is on this heading and stays there. If the PRD is ever
@@ -90,8 +89,7 @@ permission to call one bounded function on it:
 - revocation the depositor can exercise unilaterally and immediately, including
   during an incident.
 
-The vault, not the worker, is where the guarantees live. See
-[`vault-pattern.md`](./vault-pattern.md).
+The vault, not the worker, is where the guarantees live.
 
 ### Rule 3 — A worker's absence delays. It never diverts.
 
@@ -121,7 +119,7 @@ ending a subscription requires the operator's cooperation.
 Prose gets skimmed. Two mechanical checks answer it instead:
 
 1. **The PR template** carries a custody checklist for any PR touching
-   `packages/worker-core/`, `contracts/vault/` or `contracts/payroll/`.
+   `packages/worker-core/` or `contracts/payroll/`.
 2. **`.github/workflows/custody-gate.yml`** runs
    `scripts/check-no-user-custody.mjs`, which flags new code introducing a
    user-secret or user-keypair field into worker types, subscription records or
@@ -174,7 +172,7 @@ rule is broader than the check, and review is where the rest of it is enforced.
 The order is set by **risk, not convenience.**
 
 There was a fifth stage, `W4`, for a latency-sensitive tier and the vault
-pattern that tier required. It has been cut — see
+pattern that tier required. It was cut in #1137 — see
 [§6, "The vault pattern was cut"](#the-vault-pattern-was-cut). The layer ends
 at W3, where the worst outcome a worker can produce is still lateness.
 
@@ -272,8 +270,6 @@ cure. Stating it plainly is part of why this document exists.
 - [`docs/design/prior-art-workers.md`](./prior-art-workers.md) — competitive and
   prior-art notes, kept out of this document because they date fast and are
   self-reported rather than audited
-- [`docs/design/vault-pattern.md`](./vault-pattern.md) — rule 2 in code: the
-  constrained vault a worker calls into
 - [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) — system architecture
 - [`ROADMAP.md`](../../ROADMAP.md) — phases and the freeze procedure
 - [`packages/worker-core/README.md`](../../packages/worker-core/README.md) —

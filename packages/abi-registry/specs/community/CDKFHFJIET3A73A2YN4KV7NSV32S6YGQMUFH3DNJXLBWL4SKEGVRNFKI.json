@@ -1,0 +1,510 @@
+{
+  "contractId": "CDKFHFJIET3A73A2YN4KV7NSV32S6YGQMUFH3DNJXLBWL4SKEGVRNFKI",
+  "description": "DeFindex Factory on Stellar mainnet. Deploys and registers DeFindex vaults (yield-aggregating index vaults) and holds the protocol's fee receiver and vault-wasm configuration.",
+  "events": [],
+  "functions": [
+    {
+      "doc": "Initializes the factory contract with the given parameters.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `admin` - The address of the contract administrator who can manage settings.\n* `defindex_receiver` - The default address designated to receive the DeFindex portion of fees.\n* `defindex_fee` - The initial fee rate in basis points (1 basis point = 0.01%).\n* `vault_wasm_hash` - The hash of the DeFindex Vault's WASM file used for deploying new vaults.\n\n# Behavior\n1. Sets the initial admin address\n2. Sets the initial DeFindex fee receiver address\n3. Sets the initial vault WASM hash\n4. Sets the initial DeFindex fee rate\n5. Extends the contract instance's time-to-live",
+      "name": "__constructor",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "defindex_receiver",
+          "type": "address"
+        },
+        {
+          "name": "defindex_fee",
+          "type": "u32"
+        },
+        {
+          "name": "vault_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Creates a new DeFindex Vault with the specified parameters.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `roles` - A `Map` containing role identifiers (`u32`) and their corresponding `Address` assignments.\nExample roles include the manager and fee receiver.\n* `vault_fee` - The fee rate in basis points (1 basis point = 0.01%) allocated to the fee receiver.\n* `assets` - A vector of `AssetStrategySet` structs defining the strategies and assets managed by the vault.\n* `soroswap_router` - The `Address` of the Soroswap router, which facilitates swaps within the vault.\n* `name_symbol` - A `Map` containing the vault's name and symbol metadata (e.g., \"name\" -> \"MyVault\", \"symbol\" -> \"MVLT\").\n* `upgradable` - A boolean flag indicating whether the deployed vault contract should support upgrades.\n\n# Returns\n* `Result<Address, FactoryError>` - Returns the address of the newly created vault if successful, or an error if creation fails.",
+      "name": "create_defindex_vault",
+      "params": [
+        {
+          "name": "roles",
+          "type": {
+            "key": "u32",
+            "type": "map",
+            "value": "address"
+          }
+        },
+        {
+          "name": "vault_fee",
+          "type": "u32"
+        },
+        {
+          "name": "assets",
+          "type": {
+            "item": {
+              "name": "AssetStrategySet",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "soroswap_router",
+          "type": "address"
+        },
+        {
+          "name": "name_symbol",
+          "type": {
+            "key": "string",
+            "type": "map",
+            "value": "string"
+          }
+        },
+        {
+          "name": "upgradable",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Creates a new DeFindex Vault with specified parameters and performs an initial deposit to set asset ratios.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `caller` - The address of the caller, who must authenticate and provide the initial deposit.\n* `roles` - A `Map` containing role identifiers (`u32`) and their corresponding `Address` assignments.\nExample roles include the manager and fee receiver.\n* `vault_fee` - The fee rate in basis points (1 basis point = 0.01%) allocated to the fee receiver.\n* `assets` - A vector of `AssetStrategySet` structs defining the strategies and assets managed by the vault.\n* `soroswap_router` - The `Address` of the Soroswap router, which facilitates swaps within the vault.\n* `name_symbol` - A `Map` containing the vault's name and symbol metadata (e.g., \"name\" -> \"MyVault\", \"symbol\" -> \"MVLT\").\n* `upgradable` - A boolean flag indicating whether the deployed vault contract should support upgrades.\n* `amounts` - A vector of `i128` values representing the ",
+      "name": "create_defindex_vault_deposit",
+      "params": [
+        {
+          "name": "caller",
+          "type": "address"
+        },
+        {
+          "name": "roles",
+          "type": {
+            "key": "u32",
+            "type": "map",
+            "value": "address"
+          }
+        },
+        {
+          "name": "vault_fee",
+          "type": "u32"
+        },
+        {
+          "name": "assets",
+          "type": {
+            "item": {
+              "name": "AssetStrategySet",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "soroswap_router",
+          "type": "address"
+        },
+        {
+          "name": "name_symbol",
+          "type": {
+            "key": "string",
+            "type": "map",
+            "value": "string"
+          }
+        },
+        {
+          "name": "upgradable",
+          "type": "bool"
+        },
+        {
+          "name": "amounts",
+          "type": {
+            "item": "i128",
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets a new admin address.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `new_admin` - The new administrator's address.\n\n# Returns\n* `Result<(), FactoryError>` - Returns Ok(()) if successful, or an error if not authorized.",
+      "name": "set_new_admin",
+      "params": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Updates the default receiver address for the DeFindex portion of fees.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `new_fee_receiver` - The address of the new fee receiver.\n\n# Returns\n* `Result<(), FactoryError>` - Returns Ok(()) if successful, or an error if not authorized.",
+      "name": "set_defindex_receiver",
+      "params": [
+        {
+          "name": "new_fee_receiver",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Updates the default fee rate for new vaults.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `defindex_fee` - The new annual fee rate in basis points.\n\n# Returns\n* `Result<(), FactoryError>` - Returns Ok(()) if successful, or an error if not authorized.",
+      "name": "set_defindex_fee",
+      "params": [
+        {
+          "name": "defindex_fee",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "set_vault_wasm_hash",
+      "params": [
+        {
+          "name": "new_vault_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the current admin's address.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n\n# Returns\n* `Result<Address, FactoryError>` - Returns the admin's address or an error if not found.",
+      "name": "admin",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the current DeFindex receiver's address.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n\n# Returns\n* `Result<Address, FactoryError>` - Returns the DeFindex receiver's address or an error if not found.",
+      "name": "defindex_receiver",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the total number of deployed DeFindex vaults.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n\n# Returns\n* `Result<u32, FactoryError>` - Returns the total number of deployed vaults or an error if retrieval fails.",
+      "name": "total_vaults",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "u32",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves a specific vault address by its index.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n* `index` - The index of the vault to retrieve (0-based).\n\n# Returns\n* `Result<Address, FactoryError>` - Returns the vault address at the specified index or an error if not found.",
+      "name": "get_vault_by_index",
+      "params": [
+        {
+          "name": "index",
+          "type": "u32"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the current fee rate.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n\n# Returns\n* `Result<u32, FactoryError>` - Returns the fee rate in basis points or an error if not found.",
+      "name": "defindex_fee",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": "u32",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the WASM hash of the vault contract.\n\n# Arguments\n* `e` - The environment in which the contract is running.\n\n# Returns\n* `Result<BytesN<32>, FactoryError>` - Returns the 32-byte WASM hash of the vault contract\nor an error if the contract is not properly initialized.\n\n# Behavior\n1. Assumes that the contract is initialized by the constructor.\n2. Extends the instance's time-to-live (TTL) by invoking `extend_instance_ttl(&e)`.\n3. Retrieves and returns the vault WASM hash by calling `get_vault_wasm_hash(&e)`.",
+      "name": "vault_wasm_hash",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "FactoryError",
+          "type": "named"
+        },
+        "ok": {
+          "size": 32,
+          "type": "bytes_n"
+        },
+        "type": "result"
+      }
+    }
+  ],
+  "name": "DeFindex Factory",
+  "network": "mainnet",
+  "types": {
+    "AssetStrategySet": {
+      "fields": [
+        {
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "name": "strategies",
+          "type": {
+            "item": {
+              "name": "Strategy",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "AssetStrategySet"
+    },
+    "CreateDeFindexEvent": {
+      "fields": [
+        {
+          "name": "assets",
+          "type": {
+            "item": {
+              "name": "AssetStrategySet",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "roles",
+          "type": {
+            "key": "u32",
+            "type": "map",
+            "value": "address"
+          }
+        },
+        {
+          "name": "vault_fee",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "CreateDeFindexEvent"
+    },
+    "DataKey": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "Admin"
+        },
+        {
+          "fields": [],
+          "name": "DeFindexWasmHash"
+        },
+        {
+          "fields": [],
+          "name": "DeFindexReceiver"
+        },
+        {
+          "fields": [],
+          "name": "TotalVaults"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "u32"
+            }
+          ],
+          "name": "VaultAddressNIndexed"
+        },
+        {
+          "fields": [],
+          "name": "FeeRate"
+        }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "FactoryError": {
+      "kind": "enum",
+      "name": "FactoryError",
+      "variants": [
+        {
+          "discriminant": 401,
+          "name": "NotInitialized"
+        },
+        {
+          "discriminant": 404,
+          "name": "AssetLengthMismatch"
+        },
+        {
+          "discriminant": 405,
+          "name": "IndexDoesNotExist"
+        },
+        {
+          "discriminant": 406,
+          "name": "FeeTooHigh"
+        }
+      ]
+    },
+    "NewAdminEvent": {
+      "fields": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "NewAdminEvent"
+    },
+    "NewDeFindexReceiverEvent": {
+      "fields": [
+        {
+          "name": "new_defindex_receiver",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "NewDeFindexReceiverEvent"
+    },
+    "NewFeeRateEvent": {
+      "fields": [
+        {
+          "name": "new_defindex_fee",
+          "type": "u32"
+        }
+      ],
+      "kind": "struct",
+      "name": "NewFeeRateEvent"
+    },
+    "NewVaultWasmHashEvent": {
+      "fields": [
+        {
+          "name": "new_vault_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "NewVaultWasmHashEvent"
+    },
+    "Strategy": {
+      "fields": [
+        {
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ],
+      "kind": "struct",
+      "name": "Strategy"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAADEZhY3RvcnlFcnJvcgAAAAQAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAGRAAAAAAAAABNBc3NldExlbmd0aE1pc21hdGNoAAAAAZQAAAAAAAAAEUluZGV4RG9lc05vdEV4aXN0AAAAAAABlQAAAAAAAAAKRmVlVG9vSGlnaAAAAAABlg==",
+    "AAAAAQAAAAAAAAAAAAAAE0NyZWF0ZURlRmluZGV4RXZlbnQAAAAAAwAAAAAAAAAGYXNzZXRzAAAAAAPqAAAH0AAAABBBc3NldFN0cmF0ZWd5U2V0AAAAAAAAAAVyb2xlcwAAAAAAA+wAAAAEAAAAEwAAAAAAAAAJdmF1bHRfZmVlAAAAAAAABA==",
+    "AAAAAQAAAAAAAAAAAAAADU5ld0FkbWluRXZlbnQAAAAAAAABAAAAAAAAAAluZXdfYWRtaW4AAAAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAGE5ld0RlRmluZGV4UmVjZWl2ZXJFdmVudAAAAAEAAAAAAAAAFW5ld19kZWZpbmRleF9yZWNlaXZlcgAAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAD05ld0ZlZVJhdGVFdmVudAAAAAABAAAAAAAAABBuZXdfZGVmaW5kZXhfZmVlAAAABA==",
+    "AAAAAQAAAAAAAAAAAAAAFU5ld1ZhdWx0V2FzbUhhc2hFdmVudAAAAAAAAAEAAAAAAAAAE25ld192YXVsdF93YXNtX2hhc2gAAAAD7gAAACA=",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABgAAAAAAAAAAAAAABUFkbWluAAAAAAAAAAAAAAAAAAAQRGVGaW5kZXhXYXNtSGFzaAAAAAAAAAAAAAAAEERlRmluZGV4UmVjZWl2ZXIAAAAAAAAAAAAAAAtUb3RhbFZhdWx0cwAAAAABAAAAAAAAABRWYXVsdEFkZHJlc3NOSW5kZXhlZAAAAAEAAAAEAAAAAAAAAAAAAAAHRmVlUmF0ZQA=",
+    "AAAAAAAAArxJbml0aWFsaXplcyB0aGUgZmFjdG9yeSBjb250cmFjdCB3aXRoIHRoZSBnaXZlbiBwYXJhbWV0ZXJzLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYGFkbWluYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBjb250cmFjdCBhZG1pbmlzdHJhdG9yIHdobyBjYW4gbWFuYWdlIHNldHRpbmdzLgoqIGBkZWZpbmRleF9yZWNlaXZlcmAgLSBUaGUgZGVmYXVsdCBhZGRyZXNzIGRlc2lnbmF0ZWQgdG8gcmVjZWl2ZSB0aGUgRGVGaW5kZXggcG9ydGlvbiBvZiBmZWVzLgoqIGBkZWZpbmRleF9mZWVgIC0gVGhlIGluaXRpYWwgZmVlIHJhdGUgaW4gYmFzaXMgcG9pbnRzICgxIGJhc2lzIHBvaW50ID0gMC4wMSUpLgoqIGB2YXVsdF93YXNtX2hhc2hgIC0gVGhlIGhhc2ggb2YgdGhlIERlRmluZGV4IFZhdWx0J3MgV0FTTSBmaWxlIHVzZWQgZm9yIGRlcGxveWluZyBuZXcgdmF1bHRzLgoKIyBCZWhhdmlvcgoxLiBTZXRzIHRoZSBpbml0aWFsIGFkbWluIGFkZHJlc3MKMi4gU2V0cyB0aGUgaW5pdGlhbCBEZUZpbmRleCBmZWUgcmVjZWl2ZXIgYWRkcmVzcwozLiBTZXRzIHRoZSBpbml0aWFsIHZhdWx0IFdBU00gaGFzaAo0LiBTZXRzIHRoZSBpbml0aWFsIERlRmluZGV4IGZlZSByYXRlCjUuIEV4dGVuZHMgdGhlIGNvbnRyYWN0IGluc3RhbmNlJ3MgdGltZS10by1saXZlAAAADV9fY29uc3RydWN0b3IAAAAAAAAEAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAAEWRlZmluZGV4X3JlY2VpdmVyAAAAAAAAEwAAAAAAAAAMZGVmaW5kZXhfZmVlAAAABAAAAAAAAAAPdmF1bHRfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAA8NDcmVhdGVzIGEgbmV3IERlRmluZGV4IFZhdWx0IHdpdGggdGhlIHNwZWNpZmllZCBwYXJhbWV0ZXJzLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYHJvbGVzYCAtIEEgYE1hcGAgY29udGFpbmluZyByb2xlIGlkZW50aWZpZXJzIChgdTMyYCkgYW5kIHRoZWlyIGNvcnJlc3BvbmRpbmcgYEFkZHJlc3NgIGFzc2lnbm1lbnRzLgpFeGFtcGxlIHJvbGVzIGluY2x1ZGUgdGhlIG1hbmFnZXIgYW5kIGZlZSByZWNlaXZlci4KKiBgdmF1bHRfZmVlYCAtIFRoZSBmZWUgcmF0ZSBpbiBiYXNpcyBwb2ludHMgKDEgYmFzaXMgcG9pbnQgPSAwLjAxJSkgYWxsb2NhdGVkIHRvIHRoZSBmZWUgcmVjZWl2ZXIuCiogYGFzc2V0c2AgLSBBIHZlY3RvciBvZiBgQXNzZXRTdHJhdGVneVNldGAgc3RydWN0cyBkZWZpbmluZyB0aGUgc3RyYXRlZ2llcyBhbmQgYXNzZXRzIG1hbmFnZWQgYnkgdGhlIHZhdWx0LgoqIGBzb3Jvc3dhcF9yb3V0ZXJgIC0gVGhlIGBBZGRyZXNzYCBvZiB0aGUgU29yb3N3YXAgcm91dGVyLCB3aGljaCBmYWNpbGl0YXRlcyBzd2FwcyB3aXRoaW4gdGhlIHZhdWx0LgoqIGBuYW1lX3N5bWJvbGAgLSBBIGBNYXBgIGNvbnRhaW5pbmcgdGhlIHZhdWx0J3MgbmFtZSBhbmQgc3ltYm9sIG1ldGFkYXRhIChlLmcuLCAibmFtZSIgLT4gIk15VmF1bHQiLCAic3ltYm9sIiAtPiAiTVZMVCIpLgoqIGB1cGdyYWRhYmxlYCAtIEEgYm9vbGVhbiBmbGFnIGluZGljYXRpbmcgd2hldGhlciB0aGUgZGVwbG95ZWQgdmF1bHQgY29udHJhY3Qgc2hvdWxkIHN1cHBvcnQgdXBncmFkZXMuCgojIFJldHVybnMKKiBgUmVzdWx0PEFkZHJlc3MsIEZhY3RvcnlFcnJvcj5gIC0gUmV0dXJucyB0aGUgYWRkcmVzcyBvZiB0aGUgbmV3bHkgY3JlYXRlZCB2YXVsdCBpZiBzdWNjZXNzZnVsLCBvciBhbiBlcnJvciBpZiBjcmVhdGlvbiBmYWlscy4AAAAAFWNyZWF0ZV9kZWZpbmRleF92YXVsdAAAAAAAAAYAAAAAAAAABXJvbGVzAAAAAAAD7AAAAAQAAAATAAAAAAAAAAl2YXVsdF9mZWUAAAAAAAAEAAAAAAAAAAZhc3NldHMAAAAAA+oAAAfQAAAAEEFzc2V0U3RyYXRlZ3lTZXQAAAAAAAAAD3Nvcm9zd2FwX3JvdXRlcgAAAAATAAAAAAAAAAtuYW1lX3N5bWJvbAAAAAPsAAAAEAAAABAAAAAAAAAACnVwZ3JhZGFibGUAAAAAAAEAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAABABDcmVhdGVzIGEgbmV3IERlRmluZGV4IFZhdWx0IHdpdGggc3BlY2lmaWVkIHBhcmFtZXRlcnMgYW5kIHBlcmZvcm1zIGFuIGluaXRpYWwgZGVwb3NpdCB0byBzZXQgYXNzZXQgcmF0aW9zLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYGNhbGxlcmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgY2FsbGVyLCB3aG8gbXVzdCBhdXRoZW50aWNhdGUgYW5kIHByb3ZpZGUgdGhlIGluaXRpYWwgZGVwb3NpdC4KKiBgcm9sZXNgIC0gQSBgTWFwYCBjb250YWluaW5nIHJvbGUgaWRlbnRpZmllcnMgKGB1MzJgKSBhbmQgdGhlaXIgY29ycmVzcG9uZGluZyBgQWRkcmVzc2AgYXNzaWdubWVudHMuCkV4YW1wbGUgcm9sZXMgaW5jbHVkZSB0aGUgbWFuYWdlciBhbmQgZmVlIHJlY2VpdmVyLgoqIGB2YXVsdF9mZWVgIC0gVGhlIGZlZSByYXRlIGluIGJhc2lzIHBvaW50cyAoMSBiYXNpcyBwb2ludCA9IDAuMDElKSBhbGxvY2F0ZWQgdG8gdGhlIGZlZSByZWNlaXZlci4KKiBgYXNzZXRzYCAtIEEgdmVjdG9yIG9mIGBBc3NldFN0cmF0ZWd5U2V0YCBzdHJ1Y3RzIGRlZmluaW5nIHRoZSBzdHJhdGVnaWVzIGFuZCBhc3NldHMgbWFuYWdlZCBieSB0aGUgdmF1bHQuCiogYHNvcm9zd2FwX3JvdXRlcmAgLSBUaGUgYEFkZHJlc3NgIG9mIHRoZSBTb3Jvc3dhcCByb3V0ZXIsIHdoaWNoIGZhY2lsaXRhdGVzIHN3YXBzIHdpdGhpbiB0aGUgdmF1bHQuCiogYG5hbWVfc3ltYm9sYCAtIEEgYE1hcGAgY29udGFpbmluZyB0aGUgdmF1bHQncyBuYW1lIGFuZCBzeW1ib2wgbWV0YWRhdGEgKGUuZy4sICJuYW1lIiAtPiAiTXlWYXVsdCIsICJzeW1ib2wiIC0+ICJNVkxUIikuCiogYHVwZ3JhZGFibGVgIC0gQSBib29sZWFuIGZsYWcgaW5kaWNhdGluZyB3aGV0aGVyIHRoZSBkZXBsb3llZCB2YXVsdCBjb250cmFjdCBzaG91bGQgc3VwcG9ydCB1cGdyYWRlcy4KKiBgYW1vdW50c2AgLSBBIHZlY3RvciBvZiBgaTEyOGAgdmFsdWVzIHJlcHJlc2VudGluZyB0aGUgAAAAHWNyZWF0ZV9kZWZpbmRleF92YXVsdF9kZXBvc2l0AAAAAAAACAAAAAAAAAAGY2FsbGVyAAAAAAATAAAAAAAAAAVyb2xlcwAAAAAAA+wAAAAEAAAAEwAAAAAAAAAJdmF1bHRfZmVlAAAAAAAABAAAAAAAAAAGYXNzZXRzAAAAAAPqAAAH0AAAABBBc3NldFN0cmF0ZWd5U2V0AAAAAAAAAA9zb3Jvc3dhcF9yb3V0ZXIAAAAAEwAAAAAAAAALbmFtZV9zeW1ib2wAAAAD7AAAABAAAAAQAAAAAAAAAAp1cGdyYWRhYmxlAAAAAAABAAAAAAAAAAdhbW91bnRzAAAAA+oAAAALAAAAAQAAA+kAAAATAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAAPhTZXRzIGEgbmV3IGFkbWluIGFkZHJlc3MuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudCBpbiB3aGljaCB0aGUgY29udHJhY3QgaXMgcnVubmluZy4KKiBgbmV3X2FkbWluYCAtIFRoZSBuZXcgYWRtaW5pc3RyYXRvcidzIGFkZHJlc3MuCgojIFJldHVybnMKKiBgUmVzdWx0PCgpLCBGYWN0b3J5RXJyb3I+YCAtIFJldHVybnMgT2soKCkpIGlmIHN1Y2Nlc3NmdWwsIG9yIGFuIGVycm9yIGlmIG5vdCBhdXRob3JpemVkLgAAAA1zZXRfbmV3X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAATBVcGRhdGVzIHRoZSBkZWZhdWx0IHJlY2VpdmVyIGFkZHJlc3MgZm9yIHRoZSBEZUZpbmRleCBwb3J0aW9uIG9mIGZlZXMuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudCBpbiB3aGljaCB0aGUgY29udHJhY3QgaXMgcnVubmluZy4KKiBgbmV3X2ZlZV9yZWNlaXZlcmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgbmV3IGZlZSByZWNlaXZlci4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8KCksIEZhY3RvcnlFcnJvcj5gIC0gUmV0dXJucyBPaygoKSkgaWYgc3VjY2Vzc2Z1bCwgb3IgYW4gZXJyb3IgaWYgbm90IGF1dGhvcml6ZWQuAAAAFXNldF9kZWZpbmRleF9yZWNlaXZlcgAAAAAAAAEAAAAAAAAAEG5ld19mZWVfcmVjZWl2ZXIAAAATAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAARZVcGRhdGVzIHRoZSBkZWZhdWx0IGZlZSByYXRlIGZvciBuZXcgdmF1bHRzLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYGRlZmluZGV4X2ZlZWAgLSBUaGUgbmV3IGFubnVhbCBmZWUgcmF0ZSBpbiBiYXNpcyBwb2ludHMuCgojIFJldHVybnMKKiBgUmVzdWx0PCgpLCBGYWN0b3J5RXJyb3I+YCAtIFJldHVybnMgT2soKCkpIGlmIHN1Y2Nlc3NmdWwsIG9yIGFuIGVycm9yIGlmIG5vdCBhdXRob3JpemVkLgAAAAAAEHNldF9kZWZpbmRleF9mZWUAAAABAAAAAAAAAAxkZWZpbmRleF9mZWUAAAAEAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAAAAAAAATc2V0X3ZhdWx0X3dhc21faGFzaAAAAAABAAAAAAAAABNuZXdfdmF1bHRfd2FzbV9oYXNoAAAAA+4AAAAgAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAANJSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgYWRtaW4ncyBhZGRyZXNzLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCgojIFJldHVybnMKKiBgUmVzdWx0PEFkZHJlc3MsIEZhY3RvcnlFcnJvcj5gIC0gUmV0dXJucyB0aGUgYWRtaW4ncyBhZGRyZXNzIG9yIGFuIGVycm9yIGlmIG5vdCBmb3VuZC4AAAAAAAVhZG1pbgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAOpSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgRGVGaW5kZXggcmVjZWl2ZXIncyBhZGRyZXNzLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCgojIFJldHVybnMKKiBgUmVzdWx0PEFkZHJlc3MsIEZhY3RvcnlFcnJvcj5gIC0gUmV0dXJucyB0aGUgRGVGaW5kZXggcmVjZWl2ZXIncyBhZGRyZXNzIG9yIGFuIGVycm9yIGlmIG5vdCBmb3VuZC4AAAAAABFkZWZpbmRleF9yZWNlaXZlcgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAPVSZXRyaWV2ZXMgdGhlIHRvdGFsIG51bWJlciBvZiBkZXBsb3llZCBEZUZpbmRleCB2YXVsdHMuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudCBpbiB3aGljaCB0aGUgY29udHJhY3QgaXMgcnVubmluZy4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8dTMyLCBGYWN0b3J5RXJyb3I+YCAtIFJldHVybnMgdGhlIHRvdGFsIG51bWJlciBvZiBkZXBsb3llZCB2YXVsdHMgb3IgYW4gZXJyb3IgaWYgcmV0cmlldmFsIGZhaWxzLgAAAAAAAAx0b3RhbF92YXVsdHMAAAAAAAAAAQAAA+kAAAAEAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAAStSZXRyaWV2ZXMgYSBzcGVjaWZpYyB2YXVsdCBhZGRyZXNzIGJ5IGl0cyBpbmRleC4KCiMgQXJndW1lbnRzCiogYGVgIC0gVGhlIGVudmlyb25tZW50IGluIHdoaWNoIHRoZSBjb250cmFjdCBpcyBydW5uaW5nLgoqIGBpbmRleGAgLSBUaGUgaW5kZXggb2YgdGhlIHZhdWx0IHRvIHJldHJpZXZlICgwLWJhc2VkKS4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8QWRkcmVzcywgRmFjdG9yeUVycm9yPmAgLSBSZXR1cm5zIHRoZSB2YXVsdCBhZGRyZXNzIGF0IHRoZSBzcGVjaWZpZWQgaW5kZXggb3IgYW4gZXJyb3IgaWYgbm90IGZvdW5kLgAAAAASZ2V0X3ZhdWx0X2J5X2luZGV4AAAAAAABAAAAAAAAAAVpbmRleAAAAAAAAAQAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAANBSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgZmVlIHJhdGUuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudCBpbiB3aGljaCB0aGUgY29udHJhY3QgaXMgcnVubmluZy4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8dTMyLCBGYWN0b3J5RXJyb3I+YCAtIFJldHVybnMgdGhlIGZlZSByYXRlIGluIGJhc2lzIHBvaW50cyBvciBhbiBlcnJvciBpZiBub3QgZm91bmQuAAAADGRlZmluZGV4X2ZlZQAAAAAAAAABAAAD6QAAAAQAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAgdSZXRyaWV2ZXMgdGhlIFdBU00gaGFzaCBvZiB0aGUgdmF1bHQgY29udHJhY3QuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudCBpbiB3aGljaCB0aGUgY29udHJhY3QgaXMgcnVubmluZy4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8Qnl0ZXNOPDMyPiwgRmFjdG9yeUVycm9yPmAgLSBSZXR1cm5zIHRoZSAzMi1ieXRlIFdBU00gaGFzaCBvZiB0aGUgdmF1bHQgY29udHJhY3QKb3IgYW4gZXJyb3IgaWYgdGhlIGNvbnRyYWN0IGlzIG5vdCBwcm9wZXJseSBpbml0aWFsaXplZC4KCiMgQmVoYXZpb3IKMS4gQXNzdW1lcyB0aGF0IHRoZSBjb250cmFjdCBpcyBpbml0aWFsaXplZCBieSB0aGUgY29uc3RydWN0b3IuCjIuIEV4dGVuZHMgdGhlIGluc3RhbmNlJ3MgdGltZS10by1saXZlIChUVEwpIGJ5IGludm9raW5nIGBleHRlbmRfaW5zdGFuY2VfdHRsKCZlKWAuCjMuIFJldHJpZXZlcyBhbmQgcmV0dXJucyB0aGUgdmF1bHQgV0FTTSBoYXNoIGJ5IGNhbGxpbmcgYGdldF92YXVsdF93YXNtX2hhc2goJmUpYC4AAAAAD3ZhdWx0X3dhc21faGFzaAAAAAAAAAAAAQAAA+kAAAPuAAAAIAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAQAAAAAAAAAAAAAACFN0cmF0ZWd5AAAAAwAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAAAAAARuYW1lAAAAEAAAAAAAAAAGcGF1c2VkAAAAAAAB",
+    "AAAAAQAAAAAAAAAAAAAAEEFzc2V0U3RyYXRlZ3lTZXQAAAACAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAACnN0cmF0ZWdpZXMAAAAAA+oAAAfQAAAACFN0cmF0ZWd5"
+  ]
+}

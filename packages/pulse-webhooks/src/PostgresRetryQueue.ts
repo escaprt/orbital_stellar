@@ -1,6 +1,7 @@
 import type { RetryQueue, RetryRecord } from "./RetryQueue.js";
 import type { PgLike } from "./PostgresDeadLetterStore.js";
 
+/** Options for {@link PostgresRetryQueue}: table name, clock, and visibility timeout. */
 export type PostgresRetryQueueOptions = {
   /** Table name. Defaults to `pulse_webhook_retry_queue` (see `migrations/001_retry_queue.sql`). */
   tableName?: string;

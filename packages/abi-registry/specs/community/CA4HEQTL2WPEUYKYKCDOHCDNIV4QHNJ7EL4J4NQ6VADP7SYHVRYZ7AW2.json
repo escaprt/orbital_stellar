@@ -1,0 +1,275 @@
+{
+  "contractId": "CA4HEQTL2WPEUYKYKCDOHCDNIV4QHNJ7EL4J4NQ6VADP7SYHVRYZ7AW2",
+  "description": "Soroswap AMM factory: creates and indexes Soroswap pair contracts on Stellar mainnet.",
+  "events": [],
+  "functions": [
+    {
+      "doc": "Returns the recipient of the fee.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized.",
+      "name": "fee_to",
+      "params": [],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the address allowed to change the fee recipient.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized.",
+      "name": "fee_to_setter",
+      "params": [],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Checks if fees are enabled.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized.",
+      "name": "fees_enabled",
+      "params": [],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "bool",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the total number of pairs created through the factory so far.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized.",
+      "name": "all_pairs_length",
+      "params": [],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "u32",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the address of the pair for `token_a` and `token_b`, if it has been created.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `token_a` - The address of the first token in the pair.\n* `token_b` - The address of the second token in the pair.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized or if the pair does not exist",
+      "name": "get_pair",
+      "params": [
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the address of the nth pair (0-indexed) created through the factory, or address(0) if not enough pairs have been created yet.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `n` - The index of the pair to retrieve.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized or if index `n` does not exist.",
+      "name": "all_pairs",
+      "params": [{ "name": "n", "type": "u32" }],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Checks if a pair exists for the given `token_a` and `token_b`.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `token_a` - The address of the first token in the pair.\n* `token_b` - The address of the second token in the pair.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized.",
+      "name": "pair_exists",
+      "params": [
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "bool",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the `fee_to_setter` address and initializes the factory.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `setter` - The address to set as the current `fee_to_setter`.\n* `pair_wasm_hash` - The Wasm hash of the pair.\n\n# Errors\n\nReturns an error if the Factory is already initialized.",
+      "name": "initialize",
+      "params": [
+        { "name": "setter", "type": "address" },
+        { "name": "pair_wasm_hash", "type": { "size": 32, "type": "bytes_n" } }
+      ],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the `fee_to` address.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `to` - The address to set as the `fee_to`.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized or if the caller is not the current `fee_to_setter`.",
+      "name": "set_fee_to",
+      "params": [{ "name": "to", "type": "address" }],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the `fee_to_setter` address.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `new_setter` - The address to set as the new `fee_to_setter`.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized or if the caller is not the existing `fee_to_setter`.",
+      "name": "set_fee_to_setter",
+      "params": [{ "name": "new_setter", "type": "address" }],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets whether fees are enabled or disabled.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `is_enabled` - A boolean indicating whether fees are enabled or disabled.\n\n# Errors\n\nReturns an error if the Factory is not yet initialized or if the caller is not the current `fee_to_setter`.",
+      "name": "set_fees_enabled",
+      "params": [{ "name": "is_enabled", "type": "bool" }],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Creates a pair for `token_a` and `token_b` if one doesn't exist already.\n\n# Arguments\n\n* `e` - An instance of the `Env` struct.\n* `token_a` - The address of the first token in the pair.\n* `token_b` - The address of the second token in the pair.\n\n# Errors\n\nReturns an error if the pair is not yet initialized, if `token_a` and `token_b` have identical addresses, or if the pair already exists between `token_a` and `token_b`.",
+      "name": "create_pair",
+      "params": [
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "FactoryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    }
+  ],
+  "name": "Soroswap Factory",
+  "network": "mainnet",
+  "types": {
+    "DataKey": {
+      "cases": [
+        { "fields": [], "name": "FeeTo" },
+        { "fields": [], "name": "FeeToSetter" },
+        { "fields": [], "name": "PairWasmHash" },
+        { "fields": [], "name": "FeesEnabled" },
+        { "fields": [], "name": "TotalPairs" },
+        { "fields": [{ "name": "_0", "type": "u32" }], "name": "PairAddressesNIndexed" },
+        {
+          "fields": [{ "name": "_0", "type": { "name": "Pair", "type": "named" } }],
+          "name": "PairAddressesByTokens"
+        }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "FactoryError": {
+      "kind": "enum",
+      "name": "FactoryError",
+      "variants": [
+        {
+          "discriminant": 201,
+          "doc": "SoroswapFactory: not yet initialized",
+          "name": "NotInitialized"
+        },
+        {
+          "discriminant": 202,
+          "doc": "SoroswapFactory: token_a and token_b have identical addresses",
+          "name": "CreatePairIdenticalTokens"
+        },
+        {
+          "discriminant": 203,
+          "doc": "SoroswapFactory: pair already exists between token_a and token_b",
+          "name": "CreatePairAlreadyExists"
+        },
+        {
+          "discriminant": 204,
+          "doc": "SoroswapFactory: already initialized",
+          "name": "InitializeAlreadyInitialized"
+        },
+        {
+          "discriminant": 205,
+          "doc": "SoroswapFactory: pair does not exist",
+          "name": "PairDoesNotExist"
+        },
+        {
+          "discriminant": 206,
+          "doc": "SoroswapFactory: index does not exist",
+          "name": "IndexDoesNotExist"
+        }
+      ]
+    },
+    "FeeToSettedEvent": {
+      "fields": [
+        { "name": "new", "type": "address" },
+        { "name": "old", "type": "address" },
+        { "name": "setter", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "FeeToSettedEvent"
+    },
+    "InitializedEvent": {
+      "fields": [{ "name": "setter", "type": "address" }],
+      "kind": "struct",
+      "name": "InitializedEvent"
+    },
+    "NewFeesEnabledEvent": {
+      "fields": [{ "name": "fees_enabled", "type": "bool" }],
+      "kind": "struct",
+      "name": "NewFeesEnabledEvent"
+    },
+    "NewPairEvent": {
+      "fields": [
+        { "name": "new_pairs_length", "type": "u32" },
+        { "name": "pair", "type": "address" },
+        { "name": "token_0", "type": "address" },
+        { "name": "token_1", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "NewPairEvent"
+    },
+    "NewSetterEvent": {
+      "fields": [
+        { "name": "new", "type": "address" },
+        { "name": "old", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "NewSetterEvent"
+    },
+    "Pair": {
+      "fields": [
+        { "name": "0", "type": "address" },
+        { "name": "1", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "Pair"
+    },
+    "PairError": {
+      "kind": "enum",
+      "name": "PairError",
+      "variants": [
+        {
+          "discriminant": 901,
+          "doc": "SoroswapFactory: token_a and token_b have identical addresses",
+          "name": "CreatePairIdenticalTokens"
+        }
+      ]
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAAAQAAAAAAAAAAAAAAEEluaXRpYWxpemVkRXZlbnQAAAABAAAAAAAAAAZzZXR0ZXIAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAADE5ld1BhaXJFdmVudAAAAAQAAAAAAAAAEG5ld19wYWlyc19sZW5ndGgAAAAEAAAAAAAAAARwYWlyAAAAEwAAAAAAAAAHdG9rZW5fMAAAAAATAAAAAAAAAAd0b2tlbl8xAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAEEZlZVRvU2V0dGVkRXZlbnQAAAADAAAAAAAAAANuZXcAAAAAEwAAAAAAAAADb2xkAAAAABMAAAAAAAAABnNldHRlcgAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAADk5ld1NldHRlckV2ZW50AAAAAAACAAAAAAAAAANuZXcAAAAAEwAAAAAAAAADb2xkAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAE05ld0ZlZXNFbmFibGVkRXZlbnQAAAAAAQAAAAAAAAAMZmVlc19lbmFibGVkAAAAAQ==",
+    "AAAABAAAAAAAAAAAAAAACVBhaXJFcnJvcgAAAAAAAAEAAAA9U29yb3N3YXBGYWN0b3J5OiB0b2tlbl9hIGFuZCB0b2tlbl9iIGhhdmUgaWRlbnRpY2FsIGFkZHJlc3NlcwAAAAAAABlDcmVhdGVQYWlySWRlbnRpY2FsVG9rZW5zAAAAAAADhQ==",
+    "AAAAAQAAAAAAAAAAAAAABFBhaXIAAAACAAAAAAAAAAEwAAAAAAAAEwAAAAAAAAABMQAAAAAAABM=",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAABwAAAAAAAAAAAAAABUZlZVRvAAAAAAAAAAAAAAAAAAALRmVlVG9TZXR0ZXIAAAAAAAAAAAAAAAAMUGFpcldhc21IYXNoAAAAAAAAAAAAAAALRmVlc0VuYWJsZWQAAAAAAAAAAAAAAAAKVG90YWxQYWlycwAAAAAAAQAAAAAAAAAVUGFpckFkZHJlc3Nlc05JbmRleGVkAAAAAAAAAQAAAAQAAAABAAAAAAAAABVQYWlyQWRkcmVzc2VzQnlUb2tlbnMAAAAAAAABAAAH0AAAAARQYWly",
+    "AAAAAAAAAJtSZXR1cm5zIHRoZSByZWNpcGllbnQgb2YgdGhlIGZlZS4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkLgAAAAAGZmVlX3RvAAAAAAAAAAAAAQAAA+kAAAATAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAALJSZXR1cm5zIHRoZSBhZGRyZXNzIGFsbG93ZWQgdG8gY2hhbmdlIHRoZSBmZWUgcmVjaXBpZW50LgoKIyBBcmd1bWVudHMKCiogYGVgIC0gQW4gaW5zdGFuY2Ugb2YgdGhlIGBFbnZgIHN0cnVjdC4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQuAAAAAAANZmVlX3RvX3NldHRlcgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAJVDaGVja3MgaWYgZmVlcyBhcmUgZW5hYmxlZC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkLgAAAAAAAAxmZWVzX2VuYWJsZWQAAAAAAAAAAQAAA+kAAAABAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAAL9SZXR1cm5zIHRoZSB0b3RhbCBudW1iZXIgb2YgcGFpcnMgY3JlYXRlZCB0aHJvdWdoIHRoZSBmYWN0b3J5IHNvIGZhci4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkLgAAAAAQYWxsX3BhaXJzX2xlbmd0aAAAAAAAAAABAAAD6QAAAAQAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAWBSZXR1cm5zIHRoZSBhZGRyZXNzIG9mIHRoZSBwYWlyIGZvciBgdG9rZW5fYWAgYW5kIGB0b2tlbl9iYCwgaWYgaXQgaGFzIGJlZW4gY3JlYXRlZC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYHRva2VuX2FgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIGZpcnN0IHRva2VuIGluIHRoZSBwYWlyLgoqIGB0b2tlbl9iYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBzZWNvbmQgdG9rZW4gaW4gdGhlIHBhaXIuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkIG9yIGlmIHRoZSBwYWlyIGRvZXMgbm90IGV4aXN0AAAACGdldF9wYWlyAAAAAgAAAAAAAAAHdG9rZW5fYQAAAAATAAAAAAAAAAd0b2tlbl9iAAAAABMAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAUlSZXR1cm5zIHRoZSBhZGRyZXNzIG9mIHRoZSBudGggcGFpciAoMC1pbmRleGVkKSBjcmVhdGVkIHRocm91Z2ggdGhlIGZhY3RvcnksIG9yIGFkZHJlc3MoMCkgaWYgbm90IGVub3VnaCBwYWlycyBoYXZlIGJlZW4gY3JlYXRlZCB5ZXQuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBBbiBpbnN0YW5jZSBvZiB0aGUgYEVudmAgc3RydWN0LgoqIGBuYCAtIFRoZSBpbmRleCBvZiB0aGUgcGFpciB0byByZXRyaWV2ZS4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQgb3IgaWYgaW5kZXggYG5gIGRvZXMgbm90IGV4aXN0LgAAAAAAAAlhbGxfcGFpcnMAAAAAAAABAAAAAAAAAAFuAAAAAAAABAAAAAEAAAPpAAAAEwAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAAS1DaGVja3MgaWYgYSBwYWlyIGV4aXN0cyBmb3IgdGhlIGdpdmVuIGB0b2tlbl9hYCBhbmQgYHRva2VuX2JgLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gQW4gaW5zdGFuY2Ugb2YgdGhlIGBFbnZgIHN0cnVjdC4KKiBgdG9rZW5fYWAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgZmlyc3QgdG9rZW4gaW4gdGhlIHBhaXIuCiogYHRva2VuX2JgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIHNlY29uZCB0b2tlbiBpbiB0aGUgcGFpci4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQuAAAAAAAAC3BhaXJfZXhpc3RzAAAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAA+kAAAABAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAASdTZXRzIHRoZSBgZmVlX3RvX3NldHRlcmAgYWRkcmVzcyBhbmQgaW5pdGlhbGl6ZXMgdGhlIGZhY3RvcnkuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBBbiBpbnN0YW5jZSBvZiB0aGUgYEVudmAgc3RydWN0LgoqIGBzZXR0ZXJgIC0gVGhlIGFkZHJlc3MgdG8gc2V0IGFzIHRoZSBjdXJyZW50IGBmZWVfdG9fc2V0dGVyYC4KKiBgcGFpcl93YXNtX2hhc2hgIC0gVGhlIFdhc20gaGFzaCBvZiB0aGUgcGFpci4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIGFscmVhZHkgaW5pdGlhbGl6ZWQuAAAAAAppbml0aWFsaXplAAAAAAACAAAAAAAAAAZzZXR0ZXIAAAAAABMAAAAAAAAADnBhaXJfd2FzbV9oYXNoAAAAAAPuAAAAIAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAAPVTZXRzIHRoZSBgZmVlX3RvYCBhZGRyZXNzLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gQW4gaW5zdGFuY2Ugb2YgdGhlIGBFbnZgIHN0cnVjdC4KKiBgdG9gIC0gVGhlIGFkZHJlc3MgdG8gc2V0IGFzIHRoZSBgZmVlX3RvYC4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQgb3IgaWYgdGhlIGNhbGxlciBpcyBub3QgdGhlIGN1cnJlbnQgYGZlZV90b19zZXR0ZXJgLgAAAAAAAApzZXRfZmVlX3RvAAAAAAABAAAAAAAAAAJ0bwAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+    "AAAAAAAAARBTZXRzIHRoZSBgZmVlX3RvX3NldHRlcmAgYWRkcmVzcy4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYG5ld19zZXR0ZXJgIC0gVGhlIGFkZHJlc3MgdG8gc2V0IGFzIHRoZSBuZXcgYGZlZV90b19zZXR0ZXJgLgoKIyBFcnJvcnMKClJldHVybnMgYW4gZXJyb3IgaWYgdGhlIEZhY3RvcnkgaXMgbm90IHlldCBpbml0aWFsaXplZCBvciBpZiB0aGUgY2FsbGVyIGlzIG5vdCB0aGUgZXhpc3RpbmcgYGZlZV90b19zZXR0ZXJgLgAAABFzZXRfZmVlX3RvX3NldHRlcgAAAAAAAAEAAAAAAAAACm5ld19zZXR0ZXIAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAAAAAAASRTZXRzIHdoZXRoZXIgZmVlcyBhcmUgZW5hYmxlZCBvciBkaXNhYmxlZC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYGlzX2VuYWJsZWRgIC0gQSBib29sZWFuIGluZGljYXRpbmcgd2hldGhlciBmZWVzIGFyZSBlbmFibGVkIG9yIGRpc2FibGVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gZXJyb3IgaWYgdGhlIEZhY3RvcnkgaXMgbm90IHlldCBpbml0aWFsaXplZCBvciBpZiB0aGUgY2FsbGVyIGlzIG5vdCB0aGUgY3VycmVudCBgZmVlX3RvX3NldHRlcmAuAAAAEHNldF9mZWVzX2VuYWJsZWQAAAABAAAAAAAAAAppc19lbmFibGVkAAAAAAABAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
+    "AAAAAAAAAahDcmVhdGVzIGEgcGFpciBmb3IgYHRva2VuX2FgIGFuZCBgdG9rZW5fYmAgaWYgb25lIGRvZXNuJ3QgZXhpc3QgYWxyZWFkeS4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYHRva2VuX2FgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIGZpcnN0IHRva2VuIGluIHRoZSBwYWlyLgoqIGB0b2tlbl9iYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBzZWNvbmQgdG9rZW4gaW4gdGhlIHBhaXIuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgcGFpciBpcyBub3QgeWV0IGluaXRpYWxpemVkLCBpZiBgdG9rZW5fYWAgYW5kIGB0b2tlbl9iYCBoYXZlIGlkZW50aWNhbCBhZGRyZXNzZXMsIG9yIGlmIHRoZSBwYWlyIGFscmVhZHkgZXhpc3RzIGJldHdlZW4gYHRva2VuX2FgIGFuZCBgdG9rZW5fYmAuAAAAC2NyZWF0ZV9wYWlyAAAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAA+kAAAATAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
+    "AAAABAAAAAAAAAAAAAAADEZhY3RvcnlFcnJvcgAAAAYAAAAkU29yb3N3YXBGYWN0b3J5OiBub3QgeWV0IGluaXRpYWxpemVkAAAADk5vdEluaXRpYWxpemVkAAAAAADJAAAAPVNvcm9zd2FwRmFjdG9yeTogdG9rZW5fYSBhbmQgdG9rZW5fYiBoYXZlIGlkZW50aWNhbCBhZGRyZXNzZXMAAAAAAAAZQ3JlYXRlUGFpcklkZW50aWNhbFRva2VucwAAAAAAAMoAAABAU29yb3N3YXBGYWN0b3J5OiBwYWlyIGFscmVhZHkgZXhpc3RzIGJldHdlZW4gdG9rZW5fYSBhbmQgdG9rZW5fYgAAABdDcmVhdGVQYWlyQWxyZWFkeUV4aXN0cwAAAADLAAAAJFNvcm9zd2FwRmFjdG9yeTogYWxyZWFkeSBpbml0aWFsaXplZAAAABxJbml0aWFsaXplQWxyZWFkeUluaXRpYWxpemVkAAAAzAAAACRTb3Jvc3dhcEZhY3Rvcnk6IHBhaXIgZG9lcyBub3QgZXhpc3QAAAAQUGFpckRvZXNOb3RFeGlzdAAAAM0AAAAlU29yb3N3YXBGYWN0b3J5OiBpbmRleCBkb2VzIG5vdCBleGlzdAAAAAAAABFJbmRleERvZXNOb3RFeGlzdAAAAAAAAM4="
+  ]
+}

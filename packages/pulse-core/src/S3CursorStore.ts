@@ -3,6 +3,7 @@ export type S3Like = {
   putObject(params: { Bucket: string; Key: string; Body: string | Uint8Array }): Promise<void>;
 };
 
+/** Cursor store backed by an S3-compatible object store. */
 export class S3CursorStore {
   private readonly s3: S3Like;
   private readonly bucket: string;

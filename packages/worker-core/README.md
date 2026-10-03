@@ -1,5 +1,18 @@
 # @orbital-stellar/worker-core
 
+**Type model for Orbital workers: what a worker is, before anything runs one.**
+
+```bash
+pnpm add @orbital-stellar/worker-core
+```
+
+## Status
+
+The worker layer is no longer frozen scope. W0-W3 have shipped; W4 (vault,
+copy-trade, latency-sensitive tier) was dropped in #1137. See
+[`docs/design/workers.md`](../../docs/design/workers.md) for the build order
+as it stands.
+
 ## The constraint this package exists to enforce
 
 **A worker's trigger is not a custodian.** A worker definition describes *when*
@@ -35,10 +48,6 @@ alone, however convenient it is. Prior art and competitive notes are kept
 separately in
 [`docs/design/prior-art-workers.md`](../../docs/design/prior-art-workers.md),
 because they date fast and are self-reported rather than audited.
-
-```bash
-pnpm add @orbital-stellar/worker-core
-```
 
 ## What it does
 

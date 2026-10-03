@@ -80,7 +80,8 @@
         "symbol",
         "address",
         "void",
-        "error"
+        "error",
+        "val"
       ]
     },
     "BytesNType": {

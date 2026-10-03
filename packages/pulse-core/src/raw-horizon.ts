@@ -62,6 +62,12 @@ export interface RawHorizonJoinedTransaction {
   [key: string]: unknown;
 }
 
+/**
+ * Fields every raw Horizon operation record carries: identity
+ * (`id`/`paging_token`), the owning transaction, the source account, the
+ * numeric `type_i` discriminator, and the `_links` navigation block.
+ * Base interface for all `RawHorizon*` operation types below.
+ */
 export interface RawHorizonBaseOperation {
   id: string;
   paging_token: string;
@@ -89,6 +95,11 @@ export interface RawHorizonBaseOperation {
   };
 }
 
+/**
+ * Raw Horizon `payment` operation record: sender (`from`), receiver (`to`),
+ * string-encoded `amount`, and the asset triple (`asset_type` plus
+ * `asset_code`/`asset_issuer` for non-native assets).
+ */
 export interface RawHorizonPayment extends RawHorizonBaseOperation {
   type: "payment";
   to: string;
@@ -99,6 +110,11 @@ export interface RawHorizonPayment extends RawHorizonBaseOperation {
   asset_issuer?: string;
 }
 
+/**
+ * Raw Horizon `set_options` operation record: account option changes such as
+ * signers, thresholds, `home_domain`, set/clear flags, and `inflation_dest`.
+ * Only the options the transaction touched are present.
+ */
 export interface RawHorizonSetOptions extends RawHorizonBaseOperation {
   type: "set_options";
   signer_key?: string;
@@ -116,6 +132,10 @@ export interface RawHorizonSetOptions extends RawHorizonBaseOperation {
 /** Field types sourced from the generated `CreateAccount` schema - see header. */
 type _GeneratedCreateAccount = _HorizonComponents["schemas"]["CreateAccount"];
 
+/**
+ * Raw Horizon `create_account` operation record: the `funder`, the new
+ * `account`, and the string-encoded `starting_balance`.
+ */
 export interface RawHorizonCreateAccount extends RawHorizonBaseOperation {
   type: "create_account";
   funder: _GeneratedCreateAccount["funder"];
@@ -123,6 +143,11 @@ export interface RawHorizonCreateAccount extends RawHorizonBaseOperation {
   starting_balance: _GeneratedCreateAccount["starting_balance"];
 }
 
+/**
+ * Raw Horizon `manage_sell_offer` operation record: the offer being managed
+ * (`offer_id`, `0` for a new offer), the amount and both asset legs, and the
+ * `price`/`price_r` ratio. Amounts may arrive as strings or numbers.
+ */
 export interface RawHorizonManageSellOffer extends RawHorizonBaseOperation {
   type: "manage_sell_offer";
   offer_id: string | number;
@@ -137,6 +162,10 @@ export interface RawHorizonManageSellOffer extends RawHorizonBaseOperation {
   price_r: { n: number; d: number };
 }
 
+/**
+ * Raw Horizon `manage_buy_offer` operation record: same shape as
+ * {@link RawHorizonManageSellOffer} but priced from the buying side.
+ */
 export interface RawHorizonManageBuyOffer extends RawHorizonBaseOperation {
   type: "manage_buy_offer";
   offer_id: string | number;
@@ -151,17 +180,29 @@ export interface RawHorizonManageBuyOffer extends RawHorizonBaseOperation {
   price_r: { n: number; d: number };
 }
 
+/**
+ * Raw Horizon `bump_sequence` operation record: the string-encoded ledger
+ * sequence the source account is bumped to (`bump_to`).
+ */
 export interface RawHorizonBumpSequence extends RawHorizonBaseOperation {
   type: "bump_sequence";
   bump_to: string;
 }
 
+/**
+ * Raw Horizon `manage_data` operation record: the `data_name` key and its
+ * base64 `data_value`, which is `null` when the entry is removed.
+ */
 export interface RawHorizonManageData extends RawHorizonBaseOperation {
   type: "manage_data";
   data_name: string;
   data_value: string | null;
 }
 
+/**
+ * Raw Horizon `change_trust` operation record: the trustline `limit` and the
+ * asset triple. A zero limit removes the trustline.
+ */
 export interface RawHorizonChangeTrust extends RawHorizonBaseOperation {
   type: "change_trust";
   limit: string | number;
@@ -173,12 +214,21 @@ export interface RawHorizonChangeTrust extends RawHorizonBaseOperation {
 /** Field types sourced from the generated `AccountMerge` schema - see header. */
 type _GeneratedAccountMerge = _HorizonComponents["schemas"]["AccountMerge"];
 
+/**
+ * Raw Horizon `account_merge` operation record: the merged `account` and the
+ * `into` destination receiving its balance.
+ */
 export interface RawHorizonAccountMerge extends RawHorizonBaseOperation {
   type: "account_merge";
   account: _GeneratedAccountMerge["account"];
   into: _GeneratedAccountMerge["into"];
 }
 
+/**
+ * Raw Horizon `create_claimable_balance` operation record: the funded
+ * `amount`, the resulting `balance_id`, the `claimants` with their
+ * predicates, and the asset triple.
+ */
 export interface RawHorizonCreateClaimableBalance extends RawHorizonBaseOperation {
   type: "create_claimable_balance";
   amount: string;
@@ -189,11 +239,19 @@ export interface RawHorizonCreateClaimableBalance extends RawHorizonBaseOperatio
   asset_issuer?: string;
 }
 
+/**
+ * Raw Horizon `claim_claimable_balance` operation record: the `balance_id`
+ * the claimant swept. The claimant is the operation's `source_account`.
+ */
 export interface RawHorizonClaimClaimableBalance extends RawHorizonBaseOperation {
   type: "claim_claimable_balance";
   balance_id: string;
 }
 
+/**
+ * Raw Horizon `liquidity_pool_deposit` operation record: the pool, the
+ * `shares_received`, and the per-asset `reserves_deposited`.
+ */
 export interface RawHorizonLiquidityPoolDeposit extends RawHorizonBaseOperation {
   type: "liquidity_pool_deposit";
   liquidity_pool_id: string;
@@ -201,6 +259,10 @@ export interface RawHorizonLiquidityPoolDeposit extends RawHorizonBaseOperation 
   reserves_deposited: Array<{ asset: string; amount: string }>;
 }
 
+/**
+ * Raw Horizon `liquidity_pool_withdraw` operation record: the pool, the
+ * redeemed `shares`, and the per-asset `reserves_received`.
+ */
 export interface RawHorizonLiquidityPoolWithdraw extends RawHorizonBaseOperation {
   type: "liquidity_pool_withdraw";
   liquidity_pool_id: string;
@@ -208,6 +270,10 @@ export interface RawHorizonLiquidityPoolWithdraw extends RawHorizonBaseOperation
   reserves_received: Array<{ asset: string; amount: string }>;
 }
 
+/**
+ * Raw Horizon `allow_trust` operation record: the `trustor` whose trustline
+ * is authorized (`authorize`) for the asset, issued by `trustee`.
+ */
 export interface RawHorizonAllowTrust extends RawHorizonBaseOperation {
   type: "allow_trust";
   trustor: string;
@@ -218,6 +284,10 @@ export interface RawHorizonAllowTrust extends RawHorizonBaseOperation {
   asset_issuer?: string;
 }
 
+/**
+ * Raw Horizon `set_trust_line_flags` operation record: the `trustor` trustline
+ * and the string-named flags being set or cleared for the asset.
+ */
 export interface RawHorizonSetTrustLineFlags extends RawHorizonBaseOperation {
   type: "set_trust_line_flags";
   trustor: string;

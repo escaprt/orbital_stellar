@@ -47,7 +47,7 @@ section below, not on the active roadmap.
 | **Phase 1 - Production SDK** | Soroban + cursor persistence + stability pledge | `v1.0.0` | `pnpm publish -r --filter "./packages/*"` succeeds; STABILITY.md merged; Soroban e2e test green | 🟡 **In progress** - STABILITY.md merged (this PR); starter boilerplates + `v1.0.0` tag outstanding |
 | **Phase 2 - The Decoding Standard** | SEP draft, `orbital codegen`, semantic layer, hosted registry | `v1.x` | SEP draft submitted; `orbital codegen` published and used in all three starter boilerplates; ≥25 contracts with registered verified schemas; hosted registry serving reads in production | ⚪ 2026 H2 |
 | **Phase 3 - Anchor Events** | SEP-24/31 lifecycle events, `@orbital-stellar/anchor-sdk` | `v2.0.0` | `@orbital-stellar/anchor-sdk` on npm; SEP-24 + SEP-31 lifecycle events normalized into the standard taxonomy; ≥1 named anchor consuming it in production | ⚪ 2027 H1 |
-| **Phase 4 - Workers entry gate** | Worker layer — trigger-without-custody standard + runtime | `v3.x` | W0–W4 each reach their gate; §C.2 no-custody constraint enforced on every stage; build order hard constraint (W4 lands last) | ⚪ 2026 H2 → 2027 |
+| **Phase 4 - Workers entry gate** | Worker layer — trigger-without-custody standard + runtime | `v3.x` | W0–W4 each reach their gate; §C.2 no-custody constraint enforced on every stage; build order hard constraint (W4 lands last) | 🟢 **W0–W3 built** — [`@orbital-stellar/worker-core@0.2.0`](https://www.npmjs.com/package/@orbital-stellar/worker-core) on npm; **W4 dropped** ([#1137](https://github.com/orbital-stellar/orbital_stellar/issues/1137)) |
 
 The former "Trust & Agent Layer" and "Protocol Permanence" phases are not
 gone - they are preserved verbatim in the
@@ -294,10 +294,15 @@ rationale the [Frozen](#frozen--out-of-scope-until-the-core-thesis-is-proven)
 procedure requires. The counterparty that motivated it is named in the
 [`CHANGELOG.md`](./CHANGELOG.md) unfreeze entry (gate `W3`).
 
-**Release gate (overall):** every one of the five stages `W0`–`W4` reaches its
-individual gate below, the §C.2 trigger-≠-custodian constraint is enforced as a
-review gate on every stage, and the build order is honored as a hard
-constraint (W4 lands last — see below). No stage ships partial.
+**Status:** `W0`–`W3` met their gates — [`@orbital-stellar/worker-core@0.2.0`](https://www.npmjs.com/package/@orbital-stellar/worker-core)
+is on npm. `W4` was dropped ([#1137](https://github.com/orbital-stellar/orbital_stellar/issues/1137)):
+the worker layer is not a trading product, so the vault / copy-trade /
+latency-tier scope had no reason to exist.
+
+**Release gate (overall):** every one of the four shipped stages `W0`–`W3`
+reached its individual gate below, the §C.2 trigger-≠-custodian constraint was
+enforced as a review gate on every stage, and the build order was honored as a
+hard constraint. No stage shipped partial.
 
 ### The §C.2 constraint (quoted verbatim, not paraphrased)
 
@@ -323,20 +328,21 @@ the release process, not a scheduling preference.
 
 ### Staging W0–W4 (five stages, each with a gate)
 
-- **`W0` — Worker standard (MIT).**
+- **[x] `W0` — Worker standard (MIT).**
   *Gate:* the open standard (event-worker spec, trigger/attestation envelope)
-  published and reviewed; reference types land in `packages/worker-core` as
+  published and reviewed; reference types land in [`packages/worker-core`](./packages/worker-core) as
   types only. No execution path, no funds path. This is the canonical surface
   other tools emit against.
-- **`W1` — `worker-core` runtime (MIT).**
-  *Gate:* `@orbital-stellar/worker-core` published to npm; trigger-execution
+- **[x] `W1` — `worker-core` runtime (MIT).**
+  *Gate:* [`@orbital-stellar/worker-core@0.2.0`](https://www.npmjs.com/package/@orbital-stellar/worker-core)
+  published to npm; trigger-execution
   e2e test green against testnet, **with a custody assertion test** that fails
   if the worker ever holds a signing key for user funds.
-- **`W2` — external operators (MIT).**
+- **[x] `W2` — external operators (MIT).**
   *Gate:* operators other than Orbital can register and run workers, with
   subscriptions and notifications in place. Still no authority over funds —
   the record is billing and notification only.
-- **`W3` — counterparty integration gate.**
+- **[x] `W3` — counterparty integration gate.**
   *Gate:* the named counterparty (see the [`CHANGELOG.md`](./CHANGELOG.md)
   unfreeze entry — name to be supplied by maintainer) signs off that the
   worker layer's trigger-without-custody primitive satisfies their
@@ -344,8 +350,13 @@ the release process, not a scheduling preference.
   worker-triggered, with the contract itself holding the funds. This gate is what motivated the
   unfreeze — see the [`CHANGELOG.md`](./CHANGELOG.md) unfreeze entry. Until
   `W3` is met, the worker layer stays staging-only.
-- **`W4` — backstop (operated service, lands last).**
-  *Gate:* Orbital-operated backstop in staging with a met SLO (time-to-contain
+- **`W4` — backstop (operated service, lands last).** **Dropped** ([#1137](https://github.com/orbital-stellar/orbital_stellar/issues/1137)):
+  the worker layer is not a trading product — copy-trading would have required
+  moving subscriber funds, i.e. custody the layer must never hold — so the
+  vault / copy-trade / latency-tier scope was cut instead of built. The
+  time-insensitive backstop watcher (`BackstopWatcher` in `worker-core`) stays;
+  only the latency-sensitive tier and the vault it required were removed.
+  *Gate (had it shipped):* Orbital-operated backstop in staging with a met SLO (time-to-contain
   on a worker fault) and a documented incident runbook. Ships only after
   `W0`–`W3` are green, per the hard build-order constraint above.
 

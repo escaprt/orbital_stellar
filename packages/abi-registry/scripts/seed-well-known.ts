@@ -138,8 +138,11 @@ function generate(): void {
  * pointer that resolves to different bytes - or to nothing - files a hash on
  * chain that no consumer can ever reproduce, and it cannot be amended under
  * the same version.
+ *
+ * Exported so scripts/seed-community.ts reuses the identical check rather
+ * than reimplementing pointer validation.
  */
-async function checkPointer(spec: ContractSpec): Promise<string | null> {
+export async function checkPointer(spec: ContractSpec): Promise<string | null> {
   let res: Response;
   try {
     res = await fetch(spec.pointer!);
@@ -171,8 +174,8 @@ async function checkPointer(spec: ContractSpec): Promise<string | null> {
   return null;
 }
 
-/** The registry's `AlreadyPublished` is error #1 on the contract. */
-function isAlreadyPublished(err: unknown): boolean {
+/** The registry's `AlreadyPublished` is error #1 on the contract. Exported for seed-community.ts. */
+export function isAlreadyPublished(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
   return /Error\(Contract, #1\)/.test(msg);
 }

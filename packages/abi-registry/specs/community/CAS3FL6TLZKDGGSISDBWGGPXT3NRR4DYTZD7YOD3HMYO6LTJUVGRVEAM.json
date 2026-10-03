@@ -1,0 +1,405 @@
+{
+  "contractId": "CAS3FL6TLZKDGGSISDBWGGPXT3NRR4DYTZD7YOD3HMYO6LTJUVGRVEAM",
+  "description": "Comet (CometDEX) weighted liquidity pool holding BLND and USDC on Stellar mainnet. It backs the Blend protocol backstop and its pool share token (CPAL) is a SEP-41 token.",
+  "events": [],
+  "functions": [
+    {
+      "name": "init",
+      "params": [
+        { "name": "controller", "type": "address" },
+        { "name": "tokens", "type": { "item": "address", "type": "vec" } },
+        { "name": "weights", "type": { "item": "i128", "type": "vec" } },
+        { "name": "balances", "type": { "item": "i128", "type": "vec" } },
+        { "name": "swap_fee", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "gulp", "params": [{ "name": "t", "type": "address" }], "returns": "void" },
+    {
+      "name": "join_pool",
+      "params": [
+        { "name": "pool_amount_out", "type": "i128" },
+        { "name": "max_amounts_in", "type": { "item": "i128", "type": "vec" } },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "exit_pool",
+      "params": [
+        { "name": "pool_amount_in", "type": "i128" },
+        { "name": "min_amounts_out", "type": { "item": "i128", "type": "vec" } },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "swap_exact_amount_in",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "token_amount_in", "type": "i128" },
+        { "name": "token_out", "type": "address" },
+        { "name": "min_amount_out", "type": "i128" },
+        { "name": "max_price", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": { "elements": ["i128", "i128"], "type": "tuple" }
+    },
+    {
+      "name": "swap_exact_amount_out",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "max_amount_in", "type": "i128" },
+        { "name": "token_out", "type": "address" },
+        { "name": "token_amount_out", "type": "i128" },
+        { "name": "max_price", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": { "elements": ["i128", "i128"], "type": "tuple" }
+    },
+    {
+      "name": "dep_tokn_amt_in_get_lp_tokns_out",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "token_amount_in", "type": "i128" },
+        { "name": "min_pool_amount_out", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "dep_lp_tokn_amt_out_get_tokn_in",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "pool_amount_out", "type": "i128" },
+        { "name": "max_amount_in", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "wdr_tokn_amt_in_get_lp_tokns_out",
+      "params": [
+        { "name": "token_out", "type": "address" },
+        { "name": "pool_amount_in", "type": "i128" },
+        { "name": "min_amount_out", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "wdr_tokn_amt_out_get_lp_tokns_in",
+      "params": [
+        { "name": "token_out", "type": "address" },
+        { "name": "token_amount_out", "type": "i128" },
+        { "name": "max_pool_amount_in", "type": "i128" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "set_controller",
+      "params": [{ "name": "manager", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "name": "set_freeze_status",
+      "params": [{ "name": "val", "type": "bool" }],
+      "returns": "void"
+    },
+    { "name": "get_total_supply", "params": [], "returns": "i128" },
+    { "name": "get_controller", "params": [], "returns": "address" },
+    { "name": "get_tokens", "params": [], "returns": { "item": "address", "type": "vec" } },
+    {
+      "name": "get_balance",
+      "params": [{ "name": "token", "type": "address" }],
+      "returns": "i128"
+    },
+    {
+      "name": "get_normalized_weight",
+      "params": [{ "name": "token", "type": "address" }],
+      "returns": "i128"
+    },
+    {
+      "name": "get_spot_price",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "token_out", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    { "name": "get_swap_fee", "params": [], "returns": "i128" },
+    {
+      "name": "get_spot_price_sans_fee",
+      "params": [
+        { "name": "token_in", "type": "address" },
+        { "name": "token_out", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "allowance",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "approve",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" },
+        { "name": "amount", "type": "i128" },
+        { "name": "expiration_ledger", "type": "u32" }
+      ],
+      "returns": "void"
+    },
+    { "name": "balance", "params": [{ "name": "id", "type": "address" }], "returns": "i128" },
+    {
+      "name": "transfer",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "transfer_from",
+      "params": [
+        { "name": "spender", "type": "address" },
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "burn",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "burn_from",
+      "params": [
+        { "name": "spender", "type": "address" },
+        { "name": "from", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "decimals", "params": [], "returns": "u32" },
+    { "name": "name", "params": [], "returns": "string" },
+    { "name": "symbol", "params": [], "returns": "string" }
+  ],
+  "name": "Comet BLND:USDC Pool",
+  "network": "mainnet",
+  "types": {
+    "AllowanceDataKey": {
+      "fields": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "AllowanceDataKey"
+    },
+    "AllowanceValue": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "expiration_ledger", "type": "u32" }
+      ],
+      "kind": "struct",
+      "name": "AllowanceValue"
+    },
+    "DataKey": {
+      "cases": [
+        { "fields": [], "name": "Factory" },
+        { "fields": [], "name": "Controller" },
+        { "fields": [], "name": "SwapFee" },
+        { "fields": [], "name": "AllTokenVec" },
+        { "fields": [], "name": "AllRecordData" },
+        { "fields": [], "name": "TokenShare" },
+        { "fields": [], "name": "TotalShares" },
+        { "fields": [], "name": "PublicSwap" },
+        { "fields": [], "name": "Finalize" },
+        { "fields": [], "name": "Freeze" }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "DataKeyToken": {
+      "cases": [
+        {
+          "fields": [{ "name": "_0", "type": { "name": "AllowanceDataKey", "type": "named" } }],
+          "name": "Allowance"
+        },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "Balance" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "Nonce" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "State" },
+        { "fields": [], "name": "Admin" }
+      ],
+      "kind": "union",
+      "name": "DataKeyToken"
+    },
+    "DepositEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "token_amount_in", "type": "i128" },
+        { "name": "token_in", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "DepositEvent"
+    },
+    "Error": {
+      "kind": "enum",
+      "name": "Error",
+      "variants": [
+        { "discriminant": 1, "name": "ErrFinalized" },
+        { "discriminant": 2, "name": "ErrNegative" },
+        { "discriminant": 3, "name": "ErrMinFee" },
+        { "discriminant": 4, "name": "ErrMaxFee" },
+        { "discriminant": 5, "name": "ErrNotController" },
+        { "discriminant": 6, "name": "ErrInvalidVectorLen" },
+        { "discriminant": 7, "name": "AlreadyInitialized" },
+        { "discriminant": 8, "name": "ErrIsBound" },
+        { "discriminant": 9, "name": "ErrNotBound" },
+        { "discriminant": 10, "name": "ErrMaxTokens" },
+        { "discriminant": 11, "name": "ErrMinWeight" },
+        { "discriminant": 12, "name": "ErrMaxWeight" },
+        { "discriminant": 13, "name": "ErrMinBalance" },
+        { "discriminant": 14, "name": "ErrFreezeOnlyWithdrawals" },
+        { "discriminant": 15, "name": "ErrMinTokens" },
+        { "discriminant": 16, "name": "ErrSwapFee" },
+        { "discriminant": 17, "name": "ErrMaxInRatio" },
+        { "discriminant": 18, "name": "ErrMathApprox" },
+        { "discriminant": 19, "name": "ErrLimitIn" },
+        { "discriminant": 20, "name": "ErrLimitOut" },
+        { "discriminant": 21, "name": "ErrMaxOutRatio" },
+        { "discriminant": 22, "name": "ErrBadLimitPrice" },
+        { "discriminant": 23, "name": "ErrLimitPrice" },
+        { "discriminant": 24, "name": "ErrTotalWeight" },
+        { "discriminant": 25, "name": "ErrTokenAmountIsNegative" },
+        { "discriminant": 26, "name": "ErrNotAuthorizedByAdmin" },
+        { "discriminant": 27, "name": "ErrInsufficientAllowance" },
+        { "discriminant": 28, "name": "ErrDeauthorized" },
+        { "discriminant": 29, "name": "ErrInsufficientBalance" },
+        { "discriminant": 30, "name": "ErrAddOverflow" },
+        { "discriminant": 31, "name": "ErrSubUnderflow" },
+        { "discriminant": 32, "name": "ErrDivInternal" },
+        { "discriminant": 33, "name": "ErrMulOverflow" },
+        { "discriminant": 34, "name": "ErrCPowBaseTooLow" },
+        { "discriminant": 35, "name": "ErrCPowBaseTooHigh" },
+        { "discriminant": 36, "name": "ErrInvalidExpirationLedger" },
+        { "discriminant": 37, "name": "ErrNegativeOrZero" },
+        { "discriminant": 38, "name": "ErrTokenInvalid" }
+      ]
+    },
+    "ExitEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "token_amount_out", "type": "i128" },
+        { "name": "token_out", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "ExitEvent"
+    },
+    "JoinEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "token_amount_in", "type": "i128" },
+        { "name": "token_in", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "JoinEvent"
+    },
+    "Record": {
+      "fields": [
+        { "name": "balance", "type": "i128" },
+        { "name": "index", "type": "u32" },
+        { "name": "scalar", "type": "i128" },
+        { "name": "weight", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "Record"
+    },
+    "SwapEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "token_amount_in", "type": "i128" },
+        { "name": "token_amount_out", "type": "i128" },
+        { "name": "token_in", "type": "address" },
+        { "name": "token_out", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "SwapEvent"
+    },
+    "TokenMetadata": {
+      "fields": [
+        { "name": "decimal", "type": "u32" },
+        { "name": "name", "type": "string" },
+        { "name": "symbol", "type": "string" }
+      ],
+      "kind": "struct",
+      "name": "TokenMetadata"
+    },
+    "WithdrawEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "pool_amount_in", "type": "i128" },
+        { "name": "token_amount_out", "type": "i128" },
+        { "name": "token_out", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "WithdrawEvent"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAAEaW5pdAAAAAUAAAAAAAAACmNvbnRyb2xsZXIAAAAAABMAAAAAAAAABnRva2VucwAAAAAD6gAAABMAAAAAAAAAB3dlaWdodHMAAAAD6gAAAAsAAAAAAAAACGJhbGFuY2VzAAAD6gAAAAsAAAAAAAAACHN3YXBfZmVlAAAACwAAAAA=",
+    "AAAAAAAAAAAAAAAEZ3VscAAAAAEAAAAAAAAAAXQAAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAJam9pbl9wb29sAAAAAAAAAwAAAAAAAAAPcG9vbF9hbW91bnRfb3V0AAAAAAsAAAAAAAAADm1heF9hbW91bnRzX2luAAAAAAPqAAAACwAAAAAAAAAEdXNlcgAAABMAAAAA",
+    "AAAAAAAAAAAAAAAJZXhpdF9wb29sAAAAAAAAAwAAAAAAAAAOcG9vbF9hbW91bnRfaW4AAAAAAAsAAAAAAAAAD21pbl9hbW91bnRzX291dAAAAAPqAAAACwAAAAAAAAAEdXNlcgAAABMAAAAA",
+    "AAAAAAAAAAAAAAAUc3dhcF9leGFjdF9hbW91bnRfaW4AAAAGAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAAD3Rva2VuX2Ftb3VudF9pbgAAAAALAAAAAAAAAAl0b2tlbl9vdXQAAAAAAAATAAAAAAAAAA5taW5fYW1vdW50X291dAAAAAAACwAAAAAAAAAJbWF4X3ByaWNlAAAAAAAACwAAAAAAAAAEdXNlcgAAABMAAAABAAAD7QAAAAIAAAALAAAACw==",
+    "AAAAAAAAAAAAAAAVc3dhcF9leGFjdF9hbW91bnRfb3V0AAAAAAAABgAAAAAAAAAIdG9rZW5faW4AAAATAAAAAAAAAA1tYXhfYW1vdW50X2luAAAAAAAACwAAAAAAAAAJdG9rZW5fb3V0AAAAAAAAEwAAAAAAAAAQdG9rZW5fYW1vdW50X291dAAAAAsAAAAAAAAACW1heF9wcmljZQAAAAAAAAsAAAAAAAAABHVzZXIAAAATAAAAAQAAA+0AAAACAAAACwAAAAs=",
+    "AAAAAAAAAAAAAAAgZGVwX3Rva25fYW10X2luX2dldF9scF90b2tuc19vdXQAAAAEAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAAD3Rva2VuX2Ftb3VudF9pbgAAAAALAAAAAAAAABNtaW5fcG9vbF9hbW91bnRfb3V0AAAAAAsAAAAAAAAABHVzZXIAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAfZGVwX2xwX3Rva25fYW10X291dF9nZXRfdG9rbl9pbgAAAAAEAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAAD3Bvb2xfYW1vdW50X291dAAAAAALAAAAAAAAAA1tYXhfYW1vdW50X2luAAAAAAAACwAAAAAAAAAEdXNlcgAAABMAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAgd2RyX3Rva25fYW10X2luX2dldF9scF90b2tuc19vdXQAAAAEAAAAAAAAAAl0b2tlbl9vdXQAAAAAAAATAAAAAAAAAA5wb29sX2Ftb3VudF9pbgAAAAAACwAAAAAAAAAObWluX2Ftb3VudF9vdXQAAAAAAAsAAAAAAAAABHVzZXIAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAgd2RyX3Rva25fYW10X291dF9nZXRfbHBfdG9rbnNfaW4AAAAEAAAAAAAAAAl0b2tlbl9vdXQAAAAAAAATAAAAAAAAABB0b2tlbl9hbW91bnRfb3V0AAAACwAAAAAAAAASbWF4X3Bvb2xfYW1vdW50X2luAAAAAAALAAAAAAAAAAR1c2VyAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAOc2V0X2NvbnRyb2xsZXIAAAAAAAEAAAAAAAAAB21hbmFnZXIAAAAAEwAAAAA=",
+    "AAAAAAAAAAAAAAARc2V0X2ZyZWV6ZV9zdGF0dXMAAAAAAAABAAAAAAAAAAN2YWwAAAAAAQAAAAA=",
+    "AAAAAAAAAAAAAAAQZ2V0X3RvdGFsX3N1cHBseQAAAAAAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAOZ2V0X2NvbnRyb2xsZXIAAAAAAAAAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAKZ2V0X3Rva2VucwAAAAAAAAAAAAEAAAPqAAAAEw==",
+    "AAAAAAAAAAAAAAALZ2V0X2JhbGFuY2UAAAAAAQAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAVZ2V0X25vcm1hbGl6ZWRfd2VpZ2h0AAAAAAAAAQAAAAAAAAAFdG9rZW4AAAAAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAOZ2V0X3Nwb3RfcHJpY2UAAAAAAAIAAAAAAAAACHRva2VuX2luAAAAEwAAAAAAAAAJdG9rZW5fb3V0AAAAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAMZ2V0X3N3YXBfZmVlAAAAAAAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAXZ2V0X3Nwb3RfcHJpY2Vfc2Fuc19mZWUAAAAAAgAAAAAAAAAIdG9rZW5faW4AAAATAAAAAAAAAAl0b2tlbl9vdXQAAAAAAAATAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAAJYWxsb3dhbmNlAAAAAAAAAgAAAAAAAAAEZnJvbQAAABMAAAAAAAAAB3NwZW5kZXIAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAHYXBwcm92ZQAAAAAEAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAHc3BlbmRlcgAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAAEWV4cGlyYXRpb25fbGVkZ2VyAAAAAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAHYmFsYW5jZQAAAAABAAAAAAAAAAJpZAAAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAIdHJhbnNmZXIAAAADAAAAAAAAAARmcm9tAAAAEwAAAAAAAAACdG8AAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAA=",
+    "AAAAAAAAAAAAAAANdHJhbnNmZXJfZnJvbQAAAAAAAAQAAAAAAAAAB3NwZW5kZXIAAAAAEwAAAAAAAAAEZnJvbQAAABMAAAAAAAAAAnRvAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
+    "AAAAAAAAAAAAAAAEYnVybgAAAAIAAAAAAAAABGZyb20AAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
+    "AAAAAAAAAAAAAAAJYnVybl9mcm9tAAAAAAAAAwAAAAAAAAAHc3BlbmRlcgAAAAATAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA==",
+    "AAAAAAAAAAAAAAAIZGVjaW1hbHMAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAEbmFtZQAAAAAAAAABAAAAEA==",
+    "AAAAAAAAAAAAAAAGc3ltYm9sAAAAAAAAAAAAAQAAABA=",
+    "AAAAAQAAAAAAAAAAAAAACVN3YXBFdmVudAAAAAAAAAUAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAPdG9rZW5fYW1vdW50X2luAAAAAAsAAAAAAAAAEHRva2VuX2Ftb3VudF9vdXQAAAALAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACXRva2VuX291dAAAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAACUpvaW5FdmVudAAAAAAAAAMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAPdG9rZW5fYW1vdW50X2luAAAAAAsAAAAAAAAACHRva2VuX2luAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAACUV4aXRFdmVudAAAAAAAAAMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAQdG9rZW5fYW1vdW50X291dAAAAAsAAAAAAAAACXRva2VuX291dAAAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAADERlcG9zaXRFdmVudAAAAAMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAPdG9rZW5fYW1vdW50X2luAAAAAAsAAAAAAAAACHRva2VuX2luAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAADVdpdGhkcmF3RXZlbnQAAAAAAAAEAAAAAAAAAAZjYWxsZXIAAAAAABMAAAAAAAAADnBvb2xfYW1vdW50X2luAAAAAAALAAAAAAAAABB0b2tlbl9hbW91bnRfb3V0AAAACwAAAAAAAAAJdG9rZW5fb3V0AAAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAABlJlY29yZAAAAAAABAAAAAAAAAAHYmFsYW5jZQAAAAALAAAAAAAAAAVpbmRleAAAAAAAAAQAAAAAAAAABnNjYWxhcgAAAAAACwAAAAAAAAAGd2VpZ2h0AAAAAAAL",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAACgAAAAAAAAAAAAAAB0ZhY3RvcnkAAAAAAAAAAAAAAAAKQ29udHJvbGxlcgAAAAAAAAAAAAAAAAAHU3dhcEZlZQAAAAAAAAAAAAAAAAtBbGxUb2tlblZlYwAAAAAAAAAAAAAAAA1BbGxSZWNvcmREYXRhAAAAAAAAAAAAAAAAAAAKVG9rZW5TaGFyZQAAAAAAAAAAAAAAAAALVG90YWxTaGFyZXMAAAAAAAAAAAAAAAAKUHVibGljU3dhcAAAAAAAAAAAAAAAAAAIRmluYWxpemUAAAAAAAAAAAAAAAZGcmVlemUAAA==",
+    "AAAAAgAAAAAAAAAAAAAADERhdGFLZXlUb2tlbgAAAAUAAAABAAAAAAAAAAlBbGxvd2FuY2UAAAAAAAABAAAH0AAAABBBbGxvd2FuY2VEYXRhS2V5AAAAAQAAAAAAAAAHQmFsYW5jZQAAAAABAAAAEwAAAAEAAAAAAAAABU5vbmNlAAAAAAAAAQAAABMAAAABAAAAAAAAAAVTdGF0ZQAAAAAAAAEAAAATAAAAAAAAAAAAAAAFQWRtaW4AAAA=",
+    "AAAAAQAAAAAAAAAAAAAAEEFsbG93YW5jZURhdGFLZXkAAAACAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAHc3BlbmRlcgAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAADkFsbG93YW5jZVZhbHVlAAAAAAACAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAAEWV4cGlyYXRpb25fbGVkZ2VyAAAAAAAABA==",
+    "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAJgAAAAAAAAAMRXJyRmluYWxpemVkAAAAAQAAAAAAAAALRXJyTmVnYXRpdmUAAAAAAgAAAAAAAAAJRXJyTWluRmVlAAAAAAAAAwAAAAAAAAAJRXJyTWF4RmVlAAAAAAAABAAAAAAAAAAQRXJyTm90Q29udHJvbGxlcgAAAAUAAAAAAAAAE0VyckludmFsaWRWZWN0b3JMZW4AAAAABgAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAAAHAAAAAAAAAApFcnJJc0JvdW5kAAAAAAAIAAAAAAAAAAtFcnJOb3RCb3VuZAAAAAAJAAAAAAAAAAxFcnJNYXhUb2tlbnMAAAAKAAAAAAAAAAxFcnJNaW5XZWlnaHQAAAALAAAAAAAAAAxFcnJNYXhXZWlnaHQAAAAMAAAAAAAAAA1FcnJNaW5CYWxhbmNlAAAAAAAADQAAAAAAAAAYRXJyRnJlZXplT25seVdpdGhkcmF3YWxzAAAADgAAAAAAAAAMRXJyTWluVG9rZW5zAAAADwAAAAAAAAAKRXJyU3dhcEZlZQAAAAAAEAAAAAAAAAANRXJyTWF4SW5SYXRpbwAAAAAAABEAAAAAAAAADUVyck1hdGhBcHByb3gAAAAAAAASAAAAAAAAAApFcnJMaW1pdEluAAAAAAATAAAAAAAAAAtFcnJMaW1pdE91dAAAAAAUAAAAAAAAAA5FcnJNYXhPdXRSYXRpbwAAAAAAFQAAAAAAAAAQRXJyQmFkTGltaXRQcmljZQAAABYAAAAAAAAADUVyckxpbWl0UHJpY2UAAAAAAAAXAAAAAAAAAA5FcnJUb3RhbFdlaWdodAAAAAAAGAAAAAAAAAAYRXJyVG9rZW5BbW91bnRJc05lZ2F0aXZlAAAAGQAAAAAAAAAXRXJyTm90QXV0aG9yaXplZEJ5QWRtaW4AAAAAGgAAAAAAAAAYRXJySW5zdWZmaWNpZW50QWxsb3dhbmNlAAAAGwAAAAAAAAAPRXJyRGVhdXRob3JpemVkAAAAABwAAAAAAAAAFkVyckluc3VmZmljaWVudEJhbGFuY2UAAAAAAB0AAAAAAAAADkVyckFkZE92ZXJmbG93AAAAAAAeAAAAAAAAAA9FcnJTdWJVbmRlcmZsb3cAAAAAHwAAAAAAAAAORXJyRGl2SW50ZXJuYWwAAAAAACAAAAAAAAAADkVyck11bE92ZXJmbG93AAAAAAAhAAAAAAAAABFFcnJDUG93QmFzZVRvb0xvdwAAAAAAACIAAAAAAAAAEkVyckNQb3dCYXNlVG9vSGlnaAAAAAAAIwAAAAAAAAAaRXJySW52YWxpZEV4cGlyYXRpb25MZWRnZXIAAAAAACQAAAAAAAAAEUVyck5lZ2F0aXZlT3JaZXJvAAAAAAAAJQAAAAAAAAAPRXJyVG9rZW5JbnZhbGlkAAAAACY=",
+    "AAAAAQAAAAAAAAAAAAAADVRva2VuTWV0YWRhdGEAAAAAAAADAAAAAAAAAAdkZWNpbWFsAAAAAAQAAAAAAAAABG5hbWUAAAAQAAAAAAAAAAZzeW1ib2wAAAAAABA="
+  ]
+}

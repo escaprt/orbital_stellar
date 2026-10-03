@@ -10,9 +10,21 @@ import type {
 import { acquireWsConnection } from "./wsTransport.js";
 export { useStellarEventSuspense } from "./useStellarEventSuspense.js";
 
+/**
+ * Configuration object accepted by `useStellarEvent`.
+ *
+ * The positional `(serverUrl, address, options)` form cannot express
+ * `transport`, so pass a config object when you need a WebSocket stream.
+ *
+ * @typeParam T - Event type surfaced in {@link EventState.event}. Defaults to
+ *   the full `NormalizedEvent` union.
+ */
 export type UseEventConfig<T extends NormalizedEvent = NormalizedEvent> = {
+  /** Base URL of the pulse-notify server */
   serverUrl: string;
+  /** Stellar account address to watch */
   address: string;
+  /** Event type(s) to accept. Defaults to all events (`"*"`). */
   event?: string | string[];
   /** API key forwarded as ?token= query param - required when the server has authentication enabled */
   token?: string;
@@ -36,10 +48,20 @@ export type UseEventConfig<T extends NormalizedEvent = NormalizedEvent> = {
   hideAfterMs?: number;
 };
 
+/**
+ * State returned by the event hooks: the latest matching event plus the health
+ * of the underlying connection.
+ *
+ * @typeParam T - Event type surfaced in `event`.
+ */
 export type EventState<T extends NormalizedEvent = NormalizedEvent> = {
+  /** Latest matching event, or null until the first one arrives */
   event: T | null;
+  /** True once the stream handshake completes; false while reconnecting */
   connected: boolean;
+  /** Human-readable error message, or null while the stream is healthy */
   error: string | null;
+  /** ISO timestamp of the most recent event, or null until one arrives */
   lastEventAt: string | null;
   /** False only during the brief window after a reconnect where the stream is
    *  replaying events the browser requested via Last-Event-ID. Becomes true
@@ -298,11 +320,20 @@ function amountToStroop(amount: string): bigint | null {
   }
 }
 
+/**
+ * State returned by `useStellarPayment` - the `EventState` fields plus the
+ * payment amount pre-converted to stroops.
+ */
 export type PaymentState = {
+  /** Latest `payment.received` event, or null until the first one arrives */
   event: PaymentEvent | null;
+  /** True once the stream handshake completes; false while reconnecting */
   connected: boolean;
+  /** Human-readable error message, or null while the stream is healthy */
   error: string | null;
+  /** ISO timestamp of the most recent event, or null until one arrives */
   lastEventAt: string | null;
+  /** `event.amount` as a bigint in stroops (1 XLM = 10,000,000), or null */
   amountStroop: bigint | null;
 };
 
@@ -366,13 +397,24 @@ export type EventSchema<T> = {
   safeParse: (data: unknown) => { success: true; data: T } | { success: false };
 };
 
+/**
+ * Configuration object for `useContractEvent`.
+ *
+ * @typeParam T - Contract event type surfaced in {@link EventState.event}.
+ *   Defaults to `ContractInvokedEvent | ContractEmittedEvent`; narrow it for
+ *   full IDE support.
+ */
 export type UseContractEventConfig<
   T extends ContractInvokedEvent | ContractEmittedEvent =
     ContractInvokedEvent | ContractEmittedEvent,
 > = {
+  /** Base URL of the pulse-notify server */
   serverUrl: string;
+  /** Soroban contract address (C…) to watch */
   contractId: string;
+  /** Topics that every `contract.emitted` event must carry. Unfiltered when omitted. */
   topics?: string[];
+  /** API key forwarded as ?token= query param - required when the server has authentication enabled */
   token?: string;
   /**
    * Async callback that returns a fresh token when the current one expires.
@@ -566,7 +608,13 @@ export {
   type ContractStateResult,
 } from "./useContractState.js";
 
+/**
+ * Options for `useStellarHistory`.
+ *
+ * @typeParam T - Event type held in {@link HistoryState.history}.
+ */
 export type UseHistoryOptions<T extends NormalizedEvent = NormalizedEvent> = {
+  /** Accepted for symmetry with the other hooks; the history stream is currently opened unauthenticated */
   token?: string;
   /** Maximum number of events to retain in FIFO order. Defaults to 100. */
   capacity?: number;
@@ -575,14 +623,29 @@ export type UseHistoryOptions<T extends NormalizedEvent = NormalizedEvent> = {
   hideAfterMs?: number;
 };
 
+/**
+ * State returned by `useStellarHistory` - the `EventState` fields plus the
+ * retained events.
+ *
+ * @typeParam T - Event type held in `history`.
+ */
 export type HistoryState<T extends NormalizedEvent = NormalizedEvent> = EventState<T> & {
+  /** Buffered events in arrival order, oldest first, capped by `capacity` */
   history: T[];
 };
 
 // ─── useStellarAddresses ─────────────────────────────────────────────────────
 
+/**
+ * Options for `useStellarAddresses`, applied to every address in the call.
+ *
+ * All addresses share one config, so per-address behaviour is not possible
+ * here - use one `useStellarEvent` call per address instead.
+ */
 export type UseAddressesOptions = {
+  /** Event type(s) to accept for every address. Defaults to all events (`"*"`). */
   event?: string | string[];
+  /** API key forwarded as ?token= query param - required when the server has authentication enabled */
   token?: string;
   /**
    * Async callback that returns a fresh token when the current one expires.

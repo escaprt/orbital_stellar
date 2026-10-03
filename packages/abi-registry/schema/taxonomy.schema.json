@@ -86,7 +86,8 @@
         "symbol",
         "address",
         "void",
-        "error"
+        "error",
+        "val"
       ]
     },
     "Network": {

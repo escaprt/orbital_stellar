@@ -6,6 +6,7 @@ import type { RetryQueue, RetryRecord } from "./RetryQueue.js";
 // stays dependency-free and trivially testable with a mock.
 // ---------------------------------------------------------------------------
 
+/** SQS `SendMessage` shape this queue needs: target queue, body, and FIFO/delay options. */
 export type SendMessageInput = {
   QueueUrl: string;
   MessageBody: string;
@@ -32,10 +33,12 @@ export type SendMessageInput = {
   DelaySeconds?: number;
 };
 
+/** SQS `SendMessage` result shape this queue reads: the assigned message id. */
 export type SendMessageOutput = {
   MessageId?: string;
 };
 
+/** SQS `ReceiveMessage` shape this queue needs: queue, batch size, visibility, and long-poll wait. */
 export type ReceiveMessageInput = {
   QueueUrl: string;
   MaxNumberOfMessages?: number;
@@ -52,21 +55,25 @@ export type ReceiveMessageInput = {
   WaitTimeSeconds?: number;
 };
 
+/** SQS message shape this queue reads: id, receipt handle for ack, and body. */
 export type SqsMessage = {
   MessageId?: string;
   ReceiptHandle?: string;
   Body?: string;
 };
 
+/** SQS `ReceiveMessage` result shape this queue reads: the received batch. */
 export type ReceiveMessageOutput = {
   Messages?: SqsMessage[];
 };
 
+/** SQS `DeleteMessage` shape this queue needs: queue plus the receipt handle from receive. */
 export type DeleteMessageInput = {
   QueueUrl: string;
   ReceiptHandle: string;
 };
 
+/** SQS `DeleteMessage` result shape (opaque to this queue). */
 export type DeleteMessageOutput = Record<string, unknown>;
 
 /**
@@ -84,6 +91,7 @@ export type SqsLike = {
 // SqsRetryQueueOptions
 // ---------------------------------------------------------------------------
 
+/** Options for `SqsRetryQueue`: queue URL, clock, and visibility timeout. */
 export type SqsRetryQueueOptions = {
   /**
    * The SQS queue URL. Must be provided; typically the output of

@@ -1,8 +1,10 @@
+/** Minimal span surface: set attributes, then end the span. */
 export type Span = {
   setAttribute(key: string, value: string | number | boolean): void;
   end(): void;
 };
 
+/** Minimal tracer surface: start a named span with optional attributes. */
 export type Tracer = {
   startSpan(name: string, attrs?: Record<string, string | number | boolean>): Span;
 };
@@ -13,6 +15,7 @@ export type WebhookAttemptStatus = "success" | "failure";
 /** Final outcome of a delivery after all attempts/retries are resolved. */
 export type WebhookTerminalOutcome = "success" | "failure" | "dropped";
 
+/** Recorder for per-URL delivery attempts and terminal outcomes. */
 export type WebhookMetrics = {
   recordAttempt(
     url: string,
@@ -26,10 +29,12 @@ export type WebhookMetrics = {
 /** Attribute bag attached to an OpenTelemetry counter/histogram data point. */
 export type MetricAttributes = Record<string, string | number | boolean>;
 
+/** Minimal counter surface: add a value with optional attributes. */
 export type OtelCounter = {
   add(value: number, attributes?: MetricAttributes): void;
 };
 
+/** Minimal histogram surface: record a value with optional attributes. */
 export type OtelHistogram = {
   record(value: number, attributes?: MetricAttributes): void;
 };
@@ -45,8 +50,13 @@ export type Meter = {
   createHistogram(name: string, options?: { description?: string }): OtelHistogram;
 };
 
+/** One delivery target: its URL plus an optional per-URL timeout override. */
 export type UrlEntry = { url: string; timeoutMs?: number };
 
+/**
+ * Delivery configuration for {@link WebhookDelivery}: targets and secret plus
+ * retry, timeout, tracing, validation, metrics, and durable-queue options.
+ */
 export type WebhookConfig = {
   url: string | string[] | UrlEntry[];
   secret: string;
@@ -80,8 +90,10 @@ export type WebhookConfig = {
 export const DEFAULT_MAX_AGE_MS = 300_000;
 export const DEFAULT_CLOCK_SKEW_MS = 30_000;
 
+/** Webhook signature envelope version accepted by the verifier. */
 export type VerifierSignatureVersion = "v1" | "v2";
 
+/** Verification options for `verifyWebhook` / `verifyWebhookRaw`: freshness window, clock, version, schema, and size cap. */
 export type VerifyWebhookOptions = {
   /** Reject signatures older than this age in milliseconds. Defaults to 300_000 (5 minutes). */
   maxAgeMs?: number;

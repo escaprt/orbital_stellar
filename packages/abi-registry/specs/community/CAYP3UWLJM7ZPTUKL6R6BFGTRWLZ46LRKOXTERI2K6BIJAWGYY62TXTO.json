@@ -1,0 +1,652 @@
+{
+  "contractId": "CAYP3UWLJM7ZPTUKL6R6BFGTRWLZ46LRKOXTERI2K6BIJAWGYY62TXTO",
+  "description": "Soroswap Aggregator (mainnet): cross-DEX swap router that splits and routes swaps across the Soroswap, Phoenix and Aqua protocol adapters.",
+  "events": [],
+  "functions": [
+    {
+      "doc": "Initializes the contract and sets the soroswap_router address.\n\n# Arguments\n\n* `e` - The environment in which the contract is running.\n* `admin` - The address of the administrator.\n* `adapter_vec` - A vector containing the adapters to be initialized.\n\n# Errors\n\nReturns an `AggregatorError::AlreadyInitialized` error if the contract is already initialized.\n\n# Returns\n\nReturns `Ok(())` if the initialization is successful.",
+      "name": "initialize",
+      "params": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "adapter_vec",
+          "type": {
+            "item": {
+              "name": "Adapter",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Updates the adapters in the contract.\n\nThis function overwrites any existing protocol address pairs if they exist.\nIf an adapter does not exist, it will add it.\n\n# Arguments\n\n* `e` - The environment in which the contract is running.\n* `adapter_vec` - A vector containing the adapters to be updated.\n\n# Errors\n\nReturns an `AggregatorError` if the contract is not initialized or if the caller is not the admin.\n\n# Returns\n\nReturns `Ok(())` if the adapters are successfully updated.",
+      "name": "update_adapters",
+      "params": [
+        {
+          "name": "adapter_vec",
+          "type": {
+            "item": {
+              "name": "Adapter",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Removes an adapter from the contract.\n\nThis function removes the adapter associated with the specified protocol ID.\n\n# Arguments\n\n* `e` - The environment in which the contract is running.\n* `protocol_id` - The ID of the protocol whose adapter is to be removed.\n\n# Errors\n\nReturns an `AggregatorError` if the contract is not initialized or if the caller is not the admin.\n\n# Returns\n\nReturns `Ok(())` if the adapter is successfully removed.",
+      "name": "remove_adapter",
+      "params": [
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the paused state of the protocol in the aggregator.\n\n# Argumentsnts\n* `e` - The runtime environment.t.\n* `protocol_id` - The ID of the protocol to set the paused state for.\n* `paused` - The boolean value indicating whether the protocol should be paused or not.\n\n# Returns\nReturns `Ok(())` if the operation is successful, otherwise returns an `AggregatorError`.",
+      "name": "set_pause",
+      "params": [
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets a new administrator for the contract.\n\nThis function updates the administrator of the contract to the specified `new_admin` address.\n\n# Arguments\n\n* `e` - The runtime environment.\n* `new_admin` - The address of the new administrator.\n\n# Errors\n\nReturns an `AggregatorError` if the contract is not initialized or if the caller is not the current admin.\n\n# Returns\n\nReturns `Ok(())` if the operation is successful.",
+      "name": "set_admin",
+      "params": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Upgrades the contract with new WebAssembly (WASM) code.\n\nThis function updates the contract with new WASM code provided by the `new_wasm_hash`.\n\n# Arguments\n\n* `e` - The runtime environment.\n* `new_wasm_hash` - The hash of the new WASM code to upgrade the contract to.\n\n# Errors\n\nReturns an `AggregatorError` if the contract is not initialized or if the caller is not the admin.\n\n# Returns\n\nReturns `Ok(())` if the upgrade is successful.",
+      "name": "upgrade",
+      "params": [
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Swaps an exact amount of input tokens for output tokens across multiple DEXes.\n\nThis function performs a swap operation where an exact amount of input tokens is exchanged for output tokens,\ndistributed across multiple DEXes as specified by the `distribution` parameter.\n\n# Arguments\n\n* `e` - The runtime environment.\n* `token_in` - The address of the input token.\n* `token_out` - The address of the output token.\n* `amount_in` - The exact amount of input tokens to be swapped.\n* `amount_out_min` - The minimum amount of output tokens expected to receive.\n* `distribution` - A vector specifying how the swap should be distributed across different DEXes.\n* `to` - The address to receive the output tokens.\n* `deadline` - The time by which the swap must be completed.\n\n# Errors\n\nReturns an `AggregatorError` if any of the following conditions are met:\n- The parameters are invalid.\n- The swap amounts calculation fails.\n- There is an arithmetic error.\n- The final output amount is less than the minimum expected amount.\n\n# Retu",
+      "name": "swap_exact_tokens_for_tokens",
+      "params": [
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "token_out",
+          "type": "address"
+        },
+        {
+          "name": "amount_in",
+          "type": "i128"
+        },
+        {
+          "name": "amount_out_min",
+          "type": "i128"
+        },
+        {
+          "name": "distribution",
+          "type": {
+            "item": {
+              "name": "DexDistribution",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "deadline",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": {
+          "item": {
+            "item": "i128",
+            "type": "vec"
+          },
+          "type": "vec"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Swaps tokens for an exact amount of output tokens across multiple DEXes.\n\nThis function performs a swap operation where tokens are exchanged for an exact amount of output tokens,\ndistributed across multiple DEXes as specified by the `distribution` parameter.\n\n# Arguments\n\n* `e` - The runtime environment.\n* `token_in` - The address of the input token.\n* `token_out` - The address of the output token.\n* `amount_out` - The exact amount of output tokens to be received.\n* `amount_in_max` - The maximum amount of input tokens to be spent.\n* `distribution` - A vector specifying how the swap should be distributed across different DEXes.\n* `to` - The address to receive the output tokens.\n* `deadline` - The time by which the swap must be completed.\n\n# Errors\n\nReturns an `AggregatorError` if any of the following conditions are met:\n- The parameters are invalid.\n- The swap amounts calculation fails.\n- There is an arithmetic error.\n- The final input amount exceeds the maximum allowed.\n\n# Returns\n\nReturns a vector of vectors",
+      "name": "swap_tokens_for_exact_tokens",
+      "params": [
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "token_out",
+          "type": "address"
+        },
+        {
+          "name": "amount_out",
+          "type": "i128"
+        },
+        {
+          "name": "amount_in_max",
+          "type": "i128"
+        },
+        {
+          "name": "distribution",
+          "type": {
+            "item": {
+              "name": "DexDistribution",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "deadline",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": {
+          "item": {
+            "item": "i128",
+            "type": "vec"
+          },
+          "type": "vec"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the administrator address of the contract.\n\nThis function returns the current administrator address of the contract.\n\n# Arguments\n\n* `e` - A reference to the runtime environment.\n\n# Errors\n\nReturns an `AggregatorError` if the contract is not initialized.\n\n# Returns\n\nReturns the address of the current administrator if the operation is successful.",
+      "name": "get_admin",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "name": "get_adapters",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": {
+          "item": {
+            "name": "Adapter",
+            "type": "named"
+          },
+          "type": "vec"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the paused state of a specific protocol adapter.\n\nThis function returns whether the adapter associated with the specified `protocol_id` is currently paused.\n\n# Arguments\n\n* `e` - A reference to the runtime environment.\n* `protocol_id` - The ID of the protocol whose paused state is to be retrieved.\n\n# Errors\n\nReturns an `AggregatorError` if there are issues retrieving the adapter or if the protocol ID is not found.\n\n# Returns\n\nReturns `true` if the adapter is paused, otherwise `false`.",
+      "name": "get_paused",
+      "params": [
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "AggregatorError",
+          "type": "named"
+        },
+        "ok": "bool",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the version number of the contract.\n\nThis function returns the version number of the contract. If the WebAssembly (WASM) code is updated,\nthis number should be increased accordingly to reflect the new version.\n\n# Returns\n\nReturns the current version number of the contract as a `u32`.",
+      "name": "get_version",
+      "params": [],
+      "returns": "u32"
+    }
+  ],
+  "name": "Soroswap Aggregator",
+  "network": "mainnet",
+  "types": {
+    "Adapter": {
+      "fields": [
+        {
+          "name": "paused",
+          "type": "bool"
+        },
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        },
+        {
+          "name": "router",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "Adapter"
+    },
+    "AdapterError": {
+      "kind": "enum",
+      "name": "AdapterError",
+      "variants": [
+        {
+          "discriminant": 401,
+          "name": "NotInitialized"
+        },
+        {
+          "discriminant": 402,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 403,
+          "name": "NegativeNotAllowed"
+        },
+        {
+          "discriminant": 404,
+          "name": "ProtocolAddressNotFound"
+        },
+        {
+          "discriminant": 405,
+          "name": "DeadlineExpired"
+        },
+        {
+          "discriminant": 406,
+          "name": "MissingPoolHashes"
+        },
+        {
+          "discriminant": 407,
+          "name": "WrongMinimumPathLength"
+        },
+        {
+          "discriminant": 408,
+          "name": "WrongPoolHashesLength"
+        }
+      ]
+    },
+    "AggregatorError": {
+      "kind": "enum",
+      "name": "AggregatorError",
+      "variants": [
+        {
+          "discriminant": 501,
+          "name": "NotInitialized"
+        },
+        {
+          "discriminant": 502,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 503,
+          "name": "NegativeNotAllowed"
+        },
+        {
+          "discriminant": 504,
+          "name": "ProtocolNotFound"
+        },
+        {
+          "discriminant": 505,
+          "name": "DeadlineExpired"
+        },
+        {
+          "discriminant": 608,
+          "name": "InsufficientOutputAmount"
+        },
+        {
+          "discriminant": 609,
+          "name": "ExcessiveInputAmount"
+        },
+        {
+          "discriminant": 610,
+          "name": "ProtocolPaused"
+        },
+        {
+          "discriminant": 611,
+          "name": "DistributionLengthExceeded"
+        },
+        {
+          "discriminant": 612,
+          "name": "ZeroDistributionPart"
+        },
+        {
+          "discriminant": 613,
+          "name": "ArithmeticError"
+        },
+        {
+          "discriminant": 614,
+          "name": "Unauthorized"
+        },
+        {
+          "discriminant": 615,
+          "name": "InvalidPath"
+        },
+        {
+          "discriminant": 616,
+          "name": "NegibleAmount"
+        },
+        {
+          "discriminant": 404,
+          "name": "ProtocolAddressNotFound"
+        },
+        {
+          "discriminant": 406,
+          "name": "MissingPoolHashes"
+        },
+        {
+          "discriminant": 407,
+          "name": "WrongMinimumPathLength"
+        },
+        {
+          "discriminant": 408,
+          "name": "WrongPoolHashesLength"
+        }
+      ]
+    },
+    "DexDistribution": {
+      "fields": [
+        {
+          "name": "bytes",
+          "type": {
+            "inner": {
+              "item": {
+                "size": 32,
+                "type": "bytes_n"
+              },
+              "type": "vec"
+            },
+            "type": "option"
+          }
+        },
+        {
+          "name": "parts",
+          "type": "u32"
+        },
+        {
+          "name": "path",
+          "type": {
+            "item": "address",
+            "type": "vec"
+          }
+        },
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "DexDistribution"
+    },
+    "InitializedEvent": {
+      "fields": [
+        {
+          "name": "adapter_addresses",
+          "type": {
+            "item": {
+              "name": "Adapter",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "admin",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "InitializedEvent"
+    },
+    "NewAdminEvent": {
+      "fields": [
+        {
+          "name": "new",
+          "type": "address"
+        },
+        {
+          "name": "old",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "NewAdminEvent"
+    },
+    "PausedProtocolEvent": {
+      "fields": [
+        {
+          "name": "paused",
+          "type": "bool"
+        },
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "PausedProtocolEvent"
+    },
+    "Protocol": {
+      "kind": "enum",
+      "name": "Protocol",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "Soroswap"
+        },
+        {
+          "discriminant": 1,
+          "name": "Phoenix"
+        },
+        {
+          "discriminant": 2,
+          "name": "Aqua"
+        },
+        {
+          "discriminant": 3,
+          "name": "Comet"
+        }
+      ]
+    },
+    "RemovedProtocolEvent": {
+      "fields": [
+        {
+          "name": "protocol_id",
+          "type": {
+            "name": "Protocol",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "RemovedProtocolEvent"
+    },
+    "SwapEvent": {
+      "fields": [
+        {
+          "name": "amount_in",
+          "type": "i128"
+        },
+        {
+          "name": "amount_out",
+          "type": "i128"
+        },
+        {
+          "name": "distribution",
+          "type": {
+            "item": {
+              "name": "DexDistribution",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "token_in",
+          "type": "address"
+        },
+        {
+          "name": "token_out",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "SwapEvent"
+    },
+    "UpdateProtocolsEvent": {
+      "fields": [
+        {
+          "name": "adapter_addresses",
+          "type": {
+            "item": {
+              "name": "Adapter",
+              "type": "named"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "UpdateProtocolsEvent"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAAD0FnZ3JlZ2F0b3JFcnJvcgAAAAASAAAAAAAAAA5Ob3RJbml0aWFsaXplZAAAAAAB9QAAAAAAAAASQWxyZWFkeUluaXRpYWxpemVkAAAAAAH2AAAAAAAAABJOZWdhdGl2ZU5vdEFsbG93ZWQAAAAAAfcAAAAAAAAAEFByb3RvY29sTm90Rm91bmQAAAH4AAAAAAAAAA9EZWFkbGluZUV4cGlyZWQAAAAB+QAAAAAAAAAYSW5zdWZmaWNpZW50T3V0cHV0QW1vdW50AAACYAAAAAAAAAAURXhjZXNzaXZlSW5wdXRBbW91bnQAAAJhAAAAAAAAAA5Qcm90b2NvbFBhdXNlZAAAAAACYgAAAAAAAAAaRGlzdHJpYnV0aW9uTGVuZ3RoRXhjZWVkZWQAAAAAAmMAAAAAAAAAFFplcm9EaXN0cmlidXRpb25QYXJ0AAACZAAAAAAAAAAPQXJpdGhtZXRpY0Vycm9yAAAAAmUAAAAAAAAADFVuYXV0aG9yaXplZAAAAmYAAAAAAAAAC0ludmFsaWRQYXRoAAAAAmcAAAAAAAAADU5lZ2libGVBbW91bnQAAAAAAAJoAAAAAAAAABdQcm90b2NvbEFkZHJlc3NOb3RGb3VuZAAAAAGUAAAAAAAAABFNaXNzaW5nUG9vbEhhc2hlcwAAAAAAAZYAAAAAAAAAFldyb25nTWluaW11bVBhdGhMZW5ndGgAAAAAAZcAAAAAAAAAFVdyb25nUG9vbEhhc2hlc0xlbmd0aAAAAAAAAZg=",
+    "AAAAAQAAAAAAAAAAAAAAEEluaXRpYWxpemVkRXZlbnQAAAACAAAAAAAAABFhZGFwdGVyX2FkZHJlc3NlcwAAAAAAA+oAAAfQAAAAB0FkYXB0ZXIAAAAAAAAAAAVhZG1pbgAAAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAFFVwZGF0ZVByb3RvY29sc0V2ZW50AAAAAQAAAAAAAAARYWRhcHRlcl9hZGRyZXNzZXMAAAAAAAPqAAAH0AAAAAdBZGFwdGVyAA==",
+    "AAAAAQAAAAAAAAAAAAAAFFJlbW92ZWRQcm90b2NvbEV2ZW50AAAAAQAAAAAAAAALcHJvdG9jb2xfaWQAAAAH0AAAAAhQcm90b2NvbA==",
+    "AAAAAQAAAAAAAAAAAAAAE1BhdXNlZFByb3RvY29sRXZlbnQAAAAAAgAAAAAAAAAGcGF1c2VkAAAAAAABAAAAAAAAAAtwcm90b2NvbF9pZAAAAAfQAAAACFByb3RvY29s",
+    "AAAAAQAAAAAAAAAAAAAADU5ld0FkbWluRXZlbnQAAAAAAAACAAAAAAAAAANuZXcAAAAAEwAAAAAAAAADb2xkAAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAACVN3YXBFdmVudAAAAAAAAAYAAAAAAAAACWFtb3VudF9pbgAAAAAAAAsAAAAAAAAACmFtb3VudF9vdXQAAAAAAAsAAAAAAAAADGRpc3RyaWJ1dGlvbgAAA+oAAAfQAAAAD0RleERpc3RyaWJ1dGlvbgAAAAAAAAAAAnRvAAAAAAATAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACXRva2VuX291dAAAAAAAABM=",
+    "AAAAAwAAAAAAAAAAAAAACFByb3RvY29sAAAABAAAAAAAAAAIU29yb3N3YXAAAAAAAAAAAAAAAAdQaG9lbml4AAAAAAEAAAAAAAAABEFxdWEAAAACAAAAAAAAAAVDb21ldAAAAAAAAAM=",
+    "AAAAAQAAAAAAAAAAAAAAD0RleERpc3RyaWJ1dGlvbgAAAAAEAAAAAAAAAAVieXRlcwAAAAAAA+gAAAPqAAAD7gAAACAAAAAAAAAABXBhcnRzAAAAAAAABAAAAAAAAAAEcGF0aAAAA+oAAAATAAAAAAAAAAtwcm90b2NvbF9pZAAAAAfQAAAACFByb3RvY29s",
+    "AAAAAQAAAAAAAAAAAAAAB0FkYXB0ZXIAAAAAAwAAAAAAAAAGcGF1c2VkAAAAAAABAAAAAAAAAAtwcm90b2NvbF9pZAAAAAfQAAAACFByb3RvY29sAAAAAAAAAAZyb3V0ZXIAAAAAABM=",
+    "AAAAAAAAAaZJbml0aWFsaXplcyB0aGUgY29udHJhY3QgYW5kIHNldHMgdGhlIHNvcm9zd2FwX3JvdXRlciBhZGRyZXNzLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIGVudmlyb25tZW50IGluIHdoaWNoIHRoZSBjb250cmFjdCBpcyBydW5uaW5nLgoqIGBhZG1pbmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgYWRtaW5pc3RyYXRvci4KKiBgYWRhcHRlcl92ZWNgIC0gQSB2ZWN0b3IgY29udGFpbmluZyB0aGUgYWRhcHRlcnMgdG8gYmUgaW5pdGlhbGl6ZWQuCgojIEVycm9ycwoKUmV0dXJucyBhbiBgQWdncmVnYXRvckVycm9yOjpBbHJlYWR5SW5pdGlhbGl6ZWRgIGVycm9yIGlmIHRoZSBjb250cmFjdCBpcyBhbHJlYWR5IGluaXRpYWxpemVkLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBPaygoKSlgIGlmIHRoZSBpbml0aWFsaXphdGlvbiBpcyBzdWNjZXNzZnVsLgAAAAAACmluaXRpYWxpemUAAAAAAAIAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAALYWRhcHRlcl92ZWMAAAAD6gAAB9AAAAAHQWRhcHRlcgAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA9BZ2dyZWdhdG9yRXJyb3IA",
+    "AAAAAAAAAd9VcGRhdGVzIHRoZSBhZGFwdGVycyBpbiB0aGUgY29udHJhY3QuCgpUaGlzIGZ1bmN0aW9uIG92ZXJ3cml0ZXMgYW55IGV4aXN0aW5nIHByb3RvY29sIGFkZHJlc3MgcGFpcnMgaWYgdGhleSBleGlzdC4KSWYgYW4gYWRhcHRlciBkb2VzIG5vdCBleGlzdCwgaXQgd2lsbCBhZGQgaXQuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYGFkYXB0ZXJfdmVjYCAtIEEgdmVjdG9yIGNvbnRhaW5pbmcgdGhlIGFkYXB0ZXJzIHRvIGJlIHVwZGF0ZWQuCgojIEVycm9ycwoKUmV0dXJucyBhbiBgQWdncmVnYXRvckVycm9yYCBpZiB0aGUgY29udHJhY3QgaXMgbm90IGluaXRpYWxpemVkIG9yIGlmIHRoZSBjYWxsZXIgaXMgbm90IHRoZSBhZG1pbi4KCiMgUmV0dXJucwoKUmV0dXJucyBgT2soKCkpYCBpZiB0aGUgYWRhcHRlcnMgYXJlIHN1Y2Nlc3NmdWxseSB1cGRhdGVkLgAAAAAPdXBkYXRlX2FkYXB0ZXJzAAAAAAEAAAAAAAAAC2FkYXB0ZXJfdmVjAAAAA+oAAAfQAAAAB0FkYXB0ZXIAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAPQWdncmVnYXRvckVycm9yAA==",
+    "AAAAAAAAAbdSZW1vdmVzIGFuIGFkYXB0ZXIgZnJvbSB0aGUgY29udHJhY3QuCgpUaGlzIGZ1bmN0aW9uIHJlbW92ZXMgdGhlIGFkYXB0ZXIgYXNzb2NpYXRlZCB3aXRoIHRoZSBzcGVjaWZpZWQgcHJvdG9jb2wgSUQuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgaW4gd2hpY2ggdGhlIGNvbnRyYWN0IGlzIHJ1bm5pbmcuCiogYHByb3RvY29sX2lkYCAtIFRoZSBJRCBvZiB0aGUgcHJvdG9jb2wgd2hvc2UgYWRhcHRlciBpcyB0byBiZSByZW1vdmVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gYEFnZ3JlZ2F0b3JFcnJvcmAgaWYgdGhlIGNvbnRyYWN0IGlzIG5vdCBpbml0aWFsaXplZCBvciBpZiB0aGUgY2FsbGVyIGlzIG5vdCB0aGUgYWRtaW4uCgojIFJldHVybnMKClJldHVybnMgYE9rKCgpKWAgaWYgdGhlIGFkYXB0ZXIgaXMgc3VjY2Vzc2Z1bGx5IHJlbW92ZWQuAAAAAA5yZW1vdmVfYWRhcHRlcgAAAAAAAQAAAAAAAAALcHJvdG9jb2xfaWQAAAAH0AAAAAhQcm90b2NvbAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAAAW1TZXRzIHRoZSBwYXVzZWQgc3RhdGUgb2YgdGhlIHByb3RvY29sIGluIHRoZSBhZ2dyZWdhdG9yLgoKIyBBcmd1bWVudHNudHMKKiBgZWAgLSBUaGUgcnVudGltZSBlbnZpcm9ubWVudC50LgoqIGBwcm90b2NvbF9pZGAgLSBUaGUgSUQgb2YgdGhlIHByb3RvY29sIHRvIHNldCB0aGUgcGF1c2VkIHN0YXRlIGZvci4KKiBgcGF1c2VkYCAtIFRoZSBib29sZWFuIHZhbHVlIGluZGljYXRpbmcgd2hldGhlciB0aGUgcHJvdG9jb2wgc2hvdWxkIGJlIHBhdXNlZCBvciBub3QuCgojIFJldHVybnMKUmV0dXJucyBgT2soKCkpYCBpZiB0aGUgb3BlcmF0aW9uIGlzIHN1Y2Nlc3NmdWwsIG90aGVyd2lzZSByZXR1cm5zIGFuIGBBZ2dyZWdhdG9yRXJyb3JgLgAAAAAAAAlzZXRfcGF1c2UAAAAAAAACAAAAAAAAAAtwcm90b2NvbF9pZAAAAAfQAAAACFByb3RvY29sAAAAAAAAAAZwYXVzZWQAAAAAAAEAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA9BZ2dyZWdhdG9yRXJyb3IA",
+    "AAAAAAAAAaFTZXRzIGEgbmV3IGFkbWluaXN0cmF0b3IgZm9yIHRoZSBjb250cmFjdC4KClRoaXMgZnVuY3Rpb24gdXBkYXRlcyB0aGUgYWRtaW5pc3RyYXRvciBvZiB0aGUgY29udHJhY3QgdG8gdGhlIHNwZWNpZmllZCBgbmV3X2FkbWluYCBhZGRyZXNzLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIHJ1bnRpbWUgZW52aXJvbm1lbnQuCiogYG5ld19hZG1pbmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgbmV3IGFkbWluaXN0cmF0b3IuCgojIEVycm9ycwoKUmV0dXJucyBhbiBgQWdncmVnYXRvckVycm9yYCBpZiB0aGUgY29udHJhY3QgaXMgbm90IGluaXRpYWxpemVkIG9yIGlmIHRoZSBjYWxsZXIgaXMgbm90IHRoZSBjdXJyZW50IGFkbWluLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBPaygoKSlgIGlmIHRoZSBvcGVyYXRpb24gaXMgc3VjY2Vzc2Z1bC4AAAAAAAAJc2V0X2FkbWluAAAAAAAAAQAAAAAAAAAJbmV3X2FkbWluAAAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAAAbVVcGdyYWRlcyB0aGUgY29udHJhY3Qgd2l0aCBuZXcgV2ViQXNzZW1ibHkgKFdBU00pIGNvZGUuCgpUaGlzIGZ1bmN0aW9uIHVwZGF0ZXMgdGhlIGNvbnRyYWN0IHdpdGggbmV3IFdBU00gY29kZSBwcm92aWRlZCBieSB0aGUgYG5ld193YXNtX2hhc2hgLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIHJ1bnRpbWUgZW52aXJvbm1lbnQuCiogYG5ld193YXNtX2hhc2hgIC0gVGhlIGhhc2ggb2YgdGhlIG5ldyBXQVNNIGNvZGUgdG8gdXBncmFkZSB0aGUgY29udHJhY3QgdG8uCgojIEVycm9ycwoKUmV0dXJucyBhbiBgQWdncmVnYXRvckVycm9yYCBpZiB0aGUgY29udHJhY3QgaXMgbm90IGluaXRpYWxpemVkIG9yIGlmIHRoZSBjYWxsZXIgaXMgbm90IHRoZSBhZG1pbi4KCiMgUmV0dXJucwoKUmV0dXJucyBgT2soKCkpYCBpZiB0aGUgdXBncmFkZSBpcyBzdWNjZXNzZnVsLgAAAAAAAAd1cGdyYWRlAAAAAAEAAAAAAAAADW5ld193YXNtX2hhc2gAAAAAAAPuAAAAIAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAABABTd2FwcyBhbiBleGFjdCBhbW91bnQgb2YgaW5wdXQgdG9rZW5zIGZvciBvdXRwdXQgdG9rZW5zIGFjcm9zcyBtdWx0aXBsZSBERVhlcy4KClRoaXMgZnVuY3Rpb24gcGVyZm9ybXMgYSBzd2FwIG9wZXJhdGlvbiB3aGVyZSBhbiBleGFjdCBhbW91bnQgb2YgaW5wdXQgdG9rZW5zIGlzIGV4Y2hhbmdlZCBmb3Igb3V0cHV0IHRva2VucywKZGlzdHJpYnV0ZWQgYWNyb3NzIG11bHRpcGxlIERFWGVzIGFzIHNwZWNpZmllZCBieSB0aGUgYGRpc3RyaWJ1dGlvbmAgcGFyYW1ldGVyLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIHJ1bnRpbWUgZW52aXJvbm1lbnQuCiogYHRva2VuX2luYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBpbnB1dCB0b2tlbi4KKiBgdG9rZW5fb3V0YCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBvdXRwdXQgdG9rZW4uCiogYGFtb3VudF9pbmAgLSBUaGUgZXhhY3QgYW1vdW50IG9mIGlucHV0IHRva2VucyB0byBiZSBzd2FwcGVkLgoqIGBhbW91bnRfb3V0X21pbmAgLSBUaGUgbWluaW11bSBhbW91bnQgb2Ygb3V0cHV0IHRva2VucyBleHBlY3RlZCB0byByZWNlaXZlLgoqIGBkaXN0cmlidXRpb25gIC0gQSB2ZWN0b3Igc3BlY2lmeWluZyBob3cgdGhlIHN3YXAgc2hvdWxkIGJlIGRpc3RyaWJ1dGVkIGFjcm9zcyBkaWZmZXJlbnQgREVYZXMuCiogYHRvYCAtIFRoZSBhZGRyZXNzIHRvIHJlY2VpdmUgdGhlIG91dHB1dCB0b2tlbnMuCiogYGRlYWRsaW5lYCAtIFRoZSB0aW1lIGJ5IHdoaWNoIHRoZSBzd2FwIG11c3QgYmUgY29tcGxldGVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gYEFnZ3JlZ2F0b3JFcnJvcmAgaWYgYW55IG9mIHRoZSBmb2xsb3dpbmcgY29uZGl0aW9ucyBhcmUgbWV0OgotIFRoZSBwYXJhbWV0ZXJzIGFyZSBpbnZhbGlkLgotIFRoZSBzd2FwIGFtb3VudHMgY2FsY3VsYXRpb24gZmFpbHMuCi0gVGhlcmUgaXMgYW4gYXJpdGhtZXRpYyBlcnJvci4KLSBUaGUgZmluYWwgb3V0cHV0IGFtb3VudCBpcyBsZXNzIHRoYW4gdGhlIG1pbmltdW0gZXhwZWN0ZWQgYW1vdW50LgoKIyBSZXR1AAAAHHN3YXBfZXhhY3RfdG9rZW5zX2Zvcl90b2tlbnMAAAAHAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACXRva2VuX291dAAAAAAAABMAAAAAAAAACWFtb3VudF9pbgAAAAAAAAsAAAAAAAAADmFtb3VudF9vdXRfbWluAAAAAAALAAAAAAAAAAxkaXN0cmlidXRpb24AAAPqAAAH0AAAAA9EZXhEaXN0cmlidXRpb24AAAAAAAAAAAJ0bwAAAAAAEwAAAAAAAAAIZGVhZGxpbmUAAAAGAAAAAQAAA+kAAAPqAAAD6gAAAAsAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAABABTd2FwcyB0b2tlbnMgZm9yIGFuIGV4YWN0IGFtb3VudCBvZiBvdXRwdXQgdG9rZW5zIGFjcm9zcyBtdWx0aXBsZSBERVhlcy4KClRoaXMgZnVuY3Rpb24gcGVyZm9ybXMgYSBzd2FwIG9wZXJhdGlvbiB3aGVyZSB0b2tlbnMgYXJlIGV4Y2hhbmdlZCBmb3IgYW4gZXhhY3QgYW1vdW50IG9mIG91dHB1dCB0b2tlbnMsCmRpc3RyaWJ1dGVkIGFjcm9zcyBtdWx0aXBsZSBERVhlcyBhcyBzcGVjaWZpZWQgYnkgdGhlIGBkaXN0cmlidXRpb25gIHBhcmFtZXRlci4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIFRoZSBydW50aW1lIGVudmlyb25tZW50LgoqIGB0b2tlbl9pbmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgaW5wdXQgdG9rZW4uCiogYHRva2VuX291dGAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgb3V0cHV0IHRva2VuLgoqIGBhbW91bnRfb3V0YCAtIFRoZSBleGFjdCBhbW91bnQgb2Ygb3V0cHV0IHRva2VucyB0byBiZSByZWNlaXZlZC4KKiBgYW1vdW50X2luX21heGAgLSBUaGUgbWF4aW11bSBhbW91bnQgb2YgaW5wdXQgdG9rZW5zIHRvIGJlIHNwZW50LgoqIGBkaXN0cmlidXRpb25gIC0gQSB2ZWN0b3Igc3BlY2lmeWluZyBob3cgdGhlIHN3YXAgc2hvdWxkIGJlIGRpc3RyaWJ1dGVkIGFjcm9zcyBkaWZmZXJlbnQgREVYZXMuCiogYHRvYCAtIFRoZSBhZGRyZXNzIHRvIHJlY2VpdmUgdGhlIG91dHB1dCB0b2tlbnMuCiogYGRlYWRsaW5lYCAtIFRoZSB0aW1lIGJ5IHdoaWNoIHRoZSBzd2FwIG11c3QgYmUgY29tcGxldGVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gYEFnZ3JlZ2F0b3JFcnJvcmAgaWYgYW55IG9mIHRoZSBmb2xsb3dpbmcgY29uZGl0aW9ucyBhcmUgbWV0OgotIFRoZSBwYXJhbWV0ZXJzIGFyZSBpbnZhbGlkLgotIFRoZSBzd2FwIGFtb3VudHMgY2FsY3VsYXRpb24gZmFpbHMuCi0gVGhlcmUgaXMgYW4gYXJpdGhtZXRpYyBlcnJvci4KLSBUaGUgZmluYWwgaW5wdXQgYW1vdW50IGV4Y2VlZHMgdGhlIG1heGltdW0gYWxsb3dlZC4KCiMgUmV0dXJucwoKUmV0dXJucyBhIHZlY3RvciBvZiB2ZWN0b3JzAAAAHHN3YXBfdG9rZW5zX2Zvcl9leGFjdF90b2tlbnMAAAAHAAAAAAAAAAh0b2tlbl9pbgAAABMAAAAAAAAACXRva2VuX291dAAAAAAAABMAAAAAAAAACmFtb3VudF9vdXQAAAAAAAsAAAAAAAAADWFtb3VudF9pbl9tYXgAAAAAAAALAAAAAAAAAAxkaXN0cmlidXRpb24AAAPqAAAH0AAAAA9EZXhEaXN0cmlidXRpb24AAAAAAAAAAAJ0bwAAAAAAEwAAAAAAAAAIZGVhZGxpbmUAAAAGAAAAAQAAA+kAAAPqAAAD6gAAAAsAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAAAWVSZXRyaWV2ZXMgdGhlIGFkbWluaXN0cmF0b3IgYWRkcmVzcyBvZiB0aGUgY29udHJhY3QuCgpUaGlzIGZ1bmN0aW9uIHJldHVybnMgdGhlIGN1cnJlbnQgYWRtaW5pc3RyYXRvciBhZGRyZXNzIG9mIHRoZSBjb250cmFjdC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEEgcmVmZXJlbmNlIHRvIHRoZSBydW50aW1lIGVudmlyb25tZW50LgoKIyBFcnJvcnMKClJldHVybnMgYW4gYEFnZ3JlZ2F0b3JFcnJvcmAgaWYgdGhlIGNvbnRyYWN0IGlzIG5vdCBpbml0aWFsaXplZC4KCiMgUmV0dXJucwoKUmV0dXJucyB0aGUgYWRkcmVzcyBvZiB0aGUgY3VycmVudCBhZG1pbmlzdHJhdG9yIGlmIHRoZSBvcGVyYXRpb24gaXMgc3VjY2Vzc2Z1bC4AAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAAPQWdncmVnYXRvckVycm9yAA==",
+    "AAAAAAAAAAAAAAAMZ2V0X2FkYXB0ZXJzAAAAAAAAAAEAAAPpAAAD6gAAB9AAAAAHQWRhcHRlcgAAAAfQAAAAD0FnZ3JlZ2F0b3JFcnJvcgA=",
+    "AAAAAAAAAfNSZXRyaWV2ZXMgdGhlIHBhdXNlZCBzdGF0ZSBvZiBhIHNwZWNpZmljIHByb3RvY29sIGFkYXB0ZXIuCgpUaGlzIGZ1bmN0aW9uIHJldHVybnMgd2hldGhlciB0aGUgYWRhcHRlciBhc3NvY2lhdGVkIHdpdGggdGhlIHNwZWNpZmllZCBgcHJvdG9jb2xfaWRgIGlzIGN1cnJlbnRseSBwYXVzZWQuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBBIHJlZmVyZW5jZSB0byB0aGUgcnVudGltZSBlbnZpcm9ubWVudC4KKiBgcHJvdG9jb2xfaWRgIC0gVGhlIElEIG9mIHRoZSBwcm90b2NvbCB3aG9zZSBwYXVzZWQgc3RhdGUgaXMgdG8gYmUgcmV0cmlldmVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gYEFnZ3JlZ2F0b3JFcnJvcmAgaWYgdGhlcmUgYXJlIGlzc3VlcyByZXRyaWV2aW5nIHRoZSBhZGFwdGVyIG9yIGlmIHRoZSBwcm90b2NvbCBJRCBpcyBub3QgZm91bmQuCgojIFJldHVybnMKClJldHVybnMgYHRydWVgIGlmIHRoZSBhZGFwdGVyIGlzIHBhdXNlZCwgb3RoZXJ3aXNlIGBmYWxzZWAuAAAAAApnZXRfcGF1c2VkAAAAAAABAAAAAAAAAAtwcm90b2NvbF9pZAAAAAfQAAAACFByb3RvY29sAAAAAQAAA+kAAAABAAAH0AAAAA9BZ2dyZWdhdG9yRXJyb3IA",
+    "AAAAAAAAASZSZXRyaWV2ZXMgdGhlIHZlcnNpb24gbnVtYmVyIG9mIHRoZSBjb250cmFjdC4KClRoaXMgZnVuY3Rpb24gcmV0dXJucyB0aGUgdmVyc2lvbiBudW1iZXIgb2YgdGhlIGNvbnRyYWN0LiBJZiB0aGUgV2ViQXNzZW1ibHkgKFdBU00pIGNvZGUgaXMgdXBkYXRlZCwKdGhpcyBudW1iZXIgc2hvdWxkIGJlIGluY3JlYXNlZCBhY2NvcmRpbmdseSB0byByZWZsZWN0IHRoZSBuZXcgdmVyc2lvbi4KCiMgUmV0dXJucwoKUmV0dXJucyB0aGUgY3VycmVudCB2ZXJzaW9uIG51bWJlciBvZiB0aGUgY29udHJhY3QgYXMgYSBgdTMyYC4AAAAAAAtnZXRfdmVyc2lvbgAAAAAAAAAAAQAAAAQ=",
+    "AAAABAAAAAAAAAAAAAAADEFkYXB0ZXJFcnJvcgAAAAgAAAAAAAAADk5vdEluaXRpYWxpemVkAAAAAAGRAAAAAAAAABJBbHJlYWR5SW5pdGlhbGl6ZWQAAAAAAZIAAAAAAAAAEk5lZ2F0aXZlTm90QWxsb3dlZAAAAAABkwAAAAAAAAAXUHJvdG9jb2xBZGRyZXNzTm90Rm91bmQAAAABlAAAAAAAAAAPRGVhZGxpbmVFeHBpcmVkAAAAAZUAAAAAAAAAEU1pc3NpbmdQb29sSGFzaGVzAAAAAAABlgAAAAAAAAAWV3JvbmdNaW5pbXVtUGF0aExlbmd0aAAAAAABlwAAAAAAAAAVV3JvbmdQb29sSGFzaGVzTGVuZ3RoAAAAAAABmA=="
+  ]
+}

@@ -277,6 +277,8 @@ function mapContractSpecTypeToTs(type: TypeSpec): string {
         return "string";
       case "error":
         return "unknown";
+      case "val":
+        return "unknown";
     }
   }
   switch (type.type) {
@@ -320,6 +322,8 @@ function mapContractSpecTypeToZod(type: TypeSpec): string {
       case "address":
         return "z.string()";
       case "error":
+        return "z.unknown()";
+      case "val":
         return "z.unknown()";
     }
   }

@@ -1,0 +1,82 @@
+name: Community specs
+
+# Re-verifies every contributed spec in specs/community/ against its live
+# mainnet contract, so a hand-edited spec or a stale verdict cannot merge.
+# Runs only when that directory (or this workflow) changes; an empty or
+# absent directory is a successful no-op.
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "packages/abi-registry/specs/community/**"
+      - ".github/workflows/community-specs.yml"
+  pull_request:
+    branches: ["**"]
+    paths:
+      - "packages/abi-registry/specs/community/**"
+      - ".github/workflows/community-specs.yml"
+
+# Public endpoint - a value, not a secret. Community specs target mainnet
+# contracts, so verification reads the mainnet network (same default the
+# repo uses everywhere else for mainnet Soroban RPC).
+env:
+  MAINNET_RPC_URL: https://mainnet.sorobanrpc.com
+
+jobs:
+  reverify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6.0.10
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # bin/abi-registry imports from dist/, so the package has to be built
+      # before the CLI resolves.
+      - name: Build abi-registry
+        run: pnpm tsc -p packages/abi-registry/tsconfig.json
+      - name: Re-verify every community spec
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          dir="packages/abi-registry/specs/community"
+          specs=()
+          if [ -d "$dir" ]; then
+            for f in "$dir"/*.json; do
+              case "$f" in
+                *.verdict.json) continue ;;
+                *) specs+=("$f") ;;
+              esac
+            done
+          fi
+          if [ "${#specs[@]}" -eq 0 ]; then
+            echo "No community specs - nothing to verify."
+            exit 0
+          fi
+          fail=0
+          for spec in "${specs[@]}"; do
+            id="$(basename "$spec" .json)"
+            echo "::group::verify $id"
+            if ! out="$(node packages/abi-registry/bin/abi-registry verify "$id" --schema "$spec" --network mainnet --rpc-url "$MAINNET_RPC_URL" --json)"; then
+              echo "::error::verify command failed for $id"
+              echo "$out"
+              fail=1
+              echo "::endgroup::"
+              continue
+            fi
+            status="$(printf '%s' "$out" | node -e "let s='';process.stdin.on('data',d=>{s+=d}).on('end',()=>console.log(JSON.parse(s).status))")"
+            if [ "$status" = "match" ]; then
+              echo "match  $id"
+            else
+              echo "::error::$id verdict is '$status', need 'match'"
+              echo "$out"
+              fail=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$fail"

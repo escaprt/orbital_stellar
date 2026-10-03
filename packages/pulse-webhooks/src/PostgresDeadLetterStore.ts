@@ -5,6 +5,7 @@ export type PgQueryResult<Row> = {
   rowCount?: number | null;
 };
 
+/** Minimal `pg`-shaped client surface this store needs: parameterized queries. */
 export type PgLike = {
   query<Row = Record<string, unknown>>(
     sql: string,
@@ -12,6 +13,7 @@ export type PgLike = {
   ): Promise<PgQueryResult<Row>>;
 };
 
+/** Failure payload accepted by {@link PostgresDeadLetterStoreApi.save} / `put`. */
 export type DeadLetterInput = {
   url: string;
   error: string;
@@ -20,6 +22,7 @@ export type DeadLetterInput = {
   failedAt?: Date | string;
 };
 
+/** Dead-letter row read back from Postgres, with ISO `failedAt` timestamps. */
 export type DeadLetterRecord = {
   id: string;
   url: string;
@@ -30,6 +33,7 @@ export type DeadLetterRecord = {
   replayedAt: string | null;
 };
 
+/** Filter for `PostgresDeadLetterStore.list`: by URL, failure window, replay state, and paging. */
 export type DeadLetterFilter = {
   url?: string;
   failedAtFrom?: Date | string;
@@ -39,6 +43,7 @@ export type DeadLetterFilter = {
   offset?: number;
 };
 
+/** CRUD surface implemented by {@link PostgresDeadLetterStore}. */
 export type PostgresDeadLetterStoreApi = {
   save(record: DeadLetterInput): Promise<DeadLetterRecord>;
   put(record: DeadLetterInput): Promise<DeadLetterRecord>;
@@ -58,6 +63,11 @@ type DeadLetterRow = {
   replayed_at: Date | string | null;
 };
 
+/**
+ * Postgres-backed dead-letter store. Persists terminal failures as JSONB rows
+ * in `tableName` (default `pulse_webhook_dead_letters`) behind any
+ * {@link PgLike} client.
+ */
 export class PostgresDeadLetterStore implements PostgresDeadLetterStoreApi {
   private readonly tableSql: string;
 

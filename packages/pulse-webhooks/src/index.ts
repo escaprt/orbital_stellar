@@ -53,9 +53,15 @@ export type {
   ReplayHandler,
 } from "./DeadLetterStore.js";
 export type { DeadLetterStoreInterface };
+/** Alias of {@link DeadLetterStoreInterface} for consumers importing the store contract from the entry point. */
 export type DeadLetterStore = DeadLetterStoreInterface;
 export { MemoryDeadLetterStore };
-/** @deprecated Use {@link MemoryDeadLetterStore} instead. */
+/**
+ * Alias of {@link MemoryDeadLetterStore} for consumers importing the default
+ * store from the entry point.
+ *
+ * @deprecated Use {@link MemoryDeadLetterStore} instead.
+ */
 export const DeadLetterStore = MemoryDeadLetterStore;
 export { NOOP_WEBHOOK_METRICS, CountingWebhookMetrics } from "./metrics.js";
 export { PrometheusWebhookMetrics } from "./PrometheusWebhookMetrics.js";
@@ -200,6 +206,12 @@ function normalizeUrlConfig(url: WebhookConfig["url"]): {
   return { urls, urlTimeouts };
 }
 
+/**
+ * Delivers watcher events to configured webhook URLs with retries, backoff,
+ * concurrency caps, optional durable retry queue, HMAC signing, and
+ * dead-letter persistence. Construct with a `Watcher`, a {@link WebhookConfig},
+ * and optionally a dead-letter store; call `stop()` to shut down delivery.
+ */
 export class WebhookDelivery {
   private config: ResolvedWebhookConfig;
   private watcher: Watcher;

@@ -1,0 +1,426 @@
+{
+  "contractId": "CCUN4RXU5VNDHSF4S4RKV4ZJYMX2YWKOH6L4AKEKVNVDQ7HY5QIAO4UB",
+  "description": "FxDAO Vaults (contracts/vaults) - the protocol's collateralized stablecoin vault. Locks XLM as collateral and mints FxDAO-issued debt (USDx/EURx/GBPx) against it, tracking one vault per borrower and denomination, and exposes opening, repayment, redemption and liquidation of under-collateralised vaults. Deployed once per network by the FxDAO DAO account; this is the mainnet instance.",
+  "events": [],
+  "functions": [
+    {
+      "name": "evict",
+      "params": [
+        {
+          "name": "prev_key",
+          "type": {
+            "name": "OptionalVaultKey",
+            "type": "named"
+          }
+        },
+        {
+          "name": "vault_key",
+          "type": {
+            "name": "VaultKey",
+            "type": "named"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "upgrade",
+      "params": [
+        {
+          "name": "hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    }
+  ],
+  "name": "FxDAO Vaults",
+  "network": "mainnet",
+  "types": {
+    "CoreDataKeys": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "CoreState"
+        }
+      ],
+      "kind": "union",
+      "name": "CoreDataKeys"
+    },
+    "CoreState": {
+      "fields": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "col_token",
+          "type": "address"
+        },
+        {
+          "name": "fee",
+          "type": "u128"
+        },
+        {
+          "name": "oracle",
+          "type": "address"
+        },
+        {
+          "name": "panic_mode",
+          "type": "bool"
+        },
+        {
+          "name": "protocol_manager",
+          "type": "address"
+        },
+        {
+          "name": "stable_issuer",
+          "type": "address"
+        },
+        {
+          "name": "treasury",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "CoreState"
+    },
+    "CurrenciesDataKeys": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "symbol"
+            }
+          ],
+          "name": "Currency"
+        }
+      ],
+      "kind": "union",
+      "name": "CurrenciesDataKeys"
+    },
+    "Currency": {
+      "fields": [
+        {
+          "name": "active",
+          "type": "bool"
+        },
+        {
+          "name": "contract",
+          "type": "address"
+        },
+        {
+          "name": "denomination",
+          "type": "symbol"
+        }
+      ],
+      "kind": "struct",
+      "name": "Currency"
+    },
+    "OptionalVaultKey": {
+      "cases": [
+        {
+          "fields": [],
+          "name": "None"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": {
+                "name": "VaultKey",
+                "type": "named"
+              }
+            }
+          ],
+          "name": "Some"
+        }
+      ],
+      "kind": "union",
+      "name": "OptionalVaultKey"
+    },
+    "SCErrors": {
+      "kind": "enum",
+      "name": "SCErrors",
+      "variants": [
+        {
+          "discriminant": 20,
+          "name": "PanicModeEnabled"
+        },
+        {
+          "discriminant": 50,
+          "name": "UnexpectedError"
+        },
+        {
+          "discriminant": 100,
+          "name": "CoreAlreadySet"
+        },
+        {
+          "discriminant": 101,
+          "name": "InvalidFee"
+        },
+        {
+          "discriminant": 200,
+          "name": "VaultsInfoHasNotStarted"
+        },
+        {
+          "discriminant": 201,
+          "name": "ThereAreNoVaults"
+        },
+        {
+          "discriminant": 300,
+          "name": "InvalidMinDebtAmount"
+        },
+        {
+          "discriminant": 310,
+          "name": "InvalidMinCollateralAmount"
+        },
+        {
+          "discriminant": 400,
+          "name": "InvalidOpeningCollateralRatio"
+        },
+        {
+          "discriminant": 500,
+          "name": "VaultDoesntExist"
+        },
+        {
+          "discriminant": 501,
+          "name": "UserAlreadyHasDenominationVault"
+        },
+        {
+          "discriminant": 502,
+          "name": "UserVaultIndexIsInvalid"
+        },
+        {
+          "discriminant": 503,
+          "name": "UserVaultCantBeLiquidated"
+        },
+        {
+          "discriminant": 504,
+          "name": "InvalidPrevVaultIndex"
+        },
+        {
+          "discriminant": 505,
+          "name": "PrevVaultCantBeNone"
+        },
+        {
+          "discriminant": 506,
+          "name": "PrevVaultDoesntExist"
+        },
+        {
+          "discriminant": 507,
+          "name": "PrevVaultNextIndexIsLowerThanNewVault"
+        },
+        {
+          "discriminant": 508,
+          "name": "PrevVaultNextIndexIsInvalid"
+        },
+        {
+          "discriminant": 509,
+          "name": "IndexProvidedIsNotTheOneSaved"
+        },
+        {
+          "discriminant": 510,
+          "name": "NextPrevVaultShouldBeNone"
+        },
+        {
+          "discriminant": 511,
+          "name": "NotEnoughVaultsToLiquidate"
+        },
+        {
+          "discriminant": 512,
+          "name": "InvalidPrevKeyDenomination"
+        },
+        {
+          "discriminant": 600,
+          "name": "DepositAmountIsMoreThanTotalDebt"
+        },
+        {
+          "discriminant": 700,
+          "name": "CollateralRateUnderMinimum"
+        },
+        {
+          "discriminant": 800,
+          "name": "NotEnoughFundsToRedeem"
+        },
+        {
+          "discriminant": 900,
+          "name": "CurrencyAlreadyAdded"
+        },
+        {
+          "discriminant": 901,
+          "name": "CurrencyDoesntExist"
+        },
+        {
+          "discriminant": 902,
+          "name": "CurrencyIsInactive"
+        }
+      ]
+    },
+    "Vault": {
+      "fields": [
+        {
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "name": "denomination",
+          "type": "symbol"
+        },
+        {
+          "name": "index",
+          "type": "u128"
+        },
+        {
+          "name": "next_key",
+          "type": {
+            "name": "OptionalVaultKey",
+            "type": "named"
+          }
+        },
+        {
+          "name": "total_collateral",
+          "type": "u128"
+        },
+        {
+          "name": "total_debt",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "Vault"
+    },
+    "VaultIndexKey": {
+      "fields": [
+        {
+          "name": "denomination",
+          "type": "symbol"
+        },
+        {
+          "name": "user",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "VaultIndexKey"
+    },
+    "VaultKey": {
+      "fields": [
+        {
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "name": "denomination",
+          "type": "symbol"
+        },
+        {
+          "name": "index",
+          "type": "u128"
+        }
+      ],
+      "kind": "struct",
+      "name": "VaultKey"
+    },
+    "VaultsDataKeys": {
+      "cases": [
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": "symbol"
+            }
+          ],
+          "name": "VaultsInfo"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": {
+                "elements": ["address", "symbol"],
+                "type": "tuple"
+              }
+            }
+          ],
+          "name": "Vault"
+        },
+        {
+          "fields": [
+            {
+              "name": "_0",
+              "type": {
+                "name": "VaultIndexKey",
+                "type": "named"
+              }
+            }
+          ],
+          "name": "VaultIndex"
+        }
+      ],
+      "kind": "union",
+      "name": "VaultsDataKeys"
+    },
+    "VaultsInfo": {
+      "fields": [
+        {
+          "name": "denomination",
+          "type": "symbol"
+        },
+        {
+          "name": "lowest_key",
+          "type": {
+            "name": "OptionalVaultKey",
+            "type": "named"
+          }
+        },
+        {
+          "name": "min_col_rate",
+          "type": "u128"
+        },
+        {
+          "name": "min_debt_creation",
+          "type": "u128"
+        },
+        {
+          "name": "opening_col_rate",
+          "type": "u128"
+        },
+        {
+          "name": "total_col",
+          "type": "u128"
+        },
+        {
+          "name": "total_debt",
+          "type": "u128"
+        },
+        {
+          "name": "total_vaults",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "VaultsInfo"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAABAAAAAAAAAAAAAAACFNDRXJyb3JzAAAAHAAAAAAAAAAQUGFuaWNNb2RlRW5hYmxlZAAAABQAAAAAAAAAD1VuZXhwZWN0ZWRFcnJvcgAAAAAyAAAAAAAAAA5Db3JlQWxyZWFkeVNldAAAAAAAZAAAAAAAAAAKSW52YWxpZEZlZQAAAAAAZQAAAAAAAAAXVmF1bHRzSW5mb0hhc05vdFN0YXJ0ZWQAAAAAyAAAAAAAAAAQVGhlcmVBcmVOb1ZhdWx0cwAAAMkAAAAAAAAAFEludmFsaWRNaW5EZWJ0QW1vdW50AAABLAAAAAAAAAAaSW52YWxpZE1pbkNvbGxhdGVyYWxBbW91bnQAAAAAATYAAAAAAAAAHUludmFsaWRPcGVuaW5nQ29sbGF0ZXJhbFJhdGlvAAAAAAABkAAAAAAAAAAQVmF1bHREb2VzbnRFeGlzdAAAAfQAAAAAAAAAH1VzZXJBbHJlYWR5SGFzRGVub21pbmF0aW9uVmF1bHQAAAAB9QAAAAAAAAAXVXNlclZhdWx0SW5kZXhJc0ludmFsaWQAAAAB9gAAAAAAAAAZVXNlclZhdWx0Q2FudEJlTGlxdWlkYXRlZAAAAAAAAfcAAAAAAAAAFUludmFsaWRQcmV2VmF1bHRJbmRleAAAAAAAAfgAAAAAAAAAE1ByZXZWYXVsdENhbnRCZU5vbmUAAAAB+QAAAAAAAAAUUHJldlZhdWx0RG9lc250RXhpc3QAAAH6AAAAAAAAACVQcmV2VmF1bHROZXh0SW5kZXhJc0xvd2VyVGhhbk5ld1ZhdWx0AAAAAAAB+wAAAAAAAAAbUHJldlZhdWx0TmV4dEluZGV4SXNJbnZhbGlkAAAAAfwAAAAAAAAAHUluZGV4UHJvdmlkZWRJc05vdFRoZU9uZVNhdmVkAAAAAAAB/QAAAAAAAAAZTmV4dFByZXZWYXVsdFNob3VsZEJlTm9uZQAAAAAAAf4AAAAAAAAAGk5vdEVub3VnaFZhdWx0c1RvTGlxdWlkYXRlAAAAAAH/AAAAAAAAABpJbnZhbGlkUHJldktleURlbm9taW5hdGlvbgAAAAACAAAAAAAAAAAgRGVwb3NpdEFtb3VudElzTW9yZVRoYW5Ub3RhbERlYnQAAAJYAAAAAAAAABpDb2xsYXRlcmFsUmF0ZVVuZGVyTWluaW11bQAAAAACvAAAAAAAAAAWTm90RW5vdWdoRnVuZHNUb1JlZGVlbQAAAAADIAAAAAAAAAAUQ3VycmVuY3lBbHJlYWR5QWRkZWQAAAOEAAAAAAAAABNDdXJyZW5jeURvZXNudEV4aXN0AAAAA4UAAAAAAAAAEkN1cnJlbmN5SXNJbmFjdGl2ZQAAAAADhg==",
+    "AAAAAQAAAAAAAAAAAAAACEN1cnJlbmN5AAAAAwAAAAAAAAAGYWN0aXZlAAAAAAABAAAAAAAAAAhjb250cmFjdAAAABMAAAAAAAAADGRlbm9taW5hdGlvbgAAABE=",
+    "AAAAAgAAAAAAAAAAAAAAEkN1cnJlbmNpZXNEYXRhS2V5cwAAAAAAAQAAAAEAAAAAAAAACEN1cnJlbmN5AAAAAQAAABE=",
+    "AAAAAQAAAAAAAAAAAAAACUNvcmVTdGF0ZQAAAAAAAAgAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAJY29sX3Rva2VuAAAAAAAAEwAAAAAAAAADZmVlAAAAAAoAAAAAAAAABm9yYWNsZQAAAAAAEwAAAAAAAAAKcGFuaWNfbW9kZQAAAAAAAQAAAAAAAAAQcHJvdG9jb2xfbWFuYWdlcgAAABMAAAAAAAAADXN0YWJsZV9pc3N1ZXIAAAAAAAATAAAAAAAAAAh0cmVhc3VyeQAAABM=",
+    "AAAAAgAAAAAAAAAAAAAADENvcmVEYXRhS2V5cwAAAAEAAAAAAAAAAAAAAAlDb3JlU3RhdGUAAAA=",
+    "AAAAAQAAAAAAAAAAAAAABVZhdWx0AAAAAAAABgAAAAAAAAAHYWNjb3VudAAAAAATAAAAAAAAAAxkZW5vbWluYXRpb24AAAARAAAAAAAAAAVpbmRleAAAAAAAAAoAAAAAAAAACG5leHRfa2V5AAAH0AAAABBPcHRpb25hbFZhdWx0S2V5AAAAAAAAABB0b3RhbF9jb2xsYXRlcmFsAAAACgAAAAAAAAAKdG90YWxfZGVidAAAAAAACg==",
+    "AAAAAQAAAAAAAAAAAAAACFZhdWx0S2V5AAAAAwAAAAAAAAAHYWNjb3VudAAAAAATAAAAAAAAAAxkZW5vbWluYXRpb24AAAARAAAAAAAAAAVpbmRleAAAAAAAAAo=",
+    "AAAAAQAAAAAAAAAAAAAAClZhdWx0c0luZm8AAAAAAAgAAAAAAAAADGRlbm9taW5hdGlvbgAAABEAAAAAAAAACmxvd2VzdF9rZXkAAAAAB9AAAAAQT3B0aW9uYWxWYXVsdEtleQAAAAAAAAAMbWluX2NvbF9yYXRlAAAACgAAAAAAAAARbWluX2RlYnRfY3JlYXRpb24AAAAAAAAKAAAAAAAAABBvcGVuaW5nX2NvbF9yYXRlAAAACgAAAAAAAAAJdG90YWxfY29sAAAAAAAACgAAAAAAAAAKdG90YWxfZGVidAAAAAAACgAAAAAAAAAMdG90YWxfdmF1bHRzAAAABg==",
+    "AAAAAQAAAAAAAAAAAAAADVZhdWx0SW5kZXhLZXkAAAAAAAACAAAAAAAAAAxkZW5vbWluYXRpb24AAAARAAAAAAAAAAR1c2VyAAAAEw==",
+    "AAAAAgAAAAAAAAAAAAAADlZhdWx0c0RhdGFLZXlzAAAAAAADAAAAAQAAAAAAAAAKVmF1bHRzSW5mbwAAAAAAAQAAABEAAAABAAAAAAAAAAVWYXVsdAAAAAAAAAEAAAPtAAAAAgAAABMAAAARAAAAAQAAAAAAAAAKVmF1bHRJbmRleAAAAAAAAQAAB9AAAAANVmF1bHRJbmRleEtleQAAAA==",
+    "AAAAAgAAAAAAAAAAAAAAEE9wdGlvbmFsVmF1bHRLZXkAAAACAAAAAAAAAAAAAAAETm9uZQAAAAEAAAAAAAAABFNvbWUAAAABAAAH0AAAAAhWYXVsdEtleQ==",
+    "AAAAAAAAAAAAAAAFZXZpY3QAAAAAAAACAAAAAAAAAAhwcmV2X2tleQAAB9AAAAAQT3B0aW9uYWxWYXVsdEtleQAAAAAAAAAJdmF1bHRfa2V5AAAAAAAH0AAAAAhWYXVsdEtleQAAAAA=",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAARoYXNoAAAD7gAAACAAAAAA"
+  ]
+}

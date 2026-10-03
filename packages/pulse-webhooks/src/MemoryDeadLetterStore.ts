@@ -10,6 +10,11 @@ import type {
 
 export type { DeadLetterEntry, DeadLetterFilter } from "./DeadLetterStore.js";
 
+/**
+ * Per-URL delivery health snapshot: whether the URL currently receives
+ * events, the last success/failure timestamps, and the failure rate over
+ * the last hour as a percentage (0-100).
+ */
 export interface DeliveryHealth {
   healthy: boolean;
   lastSuccess?: number;

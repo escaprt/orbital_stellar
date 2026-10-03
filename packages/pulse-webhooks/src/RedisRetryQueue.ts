@@ -3,6 +3,7 @@ import type { RetryQueue, RetryRecord } from "./RetryQueue.js";
 
 type RedisValue = number | string;
 
+/** Minimal Redis surface this queue needs: sorted sets, a record index hash, and `eval`. */
 export type RedisLike = {
   zadd(key: string, score: number, member: string): RedisValue | Promise<RedisValue>;
   zrangebyscore(
@@ -28,6 +29,7 @@ export type RedisLike = {
   eval(script: string, numKeys: number, ...keysAndArgs: RedisValue[]): unknown | Promise<unknown>;
 };
 
+/** Options for `RedisRetryQueue`: key namespacing, queue selection, clock, and visibility timeout. */
 export type RedisRetryQueueOptions = {
   keyPrefix?: string;
   queueName?: string;

@@ -3,14 +3,28 @@ import { StellarEventBoundary } from "./StellarEventBoundary.js";
 import type { ComponentPropsWithoutRef, CSSProperties, ReactElement } from "react";
 import { acquireEventConnection } from "./connectionPool.js";
 
+/** The connection states the status indicator can report. */
 export type StellarConnectionStatusState = "connecting" | "connected" | "error";
 
+/**
+ * Overrides for the text shown in each {@link StellarConnectionStatusState}.
+ * Omitted states fall back to the built-in labels ("Connecting",
+ * "Connected", "Retrying").
+ */
 export type StellarConnectionStatusLabels = Partial<Record<StellarConnectionStatusState, string>>;
 
+/**
+ * Props for {@link StellarConnectionStatus}: the connection coordinates plus
+ * the native `<span>` attributes to forward.
+ */
 export type StellarConnectionStatusProps = Omit<ComponentPropsWithoutRef<"span">, "children"> & {
+  /** Base URL of the pulse-notify server */
   serverUrl: string;
+  /** Stellar account address whose connection health to display */
   address: string;
+  /** API key forwarded as ?token= query param - required when the server has authentication enabled */
   token?: string;
+  /** Text to show per state. Missing entries use the built-in labels. */
   labels?: StellarConnectionStatusLabels;
 };
 
@@ -26,6 +40,22 @@ const STATUS_COLORS: Record<StellarConnectionStatusState, string> = {
   error: "#b91c1c",
 };
 
+/**
+ * Renders a small live connection indicator for one Stellar address - for
+ * places that need "are we connected?" without wiring `connected` and `error`
+ * state by hand.
+ *
+ * The component owns its connection lifecycle and exposes the state on the
+ * DOM through `data-status` and a `stellar-connection-status--*` class.
+ * Appearance is driven entirely by CSS custom properties; see the package
+ * README for the full list.
+ *
+ * @param props - See {@link StellarConnectionStatusProps}.
+ * @returns A `<span role="status">` with a state dot and the current label.
+ *
+ * @example
+ * <StellarConnectionStatus serverUrl={serverUrl} address={address} />
+ */
 export function StellarConnectionStatus({
   serverUrl,
   address,

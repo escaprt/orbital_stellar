@@ -1,0 +1,973 @@
+{
+  "contractId": "CBHCRSVX3ZZ7EGTSYMKPEFGZNWRVCSESQR3UABET4MIW52N4EVU6BIZX",
+  "description": "Phoenix XYK pool (mainnet): constant-product XLM/USDC liquidity pool for swaps and liquidity provision; representative instance of the Phoenix pool WASM.",
+  "events": [],
+  "functions": [
+    {
+      "name": "provide_liquidity",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "desired_a",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "min_a",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "desired_b",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "min_b",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "custom_slippage_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "deadline",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "auto_stake",
+          "type": "bool"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "swap",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "offer_asset",
+          "type": "address"
+        },
+        {
+          "name": "offer_amount",
+          "type": "i128"
+        },
+        {
+          "name": "ask_asset_min_amount",
+          "type": {
+            "inner": "i128",
+            "type": "option"
+          }
+        },
+        {
+          "name": "max_spread_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "deadline",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "max_allowed_fee_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "withdraw_liquidity",
+      "params": [
+        {
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "name": "share_amount",
+          "type": "i128"
+        },
+        {
+          "name": "min_a",
+          "type": "i128"
+        },
+        {
+          "name": "min_b",
+          "type": "i128"
+        },
+        {
+          "name": "deadline",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "auto_unstake",
+          "type": {
+            "inner": {
+              "name": "AutoUnstakeInfo",
+              "type": "named"
+            },
+            "type": "option"
+          }
+        }
+      ],
+      "returns": {
+        "elements": ["i128", "i128"],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "update_config",
+      "params": [
+        {
+          "name": "new_admin",
+          "type": {
+            "inner": "address",
+            "type": "option"
+          }
+        },
+        {
+          "name": "total_fee_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "fee_recipient",
+          "type": {
+            "inner": "address",
+            "type": "option"
+          }
+        },
+        {
+          "name": "max_allowed_slippage_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "max_allowed_spread_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        },
+        {
+          "name": "max_referral_bps",
+          "type": {
+            "inner": "i64",
+            "type": "option"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "upgrade",
+      "params": [
+        {
+          "name": "new_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "query_config",
+      "params": [],
+      "returns": {
+        "name": "Config",
+        "type": "named"
+      }
+    },
+    {
+      "name": "query_share_token_address",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "query_stake_contract_address",
+      "params": [],
+      "returns": "address"
+    },
+    {
+      "name": "query_pool_info",
+      "params": [],
+      "returns": {
+        "name": "PoolResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "query_pool_info_for_factory",
+      "params": [],
+      "returns": {
+        "name": "LiquidityPoolInfo",
+        "type": "named"
+      }
+    },
+    {
+      "name": "simulate_swap",
+      "params": [
+        {
+          "name": "offer_asset",
+          "type": "address"
+        },
+        {
+          "name": "offer_amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "name": "SimulateSwapResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "simulate_reverse_swap",
+      "params": [
+        {
+          "name": "ask_asset",
+          "type": "address"
+        },
+        {
+          "name": "ask_amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "name": "SimulateReverseSwapResponse",
+        "type": "named"
+      }
+    },
+    {
+      "name": "query_share",
+      "params": [
+        {
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "returns": {
+        "elements": [
+          {
+            "name": "Asset",
+            "type": "named"
+          },
+          {
+            "name": "Asset",
+            "type": "named"
+          }
+        ],
+        "type": "tuple"
+      }
+    },
+    {
+      "name": "query_total_issued_lp",
+      "params": [],
+      "returns": "i128"
+    },
+    {
+      "name": "migrate_admin_key",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "propose_admin",
+      "params": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        },
+        {
+          "name": "time_limit",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        }
+      ],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "name": "revoke_admin_change",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "name": "accept_admin",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "name": "query_admin",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "name": "__constructor",
+      "params": [
+        {
+          "name": "stake_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "token_wasm_hash",
+          "type": {
+            "size": 32,
+            "type": "bytes_n"
+          }
+        },
+        {
+          "name": "lp_init_info",
+          "type": {
+            "name": "LiquidityPoolInitInfo",
+            "type": "named"
+          }
+        },
+        {
+          "name": "factory_addr",
+          "type": "address"
+        },
+        {
+          "name": "share_token_name",
+          "type": "string"
+        },
+        {
+          "name": "share_token_symbol",
+          "type": "string"
+        },
+        {
+          "name": "default_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "name": "max_allowed_fee_bps",
+          "type": "i64"
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "query_version",
+      "params": [],
+      "returns": "string"
+    },
+    {
+      "name": "add_new_key_to_storage",
+      "params": [],
+      "returns": {
+        "err": {
+          "name": "ContractError",
+          "type": "named"
+        },
+        "ok": "void",
+        "type": "result"
+      }
+    }
+  ],
+  "name": "Phoenix XYK Pool",
+  "network": "mainnet",
+  "types": {
+    "AdminChange": {
+      "fields": [
+        {
+          "name": "new_admin",
+          "type": "address"
+        },
+        {
+          "name": "time_limit",
+          "type": {
+            "inner": "u64",
+            "type": "option"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "AdminChange"
+    },
+    "Asset": {
+      "fields": [
+        {
+          "doc": "Address of the asset",
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "doc": "The total amount of those tokens in the pool",
+          "name": "amount",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "Asset"
+    },
+    "AutoUnstakeInfo": {
+      "fields": [
+        {
+          "name": "stake_amount",
+          "type": "i128"
+        },
+        {
+          "name": "stake_timestamp",
+          "type": "u64"
+        }
+      ],
+      "kind": "struct",
+      "name": "AutoUnstakeInfo"
+    },
+    "ComputeSwap": {
+      "fields": [
+        {
+          "doc": "The commision amount is the fee that is charged by the pool for the swap service.",
+          "name": "commission_amount",
+          "type": "i128"
+        },
+        {
+          "doc": "The referral fee is the fee that will be given back to the referral. `0` if no referral is\nset.",
+          "name": "referral_fee_amount",
+          "type": "i128"
+        },
+        {
+          "doc": "The amount that will be returned to the user, after all fees and spread has been taken into\naccount.",
+          "name": "return_amount",
+          "type": "i128"
+        },
+        {
+          "doc": "The spread amount, that is the difference between expected and actual swap amount.",
+          "name": "spread_amount",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "ComputeSwap"
+    },
+    "Config": {
+      "fields": [
+        {
+          "name": "fee_recipient",
+          "type": "address"
+        },
+        {
+          "doc": "The maximum amount of slippage (in bps) that is tolerated during providing liquidity",
+          "name": "max_allowed_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "doc": "The maximum amount of spread (in bps) that is tolerated during swap",
+          "name": "max_allowed_spread_bps",
+          "type": "i64"
+        },
+        {
+          "doc": "The maximum allowed percentage (in bps) for referral fee",
+          "name": "max_referral_bps",
+          "type": "i64"
+        },
+        {
+          "name": "pool_type",
+          "type": {
+            "name": "PairType",
+            "type": "named"
+          }
+        },
+        {
+          "name": "share_token",
+          "type": "address"
+        },
+        {
+          "name": "stake_contract",
+          "type": "address"
+        },
+        {
+          "name": "token_a",
+          "type": "address"
+        },
+        {
+          "name": "token_b",
+          "type": "address"
+        },
+        {
+          "doc": "The total fees (in bps) charged by a pool of this type.\nIn relation to the returned amount of tokens",
+          "name": "total_fee_bps",
+          "type": "i64"
+        }
+      ],
+      "kind": "struct",
+      "name": "Config"
+    },
+    "ContractError": {
+      "kind": "enum",
+      "name": "ContractError",
+      "variants": [
+        {
+          "discriminant": 300,
+          "name": "SpreadExceedsLimit"
+        },
+        {
+          "discriminant": 301,
+          "name": "ProvideLiquiditySlippageToleranceTooHigh"
+        },
+        {
+          "discriminant": 302,
+          "name": "ProvideLiquidityAtLeastOneTokenMustBeBiggerThenZero"
+        },
+        {
+          "discriminant": 303,
+          "name": "WithdrawLiquidityMinimumAmountOfAOrBIsNotSatisfied"
+        },
+        {
+          "discriminant": 304,
+          "name": "SplitDepositBothPoolsAndDepositMustBePositive"
+        },
+        {
+          "discriminant": 305,
+          "name": "ValidateFeeBpsTotalFeesCantBeGreaterThan100"
+        },
+        {
+          "discriminant": 306,
+          "name": "GetDepositAmountsMinABiggerThenDesiredA"
+        },
+        {
+          "discriminant": 307,
+          "name": "GetDepositAmountsMinBBiggerThenDesiredB"
+        },
+        {
+          "discriminant": 308,
+          "name": "GetDepositAmountsAmountABiggerThenDesiredA"
+        },
+        {
+          "discriminant": 309,
+          "name": "GetDepositAmountsAmountALessThenMinA"
+        },
+        {
+          "discriminant": 310,
+          "name": "GetDepositAmountsAmountBBiggerThenDesiredB"
+        },
+        {
+          "discriminant": 311,
+          "name": "GetDepositAmountsAmountBLessThenMinB"
+        },
+        {
+          "discriminant": 312,
+          "name": "TotalSharesEqualZero"
+        },
+        {
+          "discriminant": 313,
+          "name": "DesiredAmountsBelowOrEqualZero"
+        },
+        {
+          "discriminant": 314,
+          "name": "MinAmountsBelowZero"
+        },
+        {
+          "discriminant": 315,
+          "name": "AssetNotInPool"
+        },
+        {
+          "discriminant": 316,
+          "name": "AlreadyInitialized"
+        },
+        {
+          "discriminant": 317,
+          "name": "TokenABiggerThanTokenB"
+        },
+        {
+          "discriminant": 318,
+          "name": "InvalidBps"
+        },
+        {
+          "discriminant": 319,
+          "name": "SlippageInvalid"
+        },
+        {
+          "discriminant": 320,
+          "name": "SwapMinReceivedBiggerThanReturn"
+        },
+        {
+          "discriminant": 321,
+          "name": "TransactionAfterTimestampDeadline"
+        },
+        {
+          "discriminant": 322,
+          "name": "CannotConvertU256ToI128"
+        },
+        {
+          "discriminant": 323,
+          "name": "UserDeclinesPoolFee"
+        },
+        {
+          "discriminant": 324,
+          "name": "SwapFeeBpsOverLimit"
+        },
+        {
+          "discriminant": 325,
+          "name": "NotEnoughSharesToBeMinted"
+        },
+        {
+          "discriminant": 326,
+          "name": "NotEnoughLiquidityProvided"
+        },
+        {
+          "discriminant": 327,
+          "name": "AdminNotSet"
+        },
+        {
+          "discriminant": 328,
+          "name": "ContractMathError"
+        },
+        {
+          "discriminant": 329,
+          "name": "NegativeInputProvided"
+        },
+        {
+          "discriminant": 330,
+          "name": "SameAdmin"
+        },
+        {
+          "discriminant": 331,
+          "name": "NoAdminChangeInPlace"
+        },
+        {
+          "discriminant": 332,
+          "name": "AdminChangeExpired"
+        }
+      ]
+    },
+    "LiquidityPoolInfo": {
+      "fields": [
+        {
+          "name": "pool_address",
+          "type": "address"
+        },
+        {
+          "name": "pool_response",
+          "type": {
+            "name": "PoolResponse",
+            "type": "named"
+          }
+        },
+        {
+          "name": "total_fee_bps",
+          "type": "i64"
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidityPoolInfo"
+    },
+    "LiquidityPoolInitInfo": {
+      "fields": [
+        {
+          "name": "admin",
+          "type": "address"
+        },
+        {
+          "name": "default_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "name": "fee_recipient",
+          "type": "address"
+        },
+        {
+          "name": "max_allowed_slippage_bps",
+          "type": "i64"
+        },
+        {
+          "name": "max_allowed_spread_bps",
+          "type": "i64"
+        },
+        {
+          "name": "max_referral_bps",
+          "type": "i64"
+        },
+        {
+          "name": "stake_init_info",
+          "type": {
+            "name": "StakeInitInfo",
+            "type": "named"
+          }
+        },
+        {
+          "name": "swap_fee_bps",
+          "type": "i64"
+        },
+        {
+          "name": "token_init_info",
+          "type": {
+            "name": "TokenInitInfo",
+            "type": "named"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "LiquidityPoolInitInfo"
+    },
+    "PairType": {
+      "kind": "enum",
+      "name": "PairType",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "Xyk"
+        }
+      ]
+    },
+    "PoolResponse": {
+      "doc": "This struct is used to return a query result with the total amount of LP tokens and assets in a specific pool.",
+      "fields": [
+        {
+          "doc": "The asset A in the pool together with asset amounts",
+          "name": "asset_a",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "doc": "The asset B in the pool together with asset amounts",
+          "name": "asset_b",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "doc": "The total amount of LP tokens currently issued",
+          "name": "asset_lp_share",
+          "type": {
+            "name": "Asset",
+            "type": "named"
+          }
+        },
+        {
+          "doc": "The address of the Stake contract for the liquidity pool",
+          "name": "stake_address",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "PoolResponse"
+    },
+    "PoolType": {
+      "kind": "enum",
+      "name": "PoolType",
+      "variants": [
+        {
+          "discriminant": 0,
+          "name": "Xyk"
+        },
+        {
+          "discriminant": 1,
+          "name": "Stable"
+        }
+      ]
+    },
+    "Referral": {
+      "fields": [
+        {
+          "doc": "Address of the referral",
+          "name": "address",
+          "type": "address"
+        },
+        {
+          "doc": "fee in bps, later parsed to percentage",
+          "name": "fee",
+          "type": "i64"
+        }
+      ],
+      "kind": "struct",
+      "name": "Referral"
+    },
+    "SimulateReverseSwapResponse": {
+      "fields": [
+        {
+          "name": "commission_amount",
+          "type": "i128"
+        },
+        {
+          "name": "offer_amount",
+          "type": "i128"
+        },
+        {
+          "name": "spread_amount",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "SimulateReverseSwapResponse"
+    },
+    "SimulateSwapResponse": {
+      "fields": [
+        {
+          "name": "ask_amount",
+          "type": "i128"
+        },
+        {
+          "name": "commission_amount",
+          "type": "i128"
+        },
+        {
+          "name": "spread_amount",
+          "type": "i128"
+        },
+        {
+          "name": "total_return",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "SimulateSwapResponse"
+    },
+    "StakeInitInfo": {
+      "fields": [
+        {
+          "name": "manager",
+          "type": "address"
+        },
+        {
+          "name": "max_complexity",
+          "type": "u32"
+        },
+        {
+          "name": "min_bond",
+          "type": "i128"
+        },
+        {
+          "name": "min_reward",
+          "type": "i128"
+        }
+      ],
+      "kind": "struct",
+      "name": "StakeInitInfo"
+    },
+    "TokenInitInfo": {
+      "fields": [
+        {
+          "name": "token_a",
+          "type": "address"
+        },
+        {
+          "name": "token_b",
+          "type": "address"
+        }
+      ],
+      "kind": "struct",
+      "name": "TokenInitInfo"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAARcHJvdmlkZV9saXF1aWRpdHkAAAAAAAAIAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAACWRlc2lyZWRfYQAAAAAAA+gAAAALAAAAAAAAAAVtaW5fYQAAAAAAA+gAAAALAAAAAAAAAAlkZXNpcmVkX2IAAAAAAAPoAAAACwAAAAAAAAAFbWluX2IAAAAAAAPoAAAACwAAAAAAAAATY3VzdG9tX3NsaXBwYWdlX2JwcwAAAAPoAAAABwAAAAAAAAAIZGVhZGxpbmUAAAPoAAAABgAAAAAAAAAKYXV0b19zdGFrZQAAAAAAAQAAAAA=",
+    "AAAAAAAAAAAAAAAEc3dhcAAAAAcAAAAAAAAABnNlbmRlcgAAAAAAEwAAAAAAAAALb2ZmZXJfYXNzZXQAAAAAEwAAAAAAAAAMb2ZmZXJfYW1vdW50AAAACwAAAAAAAAAUYXNrX2Fzc2V0X21pbl9hbW91bnQAAAPoAAAACwAAAAAAAAAObWF4X3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAA+gAAAAHAAAAAQAAAAs=",
+    "AAAAAAAAAAAAAAASd2l0aGRyYXdfbGlxdWlkaXR5AAAAAAAGAAAAAAAAAAZzZW5kZXIAAAAAABMAAAAAAAAADHNoYXJlX2Ftb3VudAAAAAsAAAAAAAAABW1pbl9hAAAAAAAACwAAAAAAAAAFbWluX2IAAAAAAAALAAAAAAAAAAhkZWFkbGluZQAAA+gAAAAGAAAAAAAAAAxhdXRvX3Vuc3Rha2UAAAPoAAAH0AAAAA9BdXRvVW5zdGFrZUluZm8AAAAAAQAAA+0AAAACAAAACwAAAAs=",
+    "AAAAAAAAAAAAAAANdXBkYXRlX2NvbmZpZwAAAAAAAAYAAAAAAAAACW5ld19hZG1pbgAAAAAAA+gAAAATAAAAAAAAAA10b3RhbF9mZWVfYnBzAAAAAAAD6AAAAAcAAAAAAAAADWZlZV9yZWNpcGllbnQAAAAAAAPoAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAD6AAAAAcAAAAAAAAAFm1heF9hbGxvd2VkX3NwcmVhZF9icHMAAAAAA+gAAAAHAAAAAAAAABBtYXhfcmVmZXJyYWxfYnBzAAAD6AAAAAcAAAAA",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAAA",
+    "AAAAAAAAAAAAAAAMcXVlcnlfY29uZmlnAAAAAAAAAAEAAAfQAAAABkNvbmZpZwAA",
+    "AAAAAAAAAAAAAAAZcXVlcnlfc2hhcmVfdG9rZW5fYWRkcmVzcwAAAAAAAAAAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAccXVlcnlfc3Rha2VfY29udHJhY3RfYWRkcmVzcwAAAAAAAAABAAAAEw==",
+    "AAAAAAAAAAAAAAAPcXVlcnlfcG9vbF9pbmZvAAAAAAAAAAABAAAH0AAAAAxQb29sUmVzcG9uc2U=",
+    "AAAAAAAAAAAAAAAbcXVlcnlfcG9vbF9pbmZvX2Zvcl9mYWN0b3J5AAAAAAAAAAABAAAH0AAAABFMaXF1aWRpdHlQb29sSW5mbwAAAA==",
+    "AAAAAAAAAAAAAAANc2ltdWxhdGVfc3dhcAAAAAAAAAIAAAAAAAAAC29mZmVyX2Fzc2V0AAAAABMAAAAAAAAADG9mZmVyX2Ftb3VudAAAAAsAAAABAAAH0AAAABRTaW11bGF0ZVN3YXBSZXNwb25zZQ==",
+    "AAAAAAAAAAAAAAAVc2ltdWxhdGVfcmV2ZXJzZV9zd2FwAAAAAAAAAgAAAAAAAAAJYXNrX2Fzc2V0AAAAAAAAEwAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAAAEAAAfQAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQA=",
+    "AAAAAAAAAAAAAAALcXVlcnlfc2hhcmUAAAAAAQAAAAAAAAAGYW1vdW50AAAAAAALAAAAAQAAA+0AAAACAAAH0AAAAAVBc3NldAAAAAAAB9AAAAAFQXNzZXQAAAA=",
+    "AAAAAAAAAAAAAAAVcXVlcnlfdG90YWxfaXNzdWVkX2xwAAAAAAAAAAAAAAEAAAAL",
+    "AAAAAAAAAAAAAAARbWlncmF0ZV9hZG1pbl9rZXkAAAAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAAAAAAANcHJvcG9zZV9hZG1pbgAAAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAGAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAAAAAAATcmV2b2tlX2FkbWluX2NoYW5nZQAAAAAAAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAAAAAAAMYWNjZXB0X2FkbWluAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAAAAAAALcXVlcnlfYWRtaW4AAAAAAAAAAAEAAAPpAAAAEwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAgAAAAAAAAAD3N0YWtlX3dhc21faGFzaAAAAAPuAAAAIAAAAAAAAAAPdG9rZW5fd2FzbV9oYXNoAAAAA+4AAAAgAAAAAAAAAAxscF9pbml0X2luZm8AAAfQAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAAAAAAMZmFjdG9yeV9hZGRyAAAAEwAAAAAAAAAQc2hhcmVfdG9rZW5fbmFtZQAAABAAAAAAAAAAEnNoYXJlX3Rva2VuX3N5bWJvbAAAAAAAEAAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAABNtYXhfYWxsb3dlZF9mZWVfYnBzAAAAAAcAAAAA",
+    "AAAAAAAAAAAAAAANcXVlcnlfdmVyc2lvbgAAAAAAAAAAAAABAAAAEA==",
+    "AAAAAAAAAAAAAAAWYWRkX25ld19rZXlfdG9fc3RvcmFnZQAAAAAAAAAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAhAAAAAAAAABJTcHJlYWRFeGNlZWRzTGltaXQAAAAAASwAAAAAAAAAKFByb3ZpZGVMaXF1aWRpdHlTbGlwcGFnZVRvbGVyYW5jZVRvb0hpZ2gAAAEtAAAAAAAAADNQcm92aWRlTGlxdWlkaXR5QXRMZWFzdE9uZVRva2VuTXVzdEJlQmlnZ2VyVGhlblplcm8AAAABLgAAAAAAAAAyV2l0aGRyYXdMaXF1aWRpdHlNaW5pbXVtQW1vdW50T2ZBT3JCSXNOb3RTYXRpc2ZpZWQAAAAAAS8AAAAAAAAALVNwbGl0RGVwb3NpdEJvdGhQb29sc0FuZERlcG9zaXRNdXN0QmVQb3NpdGl2ZQAAAAAAATAAAAAAAAAAK1ZhbGlkYXRlRmVlQnBzVG90YWxGZWVzQ2FudEJlR3JlYXRlclRoYW4xMDAAAAABMQAAAAAAAAAnR2V0RGVwb3NpdEFtb3VudHNNaW5BQmlnZ2VyVGhlbkRlc2lyZWRBAAAAATIAAAAAAAAAJ0dldERlcG9zaXRBbW91bnRzTWluQkJpZ2dlclRoZW5EZXNpcmVkQgAAAAEzAAAAAAAAACpHZXREZXBvc2l0QW1vdW50c0Ftb3VudEFCaWdnZXJUaGVuRGVzaXJlZEEAAAAAATQAAAAAAAAAJEdldERlcG9zaXRBbW91bnRzQW1vdW50QUxlc3NUaGVuTWluQQAAATUAAAAAAAAAKkdldERlcG9zaXRBbW91bnRzQW1vdW50QkJpZ2dlclRoZW5EZXNpcmVkQgAAAAABNgAAAAAAAAAkR2V0RGVwb3NpdEFtb3VudHNBbW91bnRCTGVzc1RoZW5NaW5CAAABNwAAAAAAAAAUVG90YWxTaGFyZXNFcXVhbFplcm8AAAE4AAAAAAAAAB5EZXNpcmVkQW1vdW50c0JlbG93T3JFcXVhbFplcm8AAAAAATkAAAAAAAAAE01pbkFtb3VudHNCZWxvd1plcm8AAAABOgAAAAAAAAAOQXNzZXROb3RJblBvb2wAAAAAATsAAAAAAAAAEkFscmVhZHlJbml0aWFsaXplZAAAAAABPAAAAAAAAAAWVG9rZW5BQmlnZ2VyVGhhblRva2VuQgAAAAABPQAAAAAAAAAKSW52YWxpZEJwcwAAAAABPgAAAAAAAAAPU2xpcHBhZ2VJbnZhbGlkAAAAAT8AAAAAAAAAH1N3YXBNaW5SZWNlaXZlZEJpZ2dlclRoYW5SZXR1cm4AAAABQAAAAAAAAAAhVHJhbnNhY3Rpb25BZnRlclRpbWVzdGFtcERlYWRsaW5lAAAAAAABQQAAAAAAAAAXQ2Fubm90Q29udmVydFUyNTZUb0kxMjgAAAABQgAAAAAAAAATVXNlckRlY2xpbmVzUG9vbEZlZQAAAAFDAAAAAAAAABNTd2FwRmVlQnBzT3ZlckxpbWl0AAAAAUQAAAAAAAAAGU5vdEVub3VnaFNoYXJlc1RvQmVNaW50ZWQAAAAAAAFFAAAAAAAAABpOb3RFbm91Z2hMaXF1aWRpdHlQcm92aWRlZAAAAAABRgAAAAAAAAALQWRtaW5Ob3RTZXQAAAABRwAAAAAAAAARQ29udHJhY3RNYXRoRXJyb3IAAAAAAAFIAAAAAAAAABVOZWdhdGl2ZUlucHV0UHJvdmlkZWQAAAAAAAFJAAAAAAAAAAlTYW1lQWRtaW4AAAAAAAFKAAAAAAAAABROb0FkbWluQ2hhbmdlSW5QbGFjZQAAAUsAAAAAAAAAEkFkbWluQ2hhbmdlRXhwaXJlZAAAAAABTA==",
+    "AAAAAwAAAAAAAAAAAAAACFBhaXJUeXBlAAAAAQAAAAAAAAADWHlrAAAAAAA=",
+    "AAAAAQAAAAAAAAAAAAAABkNvbmZpZwAAAAAACgAAAAAAAAANZmVlX3JlY2lwaWVudAAAAAAAABMAAABUVGhlIG1heGltdW0gYW1vdW50IG9mIHNsaXBwYWdlIChpbiBicHMpIHRoYXQgaXMgdG9sZXJhdGVkIGR1cmluZyBwcm92aWRpbmcgbGlxdWlkaXR5AAAAGG1heF9hbGxvd2VkX3NsaXBwYWdlX2JwcwAAAAcAAABDVGhlIG1heGltdW0gYW1vdW50IG9mIHNwcmVhZCAoaW4gYnBzKSB0aGF0IGlzIHRvbGVyYXRlZCBkdXJpbmcgc3dhcAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAADhUaGUgbWF4aW11bSBhbGxvd2VkIHBlcmNlbnRhZ2UgKGluIGJwcykgZm9yIHJlZmVycmFsIGZlZQAAABBtYXhfcmVmZXJyYWxfYnBzAAAABwAAAAAAAAAJcG9vbF90eXBlAAAAAAAH0AAAAAhQYWlyVHlwZQAAAAAAAAALc2hhcmVfdG9rZW4AAAAAEwAAAAAAAAAOc3Rha2VfY29udHJhY3QAAAAAABMAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAZFRoZSB0b3RhbCBmZWVzIChpbiBicHMpIGNoYXJnZWQgYnkgYSBwb29sIG9mIHRoaXMgdHlwZS4KSW4gcmVsYXRpb24gdG8gdGhlIHJldHVybmVkIGFtb3VudCBvZiB0b2tlbnMAAAANdG90YWxfZmVlX2JwcwAAAAAAAAc=",
+    "AAAAAQAAAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAABRBZGRyZXNzIG9mIHRoZSBhc3NldAAAAAdhZGRyZXNzAAAAABMAAAAsVGhlIHRvdGFsIGFtb3VudCBvZiB0aG9zZSB0b2tlbnMgaW4gdGhlIHBvb2wAAAAGYW1vdW50AAAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAAC0NvbXB1dGVTd2FwAAAAAAQAAABRVGhlIGNvbW1pc2lvbiBhbW91bnQgaXMgdGhlIGZlZSB0aGF0IGlzIGNoYXJnZWQgYnkgdGhlIHBvb2wgZm9yIHRoZSBzd2FwIHNlcnZpY2UuAAAAAAAAEWNvbW1pc3Npb25fYW1vdW50AAAAAAAACwAAAF9UaGUgcmVmZXJyYWwgZmVlIGlzIHRoZSBmZWUgdGhhdCB3aWxsIGJlIGdpdmVuIGJhY2sgdG8gdGhlIHJlZmVycmFsLiBgMGAgaWYgbm8gcmVmZXJyYWwgaXMKc2V0LgAAAAATcmVmZXJyYWxfZmVlX2Ftb3VudAAAAAALAAAAZFRoZSBhbW91bnQgdGhhdCB3aWxsIGJlIHJldHVybmVkIHRvIHRoZSB1c2VyLCBhZnRlciBhbGwgZmVlcyBhbmQgc3ByZWFkIGhhcyBiZWVuIHRha2VuIGludG8KYWNjb3VudC4AAAANcmV0dXJuX2Ftb3VudAAAAAAAAAsAAABSVGhlIHNwcmVhZCBhbW91bnQsIHRoYXQgaXMgdGhlIGRpZmZlcmVuY2UgYmV0d2VlbiBleHBlY3RlZCBhbmQgYWN0dWFsIHN3YXAgYW1vdW50LgAAAAAADXNwcmVhZF9hbW91bnQAAAAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAACFJlZmVycmFsAAAAAgAAABdBZGRyZXNzIG9mIHRoZSByZWZlcnJhbAAAAAAHYWRkcmVzcwAAAAATAAAAJmZlZSBpbiBicHMsIGxhdGVyIHBhcnNlZCB0byBwZXJjZW50YWdlAAAAAAADZmVlAAAAAAc=",
+    "AAAAAQAAAG5UaGlzIHN0cnVjdCBpcyB1c2VkIHRvIHJldHVybiBhIHF1ZXJ5IHJlc3VsdCB3aXRoIHRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGFuZCBhc3NldHMgaW4gYSBzcGVjaWZpYyBwb29sLgAAAAAAAAAAAAxQb29sUmVzcG9uc2UAAAAEAAAAM1RoZSBhc3NldCBBIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYQAAAAfQAAAABUFzc2V0AAAAAAAAM1RoZSBhc3NldCBCIGluIHRoZSBwb29sIHRvZ2V0aGVyIHdpdGggYXNzZXQgYW1vdW50cwAAAAAHYXNzZXRfYgAAAAfQAAAABUFzc2V0AAAAAAAALlRoZSB0b3RhbCBhbW91bnQgb2YgTFAgdG9rZW5zIGN1cnJlbnRseSBpc3N1ZWQAAAAAAA5hc3NldF9scF9zaGFyZQAAAAAH0AAAAAVBc3NldAAAAAAAADhUaGUgYWRkcmVzcyBvZiB0aGUgU3Rha2UgY29udHJhY3QgZm9yIHRoZSBsaXF1aWRpdHkgcG9vbAAAAA1zdGFrZV9hZGRyZXNzAAAAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAEUxpcXVpZGl0eVBvb2xJbmZvAAAAAAAAAwAAAAAAAAAMcG9vbF9hZGRyZXNzAAAAEwAAAAAAAAANcG9vbF9yZXNwb25zZQAAAAAAB9AAAAAMUG9vbFJlc3BvbnNlAAAAAAAAAA10b3RhbF9mZWVfYnBzAAAAAAAABw==",
+    "AAAAAQAAAAAAAAAAAAAAFFNpbXVsYXRlU3dhcFJlc3BvbnNlAAAABAAAAAAAAAAKYXNrX2Ftb3VudAAAAAAACwAAAAAAAAARY29tbWlzc2lvbl9hbW91bnQAAAAAAAALAAAAAAAAAA1zcHJlYWRfYW1vdW50AAAAAAAACwAAAAAAAAAMdG90YWxfcmV0dXJuAAAACw==",
+    "AAAAAQAAAAAAAAAAAAAAG1NpbXVsYXRlUmV2ZXJzZVN3YXBSZXNwb25zZQAAAAADAAAAAAAAABFjb21taXNzaW9uX2Ftb3VudAAAAAAAAAsAAAAAAAAADG9mZmVyX2Ftb3VudAAAAAsAAAAAAAAADXNwcmVhZF9hbW91bnQAAAAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAADVRva2VuSW5pdEluZm8AAAAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAADVN0YWtlSW5pdEluZm8AAAAAAAAEAAAAAAAAAAdtYW5hZ2VyAAAAABMAAAAAAAAADm1heF9jb21wbGV4aXR5AAAAAAAEAAAAAAAAAAhtaW5fYm9uZAAAAAsAAAAAAAAACm1pbl9yZXdhcmQAAAAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAAFUxpcXVpZGl0eVBvb2xJbml0SW5mbwAAAAAAAAkAAAAAAAAABWFkbWluAAAAAAAAEwAAAAAAAAAUZGVmYXVsdF9zbGlwcGFnZV9icHMAAAAHAAAAAAAAAA1mZWVfcmVjaXBpZW50AAAAAAAAEwAAAAAAAAAYbWF4X2FsbG93ZWRfc2xpcHBhZ2VfYnBzAAAABwAAAAAAAAAWbWF4X2FsbG93ZWRfc3ByZWFkX2JwcwAAAAAABwAAAAAAAAAQbWF4X3JlZmVycmFsX2JwcwAAAAcAAAAAAAAAD3N0YWtlX2luaXRfaW5mbwAAAAfQAAAADVN0YWtlSW5pdEluZm8AAAAAAAAAAAAADHN3YXBfZmVlX2JwcwAAAAcAAAAAAAAAD3Rva2VuX2luaXRfaW5mbwAAAAfQAAAADVRva2VuSW5pdEluZm8AAAA=",
+    "AAAAAQAAAAAAAAAAAAAAC0FkbWluQ2hhbmdlAAAAAAIAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAAAAAACnRpbWVfbGltaXQAAAAAA+gAAAAG",
+    "AAAAAQAAAAAAAAAAAAAAD0F1dG9VbnN0YWtlSW5mbwAAAAACAAAAAAAAAAxzdGFrZV9hbW91bnQAAAALAAAAAAAAAA9zdGFrZV90aW1lc3RhbXAAAAAABg==",
+    "AAAAAwAAAAAAAAAAAAAACFBvb2xUeXBlAAAAAgAAAAAAAAADWHlrAAAAAAAAAAAAAAAABlN0YWJsZQAAAAAAAQ=="
+  ]
+}

@@ -1,0 +1,989 @@
+{
+  "contractId": "CBNKCU3HGFKHFOF7JTGXQCNKE3G3DXS5RDBQUKQMIIECYKXPIOUGB2S3",
+  "description": "DeFindex vault contract (PaltaLabs): ERC-4626-style yield vault that holds user deposits, splits them across strategy contracts by configured asset allocations, and manages deposit, withdraw, rebalance, fee and role operations. Representative mainnet vault; all DeFindex vaults share one WASM.",
+  "events": [],
+  "functions": [
+    { "name": "total_supply", "params": [], "returns": "i128" },
+    {
+      "name": "allowance",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "approve",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" },
+        { "name": "amount", "type": "i128" },
+        { "name": "expiration_ledger", "type": "u32" }
+      ],
+      "returns": "void"
+    },
+    { "name": "balance", "params": [{ "name": "id", "type": "address" }], "returns": "i128" },
+    {
+      "name": "transfer",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "transfer_from",
+      "params": [
+        { "name": "spender", "type": "address" },
+        { "name": "from", "type": "address" },
+        { "name": "to", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "burn",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "burn_from",
+      "params": [
+        { "name": "spender", "type": "address" },
+        { "name": "from", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    { "name": "decimals", "params": [], "returns": "u32" },
+    { "name": "name", "params": [], "returns": "string" },
+    { "name": "symbol", "params": [], "returns": "string" },
+    {
+      "doc": "Initializes the DeFindex Vault contract with the required parameters.\n\n# Arguments\n* `e` - The environment reference.\n* `assets` - List of asset allocations for the vault, including strategies for each asset.\n* `roles` - Map of role IDs to addresses containing:\n- Emergency Manager: For emergency control\n- Vault Fee Receiver: For receiving vault fees\n- Manager: For primary vault control\n- Rebalance Manager: For rebalancing operations\n* `vault_fee` - Vault-specific fee in basis points (0_2000 for 0.20%)\n* `defindex_protocol_receiver` - Address receiving protocol fees\n* `defindex_protocol_rate` - Protocol fee rate in basis points (0-9000 for 0-90%)\n* `soroswap_router` - Soroswap router address\n* `name_symbol` - Map containing:\n- \"name\": Vault token name\n- \"symbol\": Vault token symbol\n* `upgradable` - Boolean flag for contract upgradeability\n\n# Function Flow\n1. **Role Assignment**:\n- Sets Emergency Manager\n- Sets Vault Fee Receiver\n- Sets Manager\n- Sets Rebalance Manager\n\n2. **Fee Configuration**:\n- Sets vault fe",
+      "name": "__constructor",
+      "params": [
+        {
+          "name": "assets",
+          "type": { "item": { "name": "AssetStrategySet", "type": "named" }, "type": "vec" }
+        },
+        { "name": "roles", "type": { "key": "u32", "type": "map", "value": "address" } },
+        { "name": "vault_fee", "type": "u32" },
+        { "name": "defindex_protocol_receiver", "type": "address" },
+        { "name": "defindex_protocol_rate", "type": "u32" },
+        { "name": "soroswap_router", "type": "address" },
+        { "name": "name_symbol", "type": { "key": "string", "type": "map", "value": "string" } },
+        { "name": "upgradable", "type": "bool" }
+      ],
+      "returns": "void"
+    },
+    {
+      "doc": "Handles user deposits into the DeFindex Vault and optionally allocates investments automatically.\n\nThis function processes a deposit by transferring each specified asset amount from the user's address to\nthe vault and mints vault shares that represent the user's proportional share in the vault. Additionally,\nif the `invest` parameter is set to `true`, the function will immediately generate and execute investment\nallocations based on the vault's strategy configuration.\n\n# Parameters\n* `e` - The current environment reference (`Env`), for access to the contract state and utilities.\n* `amounts_desired` - A vector specifying the user's intended deposit amounts for each asset.\n* `amounts_min` - A vector of minimum deposit amounts required for the transaction to proceed.\n* `from` - The address of the user making the deposit.\n* `invest` - A boolean flag indicating whether to immediately invest the deposited funds into the vault's strategies:\n- `true`: Generate and execute investments after the deposit.\n- `false`: Lea",
+      "name": "deposit",
+      "params": [
+        { "name": "amounts_desired", "type": { "item": "i128", "type": "vec" } },
+        { "name": "amounts_min", "type": { "item": "i128", "type": "vec" } },
+        { "name": "from", "type": "address" },
+        { "name": "invest", "type": "bool" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": {
+          "elements": [
+            { "item": "i128", "type": "vec" },
+            "i128",
+            {
+              "inner": {
+                "item": {
+                  "inner": { "name": "AssetInvestmentAllocation", "type": "named" },
+                  "type": "option"
+                },
+                "type": "vec"
+              },
+              "type": "option"
+            }
+          ],
+          "type": "tuple"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Handles user withdrawals from the DeFindex Vault by burning shares and returning assets.\n\nThis function processes a withdrawal request by burning the specified amount of vault shares\nand returning a proportional amount of the vault's assets to the user. It can unwind positions\nfrom strategies if necessary to fulfill the withdrawal.\n\n## Parameters:\n- `e`: The contract environment (`Env`).\n- `withdraw_shares`: The number of vault shares to withdraw.\n- `min_amounts_out`: A vector of minimum amounts required for each asset to be withdrawn.\n- `from`: The address initiating the withdrawal.\n\n## Returns\n* `Result<Vec<i128>, ContractError>` - On success, returns a vector of withdrawn amounts\nwhere each index corresponds to the asset index in the vault's asset list.\nReturns ContractError if the withdrawal fails.\n\n## Errors:\n- `ContractError::AmountOverTotalSupply`: If the specified shares exceed the total supply.\n- `ContractError::ArithmeticError`: If any arithmetic operation fails during calculations.\n- `ContractError",
+      "name": "withdraw",
+      "params": [
+        { "name": "withdraw_shares", "type": "i128" },
+        { "name": "min_amounts_out", "type": { "item": "i128", "type": "vec" } },
+        { "name": "from", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": "i128", "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Executes rescue (formerly emergency withdrawal) from a specific strategy.\n\nThis function allows the emergency manager or manager to withdraw all assets from a particular strategy\nand store them as idle funds within the vault. It also pauses the strategy to prevent further use until\nunpaused.\n\n# Arguments:\n* `e` - The environment.\n* `strategy_address` - The address of the strategy to withdraw from.\n* `caller` - The address initiating the emergency withdrawal (must be the manager or emergency manager).\n\n# Returns\n* `Result<(), ContractError>` - Success (()) or ContractError if the rescue operation fails",
+      "name": "rescue",
+      "params": [
+        { "name": "strategy_address", "type": "address" },
+        { "name": "caller", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Pauses a strategy to prevent it from being used in the vault.\n\nThis function pauses a strategy by setting its `paused` field to `true`. Only the manager or emergency\nmanager can pause a strategy.\n\n# Arguments:\n* `e` - The environment.\n* `strategy_address` - The address of the strategy to pause.\n* `caller` - The address initiating the pause (must be the manager or emergency manager).\n\n# Returns\n* `Result<(), ContractError>` - Success (()) or ContractError if the pause operation fails",
+      "name": "pause_strategy",
+      "params": [
+        { "name": "strategy_address", "type": "address" },
+        { "name": "caller", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Unpauses a previously paused strategy.\n\nThis function unpauses a strategy by setting its `paused` field to `false`, allowing it to be used\nagain in the vault.\n\n# Arguments:\n* `e` - The environment.\n* `strategy_address` - The address of the strategy to unpause.\n* `caller` - The address initiating the unpause (must be the manager or emergency manager).\n\n# Returns:\n* `Result<(), ContractError>` - Ok if successful, otherwise returns a ContractError.",
+      "name": "unpause_strategy",
+      "params": [
+        { "name": "strategy_address", "type": "address" },
+        { "name": "caller", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the list of assets managed by the DeFindex Vault.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Vec<AssetStrategySet>` - A vector of `AssetStrategySet` structs representing the assets managed by the vault.",
+      "name": "get_assets",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": { "name": "AssetStrategySet", "type": "named" }, "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Returns the total managed funds of the vault, including both invested and idle funds.\n\nThis function provides a vector of `CurrentAssetInvestmentAllocation` structs containing information\nabout each asset's current allocation, including both invested amounts in strategies and idle amounts.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Result<Vec<CurrentAssetInvestmentAllocation>, ContractError>` - A vector of asset allocations or error",
+      "name": "fetch_total_managed_funds",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": {
+          "item": { "name": "CurrentAssetInvestmentAllocation", "type": "named" },
+          "type": "vec"
+        },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "This function extends the contract's time-to-live and calculates how much of each asset corresponds\nper the provided number of vault shares (`vault_shares`). It provides proportional allocations for each asset\nin the vault relative to the specified shares.\n\n# Arguments\n* `e` - The current environment reference.\n* `vault_shares` - The number of vault shares for which the corresponding asset amounts are calculated.\n\n# Returns\n* `Result<Vec<i128>, ContractError>` - A vector of asset amounts corresponding to the vault shares, where each index\nmatches the asset index in the vault's asset list. Returns ContractError if calculation fails.",
+      "name": "get_asset_amounts_per_shares",
+      "params": [{ "name": "vault_shares", "type": "i128" }],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": "i128", "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the current fee rates for the vault and the DeFindex protocol.\n\nThis function returns the fee rates for both the vault and the DeFindex protocol.\n\n# Arguments\n* `e` - The environment.\n\n# Returns\n* `(u32, u32)` - A tuple containing:\n- The vault fee rate as a percentage in basis points.\n- The DeFindex protocol fee rate as a percentage in basis points.\n",
+      "name": "get_fees",
+      "params": [],
+      "returns": { "elements": ["u32", "u32"], "type": "tuple" }
+    },
+    {
+      "doc": "Generates reports for all strategies in the vault, tracking their performance and fee accrual.\n\nThis function iterates through all assets and their associated strategies to generate\nperformance reports. It updates each strategy's report with current balances and\ncalculates gains or losses since the last report.\n\n# Arguments\n* `e` - The environment reference.\n\n# Function Flow\n1. **Instance Extension**:\n- Extends contract TTL\n\n2. **Asset & Strategy Retrieval**:\n- Gets all assets and their strategies\n- Initializes reports vector\n\n3. **Report Generation**:\n- For each asset:\n- For each strategy:\n- Gets current strategy balance\n- Updates report with new balance\n- Stores updated report\n\n# Returns\n* `Result<Vec<Report>, ContractError>` - On success, returns a vector of reports\nwhere each report contains performance metrics for a strategy. Returns\nContractError if report generation fails.\n\n# Note\nReports track:\n- Current strategy balance\n- Gains or losses since last report\n- Locked fees\n- Fee distribution status",
+      "name": "report",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": { "name": "Report", "type": "named" }, "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the fee receiver for the vault.\n\nThis function allows the manager or the vault fee receiver to set a new fee receiver address for the vault.\n\n# Arguments:\n* `e` - The environment.\n* `caller` - The address initiating the change (must be the manager or the vault fee receiver).\n* `vault_fee_receiver` - The new fee receiver address.\n\n# Returns:\n* `()` - No return value.",
+      "name": "set_fee_receiver",
+      "params": [
+        { "name": "caller", "type": "address" },
+        { "name": "new_fee_receiver", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "doc": "Retrieves the current fee receiver address for the vault.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Result<Address, ContractError>` - The fee receiver address if successful, otherwise returns a ContractError.",
+      "name": "get_fee_receiver",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the manager for the vault.\n\nThis function allows the current manager to set a new manager for the vault.\n\n# Arguments:\n* `e` - The environment.\n* `new_manager` - The new manager address.\n\n# Returns\n* `Result<(), ContractError>` - Success (()) or ContractError if the manager change fails",
+      "name": "set_manager",
+      "params": [{ "name": "new_manager", "type": "address" }],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Retrieves the current manager address for the vault.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Result<Address, ContractError>` - The manager address if successful, otherwise returns a ContractError.",
+      "name": "get_manager",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the emergency manager for the vault.\n\nThis function allows the current manager to set a new emergency manager for the vault.\n\n# Arguments:\n* `e` - The environment.\n* `emergency_manager` - The new emergency manager address.\n\n# Returns:\n* `()` - No return value.",
+      "name": "set_emergency_manager",
+      "params": [{ "name": "emergency_manager", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "doc": "Retrieves the current emergency manager address for the vault.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Result<Address, ContractError>` - The emergency manager address if successful, otherwise returns a ContractError.",
+      "name": "get_emergency_manager",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sets the rebalance manager for the vault.\n\nThis function allows the current manager to set a new rebalance manager for the vault.\n\n# Arguments:\n* `e` - The environment.\n* `new_rebalance_manager` - The new rebalance manager address.\n\n# Returns:\n* `()` - No return value.",
+      "name": "set_rebalance_manager",
+      "params": [{ "name": "new_rebalance_manager", "type": "address" }],
+      "returns": "void"
+    },
+    {
+      "doc": "Retrieves the current rebalance manager address for the vault.\n\n# Arguments:\n* `e` - The environment.\n\n# Returns:\n* `Result<Address, ContractError>` - The rebalance manager address if successful, otherwise returns a ContractError.",
+      "name": "get_rebalance_manager",
+      "params": [],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Upgrades the contract with new WebAssembly (WASM) code.\n\nThis function updates the contract with new WASM code provided by the `new_wasm_hash`.\n\n# Arguments\n\n* `e` - The runtime environment.\n* `new_wasm_hash` - The hash of the new WASM code to upgrade the contract to.\n\n# Returns\n* `Result<(), ContractError>` - Returns Ok(()) on success, ContractError if upgrade fails\n",
+      "name": "upgrade",
+      "params": [{ "name": "new_wasm_hash", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Rebalances the vault by executing a series of instructions.\n\n# Arguments:\n* `e` - The environment.\n* `instructions` - A vector of `Instruction` structs representing actions (withdraw, invest, swap, zapper) to be taken.\n\n# Returns:\n* `Result<(), ContractError>` - Ok if successful, otherwise returns a ContractError.",
+      "name": "rebalance",
+      "params": [
+        { "name": "caller", "type": "address" },
+        {
+          "name": "instructions",
+          "type": { "item": { "name": "Instruction", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": "void",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Locks fees for all assets and their strategies.\n\nIterates through each asset and its strategies, locking fees based on `new_fee_bps` or the default vault fee.\n\n# Arguments\n* `e` - The environment reference.\n* `new_fee_bps` - Optional fee basis points to override the default.\n\n# Returns\n* `Result<Vec<(Address, i128)>, ContractError>` - A vector of tuples with strategy addresses and locked fee amounts in their underlying_asset.",
+      "name": "lock_fees",
+      "params": [{ "name": "new_fee_bps", "type": { "inner": "u32", "type": "option" } }],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": { "name": "Report", "type": "named" }, "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Releases locked fees for a specific strategy.\n\n# Arguments\n* `e` - The environment reference.\n* `strategy` - The address of the strategy for which to release fees.\n* `amount` - The amount of fees to release.\n\n# Returns\n* `Result<Report, ContractError>` - A report of the released fees or a `ContractError` if the operation fails.",
+      "name": "release_fees",
+      "params": [
+        { "name": "strategy", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "name": "Report", "type": "named" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Distributes the locked fees for all assets and their strategies.\n\nThis function iterates through each asset and its strategies, calculating the fees to be distributed\nto the vault fee receiver and the DeFindex protocol fee receiver based on their respective fee rates.\nIt ensures proper authorization and validation checks before proceeding with the distribution.\n\n# Arguments\n* `e` - The environment reference.\n* `caller` - The address initiating the fee distribution.\n\n# Returns\n* `Result<Vec<(Address, i128)>, ContractError>` - A vector of tuples with asset addresses and the total distributed fee amounts.",
+      "name": "distribute_fees",
+      "params": [{ "name": "caller", "type": "address" }],
+      "returns": {
+        "err": { "name": "ContractError", "type": "named" },
+        "ok": { "item": { "elements": ["address", "i128"], "type": "tuple" }, "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Sorts two token addresses in a consistent order.\n\n# Arguments\n\n* `token_a` - The address of the first token.\n* `token_b` - The address of the second token.\n\n# Returns\n\nReturns `Result<(Address, Address), SoroswapLibraryError>` where `Ok` contains a tuple with the sorted token addresses, and `Err` indicates an error such as identical tokens.",
+      "name": "sort_tokens",
+      "params": [
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": { "elements": ["address", "address"], "type": "tuple" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Calculates the deterministic address for a pair without making any external calls.\ncheck <https://github.com/paltalabs/deterministic-address-soroban>\n\n# Arguments\n\n* `e` - The environment.\n* `factory` - The factory address.\n* `token_a` - The address of the first token.\n* `token_b` - The address of the second token.\n\n# Returns\n\nReturns `Result<Address, SoroswapLibraryError>` where `Ok` contains the deterministic address for the pair, and `Err` indicates an error such as identical tokens or an issue with sorting.",
+      "name": "pair_for",
+      "params": [
+        { "name": "factory", "type": "address" },
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": "address",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Fetches and sorts the reserves for a pair of tokens using the factory address.\n\n# Arguments\n\n* `e` - The environment.\n* `factory` - The factory address.\n* `token_a` - The address of the first token.\n* `token_b` - The address of the second token.\n\n# Returns\n\nReturns `Result<(i128, i128), SoroswapLibraryError>` where `Ok` contains a tuple of sorted reserves, and `Err` indicates an error such as identical tokens or an issue with sorting.",
+      "name": "get_reserves_with_factory",
+      "params": [
+        { "name": "factory", "type": "address" },
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": { "elements": ["i128", "i128"], "type": "tuple" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Fetches and sorts the reserves for a pair of tokens using the pair address.\n\n# Arguments\n\n* `e` - The environment.\n* `pair` - The pair address.\n* `token_a` - The address of the first token.\n* `token_b` - The address of the second token.\n\n# Returns\n\nReturns `Result<(i128, i128), SoroswapLibraryError>` where `Ok` contains a tuple of sorted reserves, and `Err` indicates an error such as identical tokens or an issue with sorting.",
+      "name": "get_reserves_with_pair",
+      "params": [
+        { "name": "pair", "type": "address" },
+        { "name": "token_a", "type": "address" },
+        { "name": "token_b", "type": "address" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": { "elements": ["i128", "i128"], "type": "tuple" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Given some amount of an asset and pair reserves, returns an equivalent amount of the other asset.\n\n# Arguments\n\n* `amount_a` - The amount of the first asset.\n* `reserve_a` - Reserves of the first asset in the pair.\n* `reserve_b` - Reserves of the second asset in the pair.\n\n# Returns\n\nReturns `Result<i128, SoroswapLibraryError>` where `Ok` contains the calculated equivalent amount, and `Err` indicates an error such as insufficient amount or liquidity",
+      "name": "quote",
+      "params": [
+        { "name": "amount_a", "type": "i128" },
+        { "name": "reserve_a", "type": "i128" },
+        { "name": "reserve_b", "type": "i128" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset.\n\n# Arguments\n\n* `amount_in` - The input amount of the asset.\n* `reserve_in` - Reserves of the input asset in the pair.\n* `reserve_out` - Reserves of the output asset in the pair.\n\n# Returns\n\nReturns `Result<i128, SoroswapLibraryError>` where `Ok` contains the calculated maximum output amount, and `Err` indicates an error such as insufficient input amount or liquidity.",
+      "name": "get_amount_out",
+      "params": [
+        { "name": "amount_in", "type": "i128" },
+        { "name": "reserve_in", "type": "i128" },
+        { "name": "reserve_out", "type": "i128" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Given an output amount of an asset and pair reserves, returns a required input amount of the other asset.\n\n# Arguments\n\n* `amount_out` - The output amount of the asset.\n* `reserve_in` - Reserves of the input asset in the pair.\n* `reserve_out` - Reserves of the output asset in the pair.\n\n# Returns\n\nReturns `Result<i128, SoroswapLibraryError>` where `Ok` contains the required input amount, and `Err` indicates an error such as insufficient output amount or liquidity.",
+      "name": "get_amount_in",
+      "params": [
+        { "name": "amount_out", "type": "i128" },
+        { "name": "reserve_in", "type": "i128" },
+        { "name": "reserve_out", "type": "i128" }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": "i128",
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Performs chained get_amount_out calculations on any number of pairs.\n\n# Arguments\n\n* `e` - The environment.\n* `factory` - The factory address.\n* `amount_in` - The input amount.\n* `path` - Vector of token addresses representing the path.\n\n# Returns\n\nReturns `Result<Vec<i128>, SoroswapLibraryError>` where `Ok` contains a vector of calculated amounts, and `Err` indicates an error such as an invalid path.",
+      "name": "get_amounts_out",
+      "params": [
+        { "name": "factory", "type": "address" },
+        { "name": "amount_in", "type": "i128" },
+        { "name": "path", "type": { "item": "address", "type": "vec" } }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": { "item": "i128", "type": "vec" },
+        "type": "result"
+      }
+    },
+    {
+      "doc": "Performs chained get_amount_in calculations on any number of pairs.\n\n# Arguments\n\n* `e` - The environment.\n* `factory` - The factory address.\n* `amount_out` - The output amount.\n* `path` - Vector of token addresses representing the path.\n\n# Returns\n\nReturns `Result<Vec<i128>, SoroswapLibraryError>` where `Ok` contains a vector of calculated amounts, and `Err` indicates an error such as an invalid path.",
+      "name": "get_amounts_in",
+      "params": [
+        { "name": "factory", "type": "address" },
+        { "name": "amount_out", "type": "i128" },
+        { "name": "path", "type": { "item": "address", "type": "vec" } }
+      ],
+      "returns": {
+        "err": { "name": "SoroswapLibraryError", "type": "named" },
+        "ok": { "item": "i128", "type": "vec" },
+        "type": "result"
+      }
+    }
+  ],
+  "name": "DeFindex Vault",
+  "network": "mainnet",
+  "types": {
+    "AllowanceDataKey": {
+      "fields": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "AllowanceDataKey"
+    },
+    "AllowanceValue": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "expiration_ledger", "type": "u32" }
+      ],
+      "kind": "struct",
+      "name": "AllowanceValue"
+    },
+    "AssetInvestmentAllocation": {
+      "fields": [
+        { "name": "asset", "type": "address" },
+        {
+          "name": "strategy_allocations",
+          "type": {
+            "item": {
+              "inner": { "name": "StrategyAllocation", "type": "named" },
+              "type": "option"
+            },
+            "type": "vec"
+          }
+        }
+      ],
+      "kind": "struct",
+      "name": "AssetInvestmentAllocation"
+    },
+    "AssetStrategySet": {
+      "fields": [
+        { "name": "address", "type": "address" },
+        {
+          "name": "strategies",
+          "type": { "item": { "name": "Strategy", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "kind": "struct",
+      "name": "AssetStrategySet"
+    },
+    "ContractError": {
+      "kind": "enum",
+      "name": "ContractError",
+      "variants": [
+        { "discriminant": 100, "name": "NotInitialized" },
+        { "discriminant": 101, "name": "InvalidRatio" },
+        { "discriminant": 102, "name": "StrategyDoesNotSupportAsset" },
+        { "discriminant": 103, "name": "NoAssetAllocation" },
+        { "discriminant": 104, "name": "RolesIncomplete" },
+        { "discriminant": 105, "name": "MetadataIncomplete" },
+        { "discriminant": 106, "name": "MaximumFeeExceeded" },
+        { "discriminant": 107, "name": "DuplicatedAsset" },
+        { "discriminant": 108, "name": "DuplicatedStrategy" },
+        { "discriminant": 110, "name": "AmountNotAllowed" },
+        { "discriminant": 111, "name": "InsufficientBalance" },
+        { "discriminant": 112, "name": "WrongAmountsLength" },
+        { "discriminant": 113, "name": "WrongLockedFees" },
+        { "discriminant": 114, "name": "InsufficientManagedFunds" },
+        { "discriminant": 115, "name": "MissingInstructionData" },
+        { "discriminant": 116, "name": "UnsupportedAsset" },
+        { "discriminant": 117, "name": "InsufficientAmount" },
+        { "discriminant": 118, "name": "NoOptimalAmounts" },
+        { "discriminant": 119, "name": "WrongInvestmentLength" },
+        { "discriminant": 122, "name": "WrongAssetAddress" },
+        { "discriminant": 123, "name": "WrongStrategiesLength" },
+        { "discriminant": 124, "name": "AmountOverTotalSupply" },
+        { "discriminant": 125, "name": "NoInstructions" },
+        { "discriminant": 126, "name": "NotUpgradable" },
+        { "discriminant": 128, "name": "UnwindMoreThanAvailable" },
+        { "discriminant": 129, "name": "InsufficientFeesToRelease" },
+        { "discriminant": 120, "name": "ArithmeticError" },
+        { "discriminant": 121, "name": "Overflow" },
+        { "discriminant": 127, "name": "Underflow" },
+        { "discriminant": 130, "name": "Unauthorized" },
+        { "discriminant": 131, "name": "RoleNotFound" },
+        { "discriminant": 132, "name": "ManagerNotInQueue" },
+        { "discriminant": 133, "name": "SetManagerBeforeTime" },
+        { "discriminant": 134, "name": "QueueEmpty" },
+        { "discriminant": 140, "name": "StrategyNotFound" },
+        { "discriminant": 141, "name": "StrategyPausedOrNotFound" },
+        { "discriminant": 142, "name": "StrategyWithdrawError" },
+        { "discriminant": 143, "name": "StrategyInvestError" },
+        { "discriminant": 144, "name": "StrategyPaused" },
+        { "discriminant": 150, "name": "AssetNotFound" },
+        { "discriminant": 151, "name": "NoAssetsProvided" },
+        { "discriminant": 160, "name": "InsufficientOutputAmount" },
+        { "discriminant": 161, "name": "ExcessiveInputAmount" },
+        { "discriminant": 162, "name": "InvalidFeeBps" },
+        { "discriminant": 190, "name": "LibrarySortIdenticalTokens" },
+        { "discriminant": 200, "name": "SoroswapRouterError" },
+        { "discriminant": 201, "name": "SwapExactInError" },
+        { "discriminant": 202, "name": "SwapExactOutError" }
+      ]
+    },
+    "CurrentAssetInvestmentAllocation": {
+      "fields": [
+        { "name": "asset", "type": "address" },
+        { "name": "idle_amount", "type": "i128" },
+        { "name": "invested_amount", "type": "i128" },
+        {
+          "name": "strategy_allocations",
+          "type": { "item": { "name": "StrategyAllocation", "type": "named" }, "type": "vec" }
+        },
+        { "name": "total_amount", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "CurrentAssetInvestmentAllocation"
+    },
+    "DataKey": {
+      "cases": [
+        {
+          "fields": [{ "name": "_0", "type": { "name": "AllowanceDataKey", "type": "named" } }],
+          "name": "Allowance"
+        },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "Balance" },
+        { "fields": [], "name": "TotalSupply" }
+      ],
+      "kind": "union",
+      "name": "DataKey"
+    },
+    "DepositEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "DepositEvent"
+    },
+    "EmergencyManagerChangedEvent": {
+      "fields": [{ "name": "new_emergency_manager", "type": "address" }],
+      "kind": "struct",
+      "name": "EmergencyManagerChangedEvent"
+    },
+    "EmergencyWithdrawEvent": {
+      "fields": [
+        { "name": "amount_withdrawn", "type": "i128" },
+        { "name": "caller", "type": "address" },
+        { "name": "strategy_address", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "EmergencyWithdrawEvent"
+    },
+    "FeeReceiverChangedEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "new_fee_receiver", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "FeeReceiverChangedEvent"
+    },
+    "FeesDistributedEvent": {
+      "fields": [
+        {
+          "name": "distributed_fees",
+          "type": { "item": { "elements": ["address", "i128"], "type": "tuple" }, "type": "vec" }
+        }
+      ],
+      "kind": "struct",
+      "name": "FeesDistributedEvent"
+    },
+    "HarvestEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" },
+        { "name": "price_per_share", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "HarvestEvent"
+    },
+    "Instruction": {
+      "cases": [
+        {
+          "doc": "Withdraw funds from a strategy.",
+          "fields": [
+            { "name": "_0", "type": "address" },
+            { "name": "_1", "type": "i128" }
+          ],
+          "name": "Unwind"
+        },
+        {
+          "doc": "Invest funds into a strategy.",
+          "fields": [
+            { "name": "_0", "type": "address" },
+            { "name": "_1", "type": "i128" }
+          ],
+          "name": "Invest"
+        },
+        {
+          "doc": "Perform a swap with an exact input amount.",
+          "fields": [
+            { "name": "_0", "type": "address" },
+            { "name": "_1", "type": "address" },
+            { "name": "_2", "type": "i128" },
+            { "name": "_3", "type": "i128" },
+            { "name": "_4", "type": "u64" }
+          ],
+          "name": "SwapExactIn"
+        },
+        {
+          "doc": "Perform a swap with an exact output amount.",
+          "fields": [
+            { "name": "_0", "type": "address" },
+            { "name": "_1", "type": "address" },
+            { "name": "_2", "type": "i128" },
+            { "name": "_3", "type": "i128" },
+            { "name": "_4", "type": "u64" }
+          ],
+          "name": "SwapExactOut"
+        }
+      ],
+      "kind": "union",
+      "name": "Instruction"
+    },
+    "InvestEvent": {
+      "fields": [
+        {
+          "name": "asset_investments",
+          "type": {
+            "item": { "name": "AssetInvestmentAllocation", "type": "named" },
+            "type": "vec"
+          }
+        },
+        { "name": "rebalance_method", "type": "symbol" },
+        { "name": "report", "type": { "name": "Report", "type": "named" } }
+      ],
+      "kind": "struct",
+      "name": "InvestEvent"
+    },
+    "ManagerChangedEvent": {
+      "fields": [{ "name": "new_manager", "type": "address" }],
+      "kind": "struct",
+      "name": "ManagerChangedEvent"
+    },
+    "RebalanceManagerChangedEvent": {
+      "fields": [{ "name": "new_rebalance_manager", "type": "address" }],
+      "kind": "struct",
+      "name": "RebalanceManagerChangedEvent"
+    },
+    "Report": {
+      "fields": [
+        { "name": "gains_or_losses", "type": "i128" },
+        { "name": "locked_fee", "type": "i128" },
+        { "name": "prev_balance", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "Report"
+    },
+    "RolesDataKey": {
+      "cases": [
+        { "fields": [], "name": "EmergencyManager" },
+        { "fields": [], "name": "VaultFeeReceiver" },
+        { "fields": [], "name": "Manager" },
+        { "fields": [], "name": "RebalanceManager" }
+      ],
+      "kind": "union",
+      "name": "RolesDataKey"
+    },
+    "SoroswapLibraryError": {
+      "kind": "enum",
+      "name": "SoroswapLibraryError",
+      "variants": [
+        {
+          "discriminant": 301,
+          "doc": "SoroswapLibrary: insufficient amount",
+          "name": "InsufficientAmount"
+        },
+        {
+          "discriminant": 302,
+          "doc": "SoroswapLibrary: insufficient liquidity",
+          "name": "InsufficientLiquidity"
+        },
+        {
+          "discriminant": 303,
+          "doc": "SoroswapLibrary: insufficient input amount",
+          "name": "InsufficientInputAmount"
+        },
+        {
+          "discriminant": 304,
+          "doc": "SoroswapLibrary: insufficient output amount",
+          "name": "InsufficientOutputAmount"
+        },
+        { "discriminant": 305, "doc": "SoroswapLibrary: invalid path", "name": "InvalidPath" },
+        {
+          "discriminant": 306,
+          "doc": "SoroswapLibrary: token_a and token_b have identical addresses",
+          "name": "SortIdenticalTokens"
+        }
+      ]
+    },
+    "Strategy": {
+      "fields": [
+        { "name": "address", "type": "address" },
+        { "name": "name", "type": "string" },
+        { "name": "paused", "type": "bool" }
+      ],
+      "kind": "struct",
+      "name": "Strategy"
+    },
+    "StrategyAllocation": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "paused", "type": "bool" },
+        { "name": "strategy_address", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "StrategyAllocation"
+    },
+    "StrategyError": {
+      "kind": "enum",
+      "name": "StrategyError",
+      "variants": [
+        { "discriminant": 401, "name": "NotInitialized" },
+        { "discriminant": 410, "name": "NegativeNotAllowed" },
+        { "discriminant": 411, "name": "InvalidArgument" },
+        { "discriminant": 412, "name": "InsufficientBalance" },
+        { "discriminant": 413, "name": "UnderflowOverflow" },
+        { "discriminant": 414, "name": "ArithmeticError" },
+        { "discriminant": 415, "name": "DivisionByZero" },
+        { "discriminant": 416, "name": "InvalidSharesMinted" },
+        { "discriminant": 417, "name": "OnlyPositiveAmountAllowed" },
+        { "discriminant": 418, "name": "NotAuthorized" },
+        { "discriminant": 420, "name": "ProtocolAddressNotFound" },
+        { "discriminant": 421, "name": "DeadlineExpired" },
+        { "discriminant": 422, "name": "ExternalError" },
+        { "discriminant": 423, "name": "SoroswapPairError" },
+        { "discriminant": 451, "name": "AmountBelowMinDust" },
+        { "discriminant": 452, "name": "UnderlyingAmountBelowMin" },
+        { "discriminant": 453, "name": "BTokensAmountBelowMin" },
+        { "discriminant": 454, "name": "InternalSwapError" },
+        { "discriminant": 455, "name": "SupplyNotFound" }
+      ]
+    },
+    "StrategyPausedEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "strategy_address", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "StrategyPausedEvent"
+    },
+    "StrategyUnpausedEvent": {
+      "fields": [
+        { "name": "caller", "type": "address" },
+        { "name": "strategy_address", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "StrategyUnpausedEvent"
+    },
+    "SwapExactInEvent": {
+      "fields": [
+        { "name": "rebalance_method", "type": "symbol" },
+        { "name": "swap_args", "type": { "item": "val", "type": "vec" } }
+      ],
+      "kind": "struct",
+      "name": "SwapExactInEvent"
+    },
+    "SwapExactOutEvent": {
+      "fields": [
+        { "name": "rebalance_method", "type": "symbol" },
+        { "name": "swap_args", "type": { "item": "val", "type": "vec" } }
+      ],
+      "kind": "struct",
+      "name": "SwapExactOutEvent"
+    },
+    "TokenMetadata": {
+      "fields": [
+        { "name": "decimal", "type": "u32" },
+        { "name": "name", "type": "string" },
+        { "name": "symbol", "type": "string" }
+      ],
+      "kind": "struct",
+      "name": "TokenMetadata"
+    },
+    "UnwindEvent": {
+      "fields": [
+        {
+          "name": "call_params",
+          "type": {
+            "item": { "elements": ["address", "i128", "address"], "type": "tuple" },
+            "type": "vec"
+          }
+        },
+        { "name": "rebalance_method", "type": "symbol" },
+        { "name": "report", "type": { "name": "Report", "type": "named" } }
+      ],
+      "kind": "struct",
+      "name": "UnwindEvent"
+    },
+    "VaultDepositEvent": {
+      "fields": [
+        { "name": "amounts", "type": { "item": "i128", "type": "vec" } },
+        { "name": "depositor", "type": "address" },
+        { "name": "df_tokens_minted", "type": "i128" },
+        {
+          "name": "total_managed_funds_before",
+          "type": {
+            "item": { "name": "CurrentAssetInvestmentAllocation", "type": "named" },
+            "type": "vec"
+          }
+        },
+        { "name": "total_supply_before", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "VaultDepositEvent"
+    },
+    "VaultWithdrawEvent": {
+      "fields": [
+        { "name": "amounts_withdrawn", "type": { "item": "i128", "type": "vec" } },
+        { "name": "df_tokens_burned", "type": "i128" },
+        {
+          "name": "total_managed_funds_before",
+          "type": {
+            "item": { "name": "CurrentAssetInvestmentAllocation", "type": "named" },
+            "type": "vec"
+          }
+        },
+        { "name": "total_supply_before", "type": "i128" },
+        { "name": "withdrawer", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "VaultWithdrawEvent"
+    },
+    "WithdrawEvent": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "from", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "WithdrawEvent"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAgAAAAAAAAAAAAAADFJvbGVzRGF0YUtleQAAAAQAAAAAAAAAAAAAABBFbWVyZ2VuY3lNYW5hZ2VyAAAAAAAAAAAAAAAQVmF1bHRGZWVSZWNlaXZlcgAAAAAAAAAAAAAAB01hbmFnZXIAAAAAAAAAAAAAAAAQUmViYWxhbmNlTWFuYWdlcg==",
+    "AAAABAAAAAAAAAAAAAAADUNvbnRyYWN0RXJyb3IAAAAAAAAwAAAAAAAAAA5Ob3RJbml0aWFsaXplZAAAAAAAZAAAAAAAAAAMSW52YWxpZFJhdGlvAAAAZQAAAAAAAAAbU3RyYXRlZ3lEb2VzTm90U3VwcG9ydEFzc2V0AAAAAGYAAAAAAAAAEU5vQXNzZXRBbGxvY2F0aW9uAAAAAAAAZwAAAAAAAAAPUm9sZXNJbmNvbXBsZXRlAAAAAGgAAAAAAAAAEk1ldGFkYXRhSW5jb21wbGV0ZQAAAAAAaQAAAAAAAAASTWF4aW11bUZlZUV4Y2VlZGVkAAAAAABqAAAAAAAAAA9EdXBsaWNhdGVkQXNzZXQAAAAAawAAAAAAAAASRHVwbGljYXRlZFN0cmF0ZWd5AAAAAABsAAAAAAAAABBBbW91bnROb3RBbGxvd2VkAAAAbgAAAAAAAAATSW5zdWZmaWNpZW50QmFsYW5jZQAAAABvAAAAAAAAABJXcm9uZ0Ftb3VudHNMZW5ndGgAAAAAAHAAAAAAAAAAD1dyb25nTG9ja2VkRmVlcwAAAABxAAAAAAAAABhJbnN1ZmZpY2llbnRNYW5hZ2VkRnVuZHMAAAByAAAAAAAAABZNaXNzaW5nSW5zdHJ1Y3Rpb25EYXRhAAAAAABzAAAAAAAAABBVbnN1cHBvcnRlZEFzc2V0AAAAdAAAAAAAAAASSW5zdWZmaWNpZW50QW1vdW50AAAAAAB1AAAAAAAAABBOb09wdGltYWxBbW91bnRzAAAAdgAAAAAAAAAVV3JvbmdJbnZlc3RtZW50TGVuZ3RoAAAAAAAAdwAAAAAAAAARV3JvbmdBc3NldEFkZHJlc3MAAAAAAAB6AAAAAAAAABVXcm9uZ1N0cmF0ZWdpZXNMZW5ndGgAAAAAAAB7AAAAAAAAABVBbW91bnRPdmVyVG90YWxTdXBwbHkAAAAAAAB8AAAAAAAAAA5Ob0luc3RydWN0aW9ucwAAAAAAfQAAAAAAAAANTm90VXBncmFkYWJsZQAAAAAAAH4AAAAAAAAAF1Vud2luZE1vcmVUaGFuQXZhaWxhYmxlAAAAAIAAAAAAAAAAGUluc3VmZmljaWVudEZlZXNUb1JlbGVhc2UAAAAAAACBAAAAAAAAAA9Bcml0aG1ldGljRXJyb3IAAAAAeAAAAAAAAAAIT3ZlcmZsb3cAAAB5AAAAAAAAAAlVbmRlcmZsb3cAAAAAAAB/AAAAAAAAAAxVbmF1dGhvcml6ZWQAAACCAAAAAAAAAAxSb2xlTm90Rm91bmQAAACDAAAAAAAAABFNYW5hZ2VyTm90SW5RdWV1ZQAAAAAAAIQAAAAAAAAAFFNldE1hbmFnZXJCZWZvcmVUaW1lAAAAhQAAAAAAAAAKUXVldWVFbXB0eQAAAAAAhgAAAAAAAAAQU3RyYXRlZ3lOb3RGb3VuZAAAAIwAAAAAAAAAGFN0cmF0ZWd5UGF1c2VkT3JOb3RGb3VuZAAAAI0AAAAAAAAAFVN0cmF0ZWd5V2l0aGRyYXdFcnJvcgAAAAAAAI4AAAAAAAAAE1N0cmF0ZWd5SW52ZXN0RXJyb3IAAAAAjwAAAAAAAAAOU3RyYXRlZ3lQYXVzZWQAAAAAAJAAAAAAAAAADUFzc2V0Tm90Rm91bmQAAAAAAACWAAAAAAAAABBOb0Fzc2V0c1Byb3ZpZGVkAAAAlwAAAAAAAAAYSW5zdWZmaWNpZW50T3V0cHV0QW1vdW50AAAAoAAAAAAAAAAURXhjZXNzaXZlSW5wdXRBbW91bnQAAAChAAAAAAAAAA1JbnZhbGlkRmVlQnBzAAAAAAAAogAAAAAAAAAaTGlicmFyeVNvcnRJZGVudGljYWxUb2tlbnMAAAAAAL4AAAAAAAAAE1Nvcm9zd2FwUm91dGVyRXJyb3IAAAAAyAAAAAAAAAAQU3dhcEV4YWN0SW5FcnJvcgAAAMkAAAAAAAAAEVN3YXBFeGFjdE91dEVycm9yAAAAAAAAyg==",
+    "AAAAAQAAAAAAAAAAAAAAEVZhdWx0RGVwb3NpdEV2ZW50AAAAAAAABQAAAAAAAAAHYW1vdW50cwAAAAPqAAAACwAAAAAAAAAJZGVwb3NpdG9yAAAAAAAAEwAAAAAAAAAQZGZfdG9rZW5zX21pbnRlZAAAAAsAAAAAAAAAGnRvdGFsX21hbmFnZWRfZnVuZHNfYmVmb3JlAAAAAAPqAAAH0AAAACBDdXJyZW50QXNzZXRJbnZlc3RtZW50QWxsb2NhdGlvbgAAAAAAAAATdG90YWxfc3VwcGx5X2JlZm9yZQAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAAElZhdWx0V2l0aGRyYXdFdmVudAAAAAAABQAAAAAAAAARYW1vdW50c193aXRoZHJhd24AAAAAAAPqAAAACwAAAAAAAAAQZGZfdG9rZW5zX2J1cm5lZAAAAAsAAAAAAAAAGnRvdGFsX21hbmFnZWRfZnVuZHNfYmVmb3JlAAAAAAPqAAAH0AAAACBDdXJyZW50QXNzZXRJbnZlc3RtZW50QWxsb2NhdGlvbgAAAAAAAAATdG90YWxfc3VwcGx5X2JlZm9yZQAAAAALAAAAAAAAAAp3aXRoZHJhd2VyAAAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAFkVtZXJnZW5jeVdpdGhkcmF3RXZlbnQAAAAAAAMAAAAAAAAAEGFtb3VudF93aXRoZHJhd24AAAALAAAAAAAAAAZjYWxsZXIAAAAAABMAAAAAAAAAEHN0cmF0ZWd5X2FkZHJlc3MAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAE1N0cmF0ZWd5UGF1c2VkRXZlbnQAAAAAAgAAAAAAAAAGY2FsbGVyAAAAAAATAAAAAAAAABBzdHJhdGVneV9hZGRyZXNzAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAFVN0cmF0ZWd5VW5wYXVzZWRFdmVudAAAAAAAAAIAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAQc3RyYXRlZ3lfYWRkcmVzcwAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAF0ZlZVJlY2VpdmVyQ2hhbmdlZEV2ZW50AAAAAAIAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAQbmV3X2ZlZV9yZWNlaXZlcgAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAE01hbmFnZXJDaGFuZ2VkRXZlbnQAAAAAAQAAAAAAAAALbmV3X21hbmFnZXIAAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAAHEVtZXJnZW5jeU1hbmFnZXJDaGFuZ2VkRXZlbnQAAAABAAAAAAAAABVuZXdfZW1lcmdlbmN5X21hbmFnZXIAAAAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAHFJlYmFsYW5jZU1hbmFnZXJDaGFuZ2VkRXZlbnQAAAABAAAAAAAAABVuZXdfcmViYWxhbmNlX21hbmFnZXIAAAAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAFEZlZXNEaXN0cmlidXRlZEV2ZW50AAAAAQAAAAAAAAAQZGlzdHJpYnV0ZWRfZmVlcwAAA+oAAAPtAAAAAgAAABMAAAAL",
+    "AAAAAQAAAAAAAAAAAAAAC1Vud2luZEV2ZW50AAAAAAMAAAAAAAAAC2NhbGxfcGFyYW1zAAAAA+oAAAPtAAAAAwAAABMAAAALAAAAEwAAAAAAAAAQcmViYWxhbmNlX21ldGhvZAAAABEAAAAAAAAABnJlcG9ydAAAAAAH0AAAAAZSZXBvcnQAAA==",
+    "AAAAAQAAAAAAAAAAAAAAC0ludmVzdEV2ZW50AAAAAAMAAAAAAAAAEWFzc2V0X2ludmVzdG1lbnRzAAAAAAAD6gAAB9AAAAAZQXNzZXRJbnZlc3RtZW50QWxsb2NhdGlvbgAAAAAAAAAAAAAQcmViYWxhbmNlX21ldGhvZAAAABEAAAAAAAAABnJlcG9ydAAAAAAH0AAAAAZSZXBvcnQAAA==",
+    "AAAAAQAAAAAAAAAAAAAAEFN3YXBFeGFjdEluRXZlbnQAAAACAAAAAAAAABByZWJhbGFuY2VfbWV0aG9kAAAAEQAAAAAAAAAJc3dhcF9hcmdzAAAAAAAD6gAAAAA=",
+    "AAAAAQAAAAAAAAAAAAAAEVN3YXBFeGFjdE91dEV2ZW50AAAAAAAAAgAAAAAAAAAQcmViYWxhbmNlX21ldGhvZAAAABEAAAAAAAAACXN3YXBfYXJncwAAAAAAA+oAAAAA",
+    "AAAAAQAAAAAAAAAAAAAAElN0cmF0ZWd5QWxsb2NhdGlvbgAAAAAAAwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAAZwYXVzZWQAAAAAAAEAAAAAAAAAEHN0cmF0ZWd5X2FkZHJlc3MAAAAT",
+    "AAAAAQAAAAAAAAAAAAAAIEN1cnJlbnRBc3NldEludmVzdG1lbnRBbGxvY2F0aW9uAAAABQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAtpZGxlX2Ftb3VudAAAAAALAAAAAAAAAA9pbnZlc3RlZF9hbW91bnQAAAAACwAAAAAAAAAUc3RyYXRlZ3lfYWxsb2NhdGlvbnMAAAPqAAAH0AAAABJTdHJhdGVneUFsbG9jYXRpb24AAAAAAAAAAAAMdG90YWxfYW1vdW50AAAACw==",
+    "AAAAAQAAAAAAAAAAAAAAGUFzc2V0SW52ZXN0bWVudEFsbG9jYXRpb24AAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAAFHN0cmF0ZWd5X2FsbG9jYXRpb25zAAAD6gAAA+gAAAfQAAAAElN0cmF0ZWd5QWxsb2NhdGlvbgAA",
+    "AAAAAgAAAAAAAAAAAAAAC0luc3RydWN0aW9uAAAAAAQAAAABAAAAH1dpdGhkcmF3IGZ1bmRzIGZyb20gYSBzdHJhdGVneS4AAAAABlVud2luZAAAAAAAAgAAABMAAAALAAAAAQAAAB1JbnZlc3QgZnVuZHMgaW50byBhIHN0cmF0ZWd5LgAAAAAAAAZJbnZlc3QAAAAAAAIAAAATAAAACwAAAAEAAAAqUGVyZm9ybSBhIHN3YXAgd2l0aCBhbiBleGFjdCBpbnB1dCBhbW91bnQuAAAAAAALU3dhcEV4YWN0SW4AAAAABQAAABMAAAATAAAACwAAAAsAAAAGAAAAAQAAACtQZXJmb3JtIGEgc3dhcCB3aXRoIGFuIGV4YWN0IG91dHB1dCBhbW91bnQuAAAAAAxTd2FwRXhhY3RPdXQAAAAFAAAAEwAAABMAAAALAAAACwAAAAY=",
+    "AAAAAQAAAAAAAAAAAAAABlJlcG9ydAAAAAAAAwAAAAAAAAAPZ2FpbnNfb3JfbG9zc2VzAAAAAAsAAAAAAAAACmxvY2tlZF9mZWUAAAAAAAsAAAAAAAAADHByZXZfYmFsYW5jZQAAAAs=",
+    "AAAAAAAAAAAAAAAMdG90YWxfc3VwcGx5AAAAAAAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAJYWxsb3dhbmNlAAAAAAAAAgAAAAAAAAAEZnJvbQAAABMAAAAAAAAAB3NwZW5kZXIAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAHYXBwcm92ZQAAAAAEAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAHc3BlbmRlcgAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAAEWV4cGlyYXRpb25fbGVkZ2VyAAAAAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAHYmFsYW5jZQAAAAABAAAAAAAAAAJpZAAAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAIdHJhbnNmZXIAAAADAAAAAAAAAARmcm9tAAAAEwAAAAAAAAACdG8AAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAA=",
+    "AAAAAAAAAAAAAAANdHJhbnNmZXJfZnJvbQAAAAAAAAQAAAAAAAAAB3NwZW5kZXIAAAAAEwAAAAAAAAAEZnJvbQAAABMAAAAAAAAAAnRvAAAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
+    "AAAAAAAAAAAAAAAEYnVybgAAAAIAAAAAAAAABGZyb20AAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAA",
+    "AAAAAAAAAAAAAAAJYnVybl9mcm9tAAAAAAAAAwAAAAAAAAAHc3BlbmRlcgAAAAATAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAA==",
+    "AAAAAAAAAAAAAAAIZGVjaW1hbHMAAAAAAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAEbmFtZQAAAAAAAAABAAAAEA==",
+    "AAAAAAAAAAAAAAAGc3ltYm9sAAAAAAAAAAAAAQAAABA=",
+    "AAAAAQAAAAAAAAAAAAAAEEFsbG93YW5jZURhdGFLZXkAAAACAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAHc3BlbmRlcgAAAAAT",
+    "AAAAAQAAAAAAAAAAAAAADkFsbG93YW5jZVZhbHVlAAAAAAACAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAAEWV4cGlyYXRpb25fbGVkZ2VyAAAAAAAABA==",
+    "AAAAAgAAAAAAAAAAAAAAB0RhdGFLZXkAAAAAAwAAAAEAAAAAAAAACUFsbG93YW5jZQAAAAAAAAEAAAfQAAAAEEFsbG93YW5jZURhdGFLZXkAAAABAAAAAAAAAAdCYWxhbmNlAAAAAAEAAAATAAAAAAAAAAAAAAALVG90YWxTdXBwbHkA",
+    "AAAAAAAABABJbml0aWFsaXplcyB0aGUgRGVGaW5kZXggVmF1bHQgY29udHJhY3Qgd2l0aCB0aGUgcmVxdWlyZWQgcGFyYW1ldGVycy4KCiMgQXJndW1lbnRzCiogYGVgIC0gVGhlIGVudmlyb25tZW50IHJlZmVyZW5jZS4KKiBgYXNzZXRzYCAtIExpc3Qgb2YgYXNzZXQgYWxsb2NhdGlvbnMgZm9yIHRoZSB2YXVsdCwgaW5jbHVkaW5nIHN0cmF0ZWdpZXMgZm9yIGVhY2ggYXNzZXQuCiogYHJvbGVzYCAtIE1hcCBvZiByb2xlIElEcyB0byBhZGRyZXNzZXMgY29udGFpbmluZzoKLSBFbWVyZ2VuY3kgTWFuYWdlcjogRm9yIGVtZXJnZW5jeSBjb250cm9sCi0gVmF1bHQgRmVlIFJlY2VpdmVyOiBGb3IgcmVjZWl2aW5nIHZhdWx0IGZlZXMKLSBNYW5hZ2VyOiBGb3IgcHJpbWFyeSB2YXVsdCBjb250cm9sCi0gUmViYWxhbmNlIE1hbmFnZXI6IEZvciByZWJhbGFuY2luZyBvcGVyYXRpb25zCiogYHZhdWx0X2ZlZWAgLSBWYXVsdC1zcGVjaWZpYyBmZWUgaW4gYmFzaXMgcG9pbnRzICgwXzIwMDAgZm9yIDAuMjAlKQoqIGBkZWZpbmRleF9wcm90b2NvbF9yZWNlaXZlcmAgLSBBZGRyZXNzIHJlY2VpdmluZyBwcm90b2NvbCBmZWVzCiogYGRlZmluZGV4X3Byb3RvY29sX3JhdGVgIC0gUHJvdG9jb2wgZmVlIHJhdGUgaW4gYmFzaXMgcG9pbnRzICgwLTkwMDAgZm9yIDAtOTAlKQoqIGBzb3Jvc3dhcF9yb3V0ZXJgIC0gU29yb3N3YXAgcm91dGVyIGFkZHJlc3MKKiBgbmFtZV9zeW1ib2xgIC0gTWFwIGNvbnRhaW5pbmc6Ci0gIm5hbWUiOiBWYXVsdCB0b2tlbiBuYW1lCi0gInN5bWJvbCI6IFZhdWx0IHRva2VuIHN5bWJvbAoqIGB1cGdyYWRhYmxlYCAtIEJvb2xlYW4gZmxhZyBmb3IgY29udHJhY3QgdXBncmFkZWFiaWxpdHkKCiMgRnVuY3Rpb24gRmxvdwoxLiAqKlJvbGUgQXNzaWdubWVudCoqOgotIFNldHMgRW1lcmdlbmN5IE1hbmFnZXIKLSBTZXRzIFZhdWx0IEZlZSBSZWNlaXZlcgotIFNldHMgTWFuYWdlcgotIFNldHMgUmViYWxhbmNlIE1hbmFnZXIKCjIuICoqRmVlIENvbmZpZ3VyYXRpb24qKjoKLSBTZXRzIHZhdWx0IGZlAAAADV9fY29uc3RydWN0b3IAAAAAAAAIAAAAAAAAAAZhc3NldHMAAAAAA+oAAAfQAAAAEEFzc2V0U3RyYXRlZ3lTZXQAAAAAAAAABXJvbGVzAAAAAAAD7AAAAAQAAAATAAAAAAAAAAl2YXVsdF9mZWUAAAAAAAAEAAAAAAAAABpkZWZpbmRleF9wcm90b2NvbF9yZWNlaXZlcgAAAAAAEwAAAAAAAAAWZGVmaW5kZXhfcHJvdG9jb2xfcmF0ZQAAAAAABAAAAAAAAAAPc29yb3N3YXBfcm91dGVyAAAAABMAAAAAAAAAC25hbWVfc3ltYm9sAAAAA+wAAAAQAAAAEAAAAAAAAAAKdXBncmFkYWJsZQAAAAAAAQAAAAA=",
+    "AAAAAAAABABIYW5kbGVzIHVzZXIgZGVwb3NpdHMgaW50byB0aGUgRGVGaW5kZXggVmF1bHQgYW5kIG9wdGlvbmFsbHkgYWxsb2NhdGVzIGludmVzdG1lbnRzIGF1dG9tYXRpY2FsbHkuCgpUaGlzIGZ1bmN0aW9uIHByb2Nlc3NlcyBhIGRlcG9zaXQgYnkgdHJhbnNmZXJyaW5nIGVhY2ggc3BlY2lmaWVkIGFzc2V0IGFtb3VudCBmcm9tIHRoZSB1c2VyJ3MgYWRkcmVzcyB0bwp0aGUgdmF1bHQgYW5kIG1pbnRzIHZhdWx0IHNoYXJlcyB0aGF0IHJlcHJlc2VudCB0aGUgdXNlcidzIHByb3BvcnRpb25hbCBzaGFyZSBpbiB0aGUgdmF1bHQuIEFkZGl0aW9uYWxseSwKaWYgdGhlIGBpbnZlc3RgIHBhcmFtZXRlciBpcyBzZXQgdG8gYHRydWVgLCB0aGUgZnVuY3Rpb24gd2lsbCBpbW1lZGlhdGVseSBnZW5lcmF0ZSBhbmQgZXhlY3V0ZSBpbnZlc3RtZW50CmFsbG9jYXRpb25zIGJhc2VkIG9uIHRoZSB2YXVsdCdzIHN0cmF0ZWd5IGNvbmZpZ3VyYXRpb24uCgojIFBhcmFtZXRlcnMKKiBgZWAgLSBUaGUgY3VycmVudCBlbnZpcm9ubWVudCByZWZlcmVuY2UgKGBFbnZgKSwgZm9yIGFjY2VzcyB0byB0aGUgY29udHJhY3Qgc3RhdGUgYW5kIHV0aWxpdGllcy4KKiBgYW1vdW50c19kZXNpcmVkYCAtIEEgdmVjdG9yIHNwZWNpZnlpbmcgdGhlIHVzZXIncyBpbnRlbmRlZCBkZXBvc2l0IGFtb3VudHMgZm9yIGVhY2ggYXNzZXQuCiogYGFtb3VudHNfbWluYCAtIEEgdmVjdG9yIG9mIG1pbmltdW0gZGVwb3NpdCBhbW91bnRzIHJlcXVpcmVkIGZvciB0aGUgdHJhbnNhY3Rpb24gdG8gcHJvY2VlZC4KKiBgZnJvbWAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgdXNlciBtYWtpbmcgdGhlIGRlcG9zaXQuCiogYGludmVzdGAgLSBBIGJvb2xlYW4gZmxhZyBpbmRpY2F0aW5nIHdoZXRoZXIgdG8gaW1tZWRpYXRlbHkgaW52ZXN0IHRoZSBkZXBvc2l0ZWQgZnVuZHMgaW50byB0aGUgdmF1bHQncyBzdHJhdGVnaWVzOgotIGB0cnVlYDogR2VuZXJhdGUgYW5kIGV4ZWN1dGUgaW52ZXN0bWVudHMgYWZ0ZXIgdGhlIGRlcG9zaXQuCi0gYGZhbHNlYDogTGVhAAAAB2RlcG9zaXQAAAAABAAAAAAAAAAPYW1vdW50c19kZXNpcmVkAAAAA+oAAAALAAAAAAAAAAthbW91bnRzX21pbgAAAAPqAAAACwAAAAAAAAAEZnJvbQAAABMAAAAAAAAABmludmVzdAAAAAAAAQAAAAEAAAPpAAAD7QAAAAMAAAPqAAAACwAAAAsAAAPoAAAD6gAAA+gAAAfQAAAAGUFzc2V0SW52ZXN0bWVudEFsbG9jYXRpb24AAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAAAABABIYW5kbGVzIHVzZXIgd2l0aGRyYXdhbHMgZnJvbSB0aGUgRGVGaW5kZXggVmF1bHQgYnkgYnVybmluZyBzaGFyZXMgYW5kIHJldHVybmluZyBhc3NldHMuCgpUaGlzIGZ1bmN0aW9uIHByb2Nlc3NlcyBhIHdpdGhkcmF3YWwgcmVxdWVzdCBieSBidXJuaW5nIHRoZSBzcGVjaWZpZWQgYW1vdW50IG9mIHZhdWx0IHNoYXJlcwphbmQgcmV0dXJuaW5nIGEgcHJvcG9ydGlvbmFsIGFtb3VudCBvZiB0aGUgdmF1bHQncyBhc3NldHMgdG8gdGhlIHVzZXIuIEl0IGNhbiB1bndpbmQgcG9zaXRpb25zCmZyb20gc3RyYXRlZ2llcyBpZiBuZWNlc3NhcnkgdG8gZnVsZmlsbCB0aGUgd2l0aGRyYXdhbC4KCiMjIFBhcmFtZXRlcnM6Ci0gYGVgOiBUaGUgY29udHJhY3QgZW52aXJvbm1lbnQgKGBFbnZgKS4KLSBgd2l0aGRyYXdfc2hhcmVzYDogVGhlIG51bWJlciBvZiB2YXVsdCBzaGFyZXMgdG8gd2l0aGRyYXcuCi0gYG1pbl9hbW91bnRzX291dGA6IEEgdmVjdG9yIG9mIG1pbmltdW0gYW1vdW50cyByZXF1aXJlZCBmb3IgZWFjaCBhc3NldCB0byBiZSB3aXRoZHJhd24uCi0gYGZyb21gOiBUaGUgYWRkcmVzcyBpbml0aWF0aW5nIHRoZSB3aXRoZHJhd2FsLgoKIyMgUmV0dXJucwoqIGBSZXN1bHQ8VmVjPGkxMjg+LCBDb250cmFjdEVycm9yPmAgLSBPbiBzdWNjZXNzLCByZXR1cm5zIGEgdmVjdG9yIG9mIHdpdGhkcmF3biBhbW91bnRzCndoZXJlIGVhY2ggaW5kZXggY29ycmVzcG9uZHMgdG8gdGhlIGFzc2V0IGluZGV4IGluIHRoZSB2YXVsdCdzIGFzc2V0IGxpc3QuClJldHVybnMgQ29udHJhY3RFcnJvciBpZiB0aGUgd2l0aGRyYXdhbCBmYWlscy4KCiMjIEVycm9yczoKLSBgQ29udHJhY3RFcnJvcjo6QW1vdW50T3ZlclRvdGFsU3VwcGx5YDogSWYgdGhlIHNwZWNpZmllZCBzaGFyZXMgZXhjZWVkIHRoZSB0b3RhbCBzdXBwbHkuCi0gYENvbnRyYWN0RXJyb3I6OkFyaXRobWV0aWNFcnJvcmA6IElmIGFueSBhcml0aG1ldGljIG9wZXJhdGlvbiBmYWlscyBkdXJpbmcgY2FsY3VsYXRpb25zLgotIGBDb250cmFjdEVycm9yAAAACHdpdGhkcmF3AAAAAwAAAAAAAAAPd2l0aGRyYXdfc2hhcmVzAAAAAAsAAAAAAAAAD21pbl9hbW91bnRzX291dAAAAAPqAAAACwAAAAAAAAAEZnJvbQAAABMAAAABAAAD6QAAA+oAAAALAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAmBFeGVjdXRlcyByZXNjdWUgKGZvcm1lcmx5IGVtZXJnZW5jeSB3aXRoZHJhd2FsKSBmcm9tIGEgc3BlY2lmaWMgc3RyYXRlZ3kuCgpUaGlzIGZ1bmN0aW9uIGFsbG93cyB0aGUgZW1lcmdlbmN5IG1hbmFnZXIgb3IgbWFuYWdlciB0byB3aXRoZHJhdyBhbGwgYXNzZXRzIGZyb20gYSBwYXJ0aWN1bGFyIHN0cmF0ZWd5CmFuZCBzdG9yZSB0aGVtIGFzIGlkbGUgZnVuZHMgd2l0aGluIHRoZSB2YXVsdC4gSXQgYWxzbyBwYXVzZXMgdGhlIHN0cmF0ZWd5IHRvIHByZXZlbnQgZnVydGhlciB1c2UgdW50aWwKdW5wYXVzZWQuCgojIEFyZ3VtZW50czoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCiogYHN0cmF0ZWd5X2FkZHJlc3NgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIHN0cmF0ZWd5IHRvIHdpdGhkcmF3IGZyb20uCiogYGNhbGxlcmAgLSBUaGUgYWRkcmVzcyBpbml0aWF0aW5nIHRoZSBlbWVyZ2VuY3kgd2l0aGRyYXdhbCAobXVzdCBiZSB0aGUgbWFuYWdlciBvciBlbWVyZ2VuY3kgbWFuYWdlcikuCgojIFJldHVybnMKKiBgUmVzdWx0PCgpLCBDb250cmFjdEVycm9yPmAgLSBTdWNjZXNzICgoKSkgb3IgQ29udHJhY3RFcnJvciBpZiB0aGUgcmVzY3VlIG9wZXJhdGlvbiBmYWlscwAAAAZyZXNjdWUAAAAAAAIAAAAAAAAAEHN0cmF0ZWd5X2FkZHJlc3MAAAATAAAAAAAAAAZjYWxsZXIAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAedQYXVzZXMgYSBzdHJhdGVneSB0byBwcmV2ZW50IGl0IGZyb20gYmVpbmcgdXNlZCBpbiB0aGUgdmF1bHQuCgpUaGlzIGZ1bmN0aW9uIHBhdXNlcyBhIHN0cmF0ZWd5IGJ5IHNldHRpbmcgaXRzIGBwYXVzZWRgIGZpZWxkIHRvIGB0cnVlYC4gT25seSB0aGUgbWFuYWdlciBvciBlbWVyZ2VuY3kKbWFuYWdlciBjYW4gcGF1c2UgYSBzdHJhdGVneS4KCiMgQXJndW1lbnRzOgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KKiBgc3RyYXRlZ3lfYWRkcmVzc2AgLSBUaGUgYWRkcmVzcyBvZiB0aGUgc3RyYXRlZ3kgdG8gcGF1c2UuCiogYGNhbGxlcmAgLSBUaGUgYWRkcmVzcyBpbml0aWF0aW5nIHRoZSBwYXVzZSAobXVzdCBiZSB0aGUgbWFuYWdlciBvciBlbWVyZ2VuY3kgbWFuYWdlcikuCgojIFJldHVybnMKKiBgUmVzdWx0PCgpLCBDb250cmFjdEVycm9yPmAgLSBTdWNjZXNzICgoKSkgb3IgQ29udHJhY3RFcnJvciBpZiB0aGUgcGF1c2Ugb3BlcmF0aW9uIGZhaWxzAAAAAA5wYXVzZV9zdHJhdGVneQAAAAAAAgAAAAAAAAAQc3RyYXRlZ3lfYWRkcmVzcwAAABMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAAAAAcFVbnBhdXNlcyBhIHByZXZpb3VzbHkgcGF1c2VkIHN0cmF0ZWd5LgoKVGhpcyBmdW5jdGlvbiB1bnBhdXNlcyBhIHN0cmF0ZWd5IGJ5IHNldHRpbmcgaXRzIGBwYXVzZWRgIGZpZWxkIHRvIGBmYWxzZWAsIGFsbG93aW5nIGl0IHRvIGJlIHVzZWQKYWdhaW4gaW4gdGhlIHZhdWx0LgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoqIGBzdHJhdGVneV9hZGRyZXNzYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBzdHJhdGVneSB0byB1bnBhdXNlLgoqIGBjYWxsZXJgIC0gVGhlIGFkZHJlc3MgaW5pdGlhdGluZyB0aGUgdW5wYXVzZSAobXVzdCBiZSB0aGUgbWFuYWdlciBvciBlbWVyZ2VuY3kgbWFuYWdlcikuCgojIFJldHVybnM6CiogYFJlc3VsdDwoKSwgQ29udHJhY3RFcnJvcj5gIC0gT2sgaWYgc3VjY2Vzc2Z1bCwgb3RoZXJ3aXNlIHJldHVybnMgYSBDb250cmFjdEVycm9yLgAAAAAAABB1bnBhdXNlX3N0cmF0ZWd5AAAAAgAAAAAAAAAQc3RyYXRlZ3lfYWRkcmVzcwAAABMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAEAAAPpAAAD7QAAAAAAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAAAAAN9SZXRyaWV2ZXMgdGhlIGxpc3Qgb2YgYXNzZXRzIG1hbmFnZWQgYnkgdGhlIERlRmluZGV4IFZhdWx0LgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoKIyBSZXR1cm5zOgoqIGBWZWM8QXNzZXRTdHJhdGVneVNldD5gIC0gQSB2ZWN0b3Igb2YgYEFzc2V0U3RyYXRlZ3lTZXRgIHN0cnVjdHMgcmVwcmVzZW50aW5nIHRoZSBhc3NldHMgbWFuYWdlZCBieSB0aGUgdmF1bHQuAAAAAApnZXRfYXNzZXRzAAAAAAAAAAAAAQAAA+kAAAPqAAAH0AAAABBBc3NldFN0cmF0ZWd5U2V0AAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAb9SZXR1cm5zIHRoZSB0b3RhbCBtYW5hZ2VkIGZ1bmRzIG9mIHRoZSB2YXVsdCwgaW5jbHVkaW5nIGJvdGggaW52ZXN0ZWQgYW5kIGlkbGUgZnVuZHMuCgpUaGlzIGZ1bmN0aW9uIHByb3ZpZGVzIGEgdmVjdG9yIG9mIGBDdXJyZW50QXNzZXRJbnZlc3RtZW50QWxsb2NhdGlvbmAgc3RydWN0cyBjb250YWluaW5nIGluZm9ybWF0aW9uCmFib3V0IGVhY2ggYXNzZXQncyBjdXJyZW50IGFsbG9jYXRpb24sIGluY2x1ZGluZyBib3RoIGludmVzdGVkIGFtb3VudHMgaW4gc3RyYXRlZ2llcyBhbmQgaWRsZSBhbW91bnRzLgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoKIyBSZXR1cm5zOgoqIGBSZXN1bHQ8VmVjPEN1cnJlbnRBc3NldEludmVzdG1lbnRBbGxvY2F0aW9uPiwgQ29udHJhY3RFcnJvcj5gIC0gQSB2ZWN0b3Igb2YgYXNzZXQgYWxsb2NhdGlvbnMgb3IgZXJyb3IAAAAAGWZldGNoX3RvdGFsX21hbmFnZWRfZnVuZHMAAAAAAAAAAAAAAQAAA+kAAAPqAAAH0AAAACBDdXJyZW50QXNzZXRJbnZlc3RtZW50QWxsb2NhdGlvbgAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAn9UaGlzIGZ1bmN0aW9uIGV4dGVuZHMgdGhlIGNvbnRyYWN0J3MgdGltZS10by1saXZlIGFuZCBjYWxjdWxhdGVzIGhvdyBtdWNoIG9mIGVhY2ggYXNzZXQgY29ycmVzcG9uZHMKcGVyIHRoZSBwcm92aWRlZCBudW1iZXIgb2YgdmF1bHQgc2hhcmVzIChgdmF1bHRfc2hhcmVzYCkuIEl0IHByb3ZpZGVzIHByb3BvcnRpb25hbCBhbGxvY2F0aW9ucyBmb3IgZWFjaCBhc3NldAppbiB0aGUgdmF1bHQgcmVsYXRpdmUgdG8gdGhlIHNwZWNpZmllZCBzaGFyZXMuCgojIEFyZ3VtZW50cwoqIGBlYCAtIFRoZSBjdXJyZW50IGVudmlyb25tZW50IHJlZmVyZW5jZS4KKiBgdmF1bHRfc2hhcmVzYCAtIFRoZSBudW1iZXIgb2YgdmF1bHQgc2hhcmVzIGZvciB3aGljaCB0aGUgY29ycmVzcG9uZGluZyBhc3NldCBhbW91bnRzIGFyZSBjYWxjdWxhdGVkLgoKIyBSZXR1cm5zCiogYFJlc3VsdDxWZWM8aTEyOD4sIENvbnRyYWN0RXJyb3I+YCAtIEEgdmVjdG9yIG9mIGFzc2V0IGFtb3VudHMgY29ycmVzcG9uZGluZyB0byB0aGUgdmF1bHQgc2hhcmVzLCB3aGVyZSBlYWNoIGluZGV4Cm1hdGNoZXMgdGhlIGFzc2V0IGluZGV4IGluIHRoZSB2YXVsdCdzIGFzc2V0IGxpc3QuIFJldHVybnMgQ29udHJhY3RFcnJvciBpZiBjYWxjdWxhdGlvbiBmYWlscy4AAAAAHGdldF9hc3NldF9hbW91bnRzX3Blcl9zaGFyZXMAAAABAAAAAAAAAAx2YXVsdF9zaGFyZXMAAAALAAAAAQAAA+kAAAPqAAAACwAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAWpSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgZmVlIHJhdGVzIGZvciB0aGUgdmF1bHQgYW5kIHRoZSBEZUZpbmRleCBwcm90b2NvbC4KClRoaXMgZnVuY3Rpb24gcmV0dXJucyB0aGUgZmVlIHJhdGVzIGZvciBib3RoIHRoZSB2YXVsdCBhbmQgdGhlIERlRmluZGV4IHByb3RvY29sLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCgojIFJldHVybnMKKiBgKHUzMiwgdTMyKWAgLSBBIHR1cGxlIGNvbnRhaW5pbmc6Ci0gVGhlIHZhdWx0IGZlZSByYXRlIGFzIGEgcGVyY2VudGFnZSBpbiBiYXNpcyBwb2ludHMuCi0gVGhlIERlRmluZGV4IHByb3RvY29sIGZlZSByYXRlIGFzIGEgcGVyY2VudGFnZSBpbiBiYXNpcyBwb2ludHMuCgAAAAAACGdldF9mZWVzAAAAAAAAAAEAAAPtAAAAAgAAAAQAAAAE",
+    "AAAAAAAAA/pHZW5lcmF0ZXMgcmVwb3J0cyBmb3IgYWxsIHN0cmF0ZWdpZXMgaW4gdGhlIHZhdWx0LCB0cmFja2luZyB0aGVpciBwZXJmb3JtYW5jZSBhbmQgZmVlIGFjY3J1YWwuCgpUaGlzIGZ1bmN0aW9uIGl0ZXJhdGVzIHRocm91Z2ggYWxsIGFzc2V0cyBhbmQgdGhlaXIgYXNzb2NpYXRlZCBzdHJhdGVnaWVzIHRvIGdlbmVyYXRlCnBlcmZvcm1hbmNlIHJlcG9ydHMuIEl0IHVwZGF0ZXMgZWFjaCBzdHJhdGVneSdzIHJlcG9ydCB3aXRoIGN1cnJlbnQgYmFsYW5jZXMgYW5kCmNhbGN1bGF0ZXMgZ2FpbnMgb3IgbG9zc2VzIHNpbmNlIHRoZSBsYXN0IHJlcG9ydC4KCiMgQXJndW1lbnRzCiogYGVgIC0gVGhlIGVudmlyb25tZW50IHJlZmVyZW5jZS4KCiMgRnVuY3Rpb24gRmxvdwoxLiAqKkluc3RhbmNlIEV4dGVuc2lvbioqOgotIEV4dGVuZHMgY29udHJhY3QgVFRMCgoyLiAqKkFzc2V0ICYgU3RyYXRlZ3kgUmV0cmlldmFsKio6Ci0gR2V0cyBhbGwgYXNzZXRzIGFuZCB0aGVpciBzdHJhdGVnaWVzCi0gSW5pdGlhbGl6ZXMgcmVwb3J0cyB2ZWN0b3IKCjMuICoqUmVwb3J0IEdlbmVyYXRpb24qKjoKLSBGb3IgZWFjaCBhc3NldDoKLSBGb3IgZWFjaCBzdHJhdGVneToKLSBHZXRzIGN1cnJlbnQgc3RyYXRlZ3kgYmFsYW5jZQotIFVwZGF0ZXMgcmVwb3J0IHdpdGggbmV3IGJhbGFuY2UKLSBTdG9yZXMgdXBkYXRlZCByZXBvcnQKCiMgUmV0dXJucwoqIGBSZXN1bHQ8VmVjPFJlcG9ydD4sIENvbnRyYWN0RXJyb3I+YCAtIE9uIHN1Y2Nlc3MsIHJldHVybnMgYSB2ZWN0b3Igb2YgcmVwb3J0cwp3aGVyZSBlYWNoIHJlcG9ydCBjb250YWlucyBwZXJmb3JtYW5jZSBtZXRyaWNzIGZvciBhIHN0cmF0ZWd5LiBSZXR1cm5zCkNvbnRyYWN0RXJyb3IgaWYgcmVwb3J0IGdlbmVyYXRpb24gZmFpbHMuCgojIE5vdGUKUmVwb3J0cyB0cmFjazoKLSBDdXJyZW50IHN0cmF0ZWd5IGJhbGFuY2UKLSBHYWlucyBvciBsb3NzZXMgc2luY2UgbGFzdCByZXBvcnQKLSBMb2NrZWQgZmVlcwotIEZlZSBkaXN0cmlidXRpb24gc3RhdHVzAAAAAAAGcmVwb3J0AAAAAAAAAAAAAQAAA+kAAAPqAAAH0AAAAAZSZXBvcnQAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAXVTZXRzIHRoZSBmZWUgcmVjZWl2ZXIgZm9yIHRoZSB2YXVsdC4KClRoaXMgZnVuY3Rpb24gYWxsb3dzIHRoZSBtYW5hZ2VyIG9yIHRoZSB2YXVsdCBmZWUgcmVjZWl2ZXIgdG8gc2V0IGEgbmV3IGZlZSByZWNlaXZlciBhZGRyZXNzIGZvciB0aGUgdmF1bHQuCgojIEFyZ3VtZW50czoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCiogYGNhbGxlcmAgLSBUaGUgYWRkcmVzcyBpbml0aWF0aW5nIHRoZSBjaGFuZ2UgKG11c3QgYmUgdGhlIG1hbmFnZXIgb3IgdGhlIHZhdWx0IGZlZSByZWNlaXZlcikuCiogYHZhdWx0X2ZlZV9yZWNlaXZlcmAgLSBUaGUgbmV3IGZlZSByZWNlaXZlciBhZGRyZXNzLgoKIyBSZXR1cm5zOgoqIGAoKWAgLSBObyByZXR1cm4gdmFsdWUuAAAAAAAAEHNldF9mZWVfcmVjZWl2ZXIAAAACAAAAAAAAAAZjYWxsZXIAAAAAABMAAAAAAAAAEG5ld19mZWVfcmVjZWl2ZXIAAAATAAAAAA==",
+    "AAAAAAAAANxSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgZmVlIHJlY2VpdmVyIGFkZHJlc3MgZm9yIHRoZSB2YXVsdC4KCiMgQXJndW1lbnRzOgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KCiMgUmV0dXJuczoKKiBgUmVzdWx0PEFkZHJlc3MsIENvbnRyYWN0RXJyb3I+YCAtIFRoZSBmZWUgcmVjZWl2ZXIgYWRkcmVzcyBpZiBzdWNjZXNzZnVsLCBvdGhlcndpc2UgcmV0dXJucyBhIENvbnRyYWN0RXJyb3IuAAAAEGdldF9mZWVfcmVjZWl2ZXIAAAAAAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAASRTZXRzIHRoZSBtYW5hZ2VyIGZvciB0aGUgdmF1bHQuCgpUaGlzIGZ1bmN0aW9uIGFsbG93cyB0aGUgY3VycmVudCBtYW5hZ2VyIHRvIHNldCBhIG5ldyBtYW5hZ2VyIGZvciB0aGUgdmF1bHQuCgojIEFyZ3VtZW50czoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCiogYG5ld19tYW5hZ2VyYCAtIFRoZSBuZXcgbWFuYWdlciBhZGRyZXNzLgoKIyBSZXR1cm5zCiogYFJlc3VsdDwoKSwgQ29udHJhY3RFcnJvcj5gIC0gU3VjY2VzcyAoKCkpIG9yIENvbnRyYWN0RXJyb3IgaWYgdGhlIG1hbmFnZXIgY2hhbmdlIGZhaWxzAAAAC3NldF9tYW5hZ2VyAAAAAAEAAAAAAAAAC25ld19tYW5hZ2VyAAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAANJSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgbWFuYWdlciBhZGRyZXNzIGZvciB0aGUgdmF1bHQuCgojIEFyZ3VtZW50czoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCgojIFJldHVybnM6CiogYFJlc3VsdDxBZGRyZXNzLCBDb250cmFjdEVycm9yPmAgLSBUaGUgbWFuYWdlciBhZGRyZXNzIGlmIHN1Y2Nlc3NmdWwsIG90aGVyd2lzZSByZXR1cm5zIGEgQ29udHJhY3RFcnJvci4AAAAAAAtnZXRfbWFuYWdlcgAAAAAAAAAAAQAAA+kAAAATAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAQlTZXRzIHRoZSBlbWVyZ2VuY3kgbWFuYWdlciBmb3IgdGhlIHZhdWx0LgoKVGhpcyBmdW5jdGlvbiBhbGxvd3MgdGhlIGN1cnJlbnQgbWFuYWdlciB0byBzZXQgYSBuZXcgZW1lcmdlbmN5IG1hbmFnZXIgZm9yIHRoZSB2YXVsdC4KCiMgQXJndW1lbnRzOgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KKiBgZW1lcmdlbmN5X21hbmFnZXJgIC0gVGhlIG5ldyBlbWVyZ2VuY3kgbWFuYWdlciBhZGRyZXNzLgoKIyBSZXR1cm5zOgoqIGAoKWAgLSBObyByZXR1cm4gdmFsdWUuAAAAAAAAFXNldF9lbWVyZ2VuY3lfbWFuYWdlcgAAAAAAAAEAAAAAAAAAEWVtZXJnZW5jeV9tYW5hZ2VyAAAAAAAAEwAAAAA=",
+    "AAAAAAAAAOZSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgZW1lcmdlbmN5IG1hbmFnZXIgYWRkcmVzcyBmb3IgdGhlIHZhdWx0LgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoKIyBSZXR1cm5zOgoqIGBSZXN1bHQ8QWRkcmVzcywgQ29udHJhY3RFcnJvcj5gIC0gVGhlIGVtZXJnZW5jeSBtYW5hZ2VyIGFkZHJlc3MgaWYgc3VjY2Vzc2Z1bCwgb3RoZXJ3aXNlIHJldHVybnMgYSBDb250cmFjdEVycm9yLgAAAAAAFWdldF9lbWVyZ2VuY3lfbWFuYWdlcgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAAAAAQ1TZXRzIHRoZSByZWJhbGFuY2UgbWFuYWdlciBmb3IgdGhlIHZhdWx0LgoKVGhpcyBmdW5jdGlvbiBhbGxvd3MgdGhlIGN1cnJlbnQgbWFuYWdlciB0byBzZXQgYSBuZXcgcmViYWxhbmNlIG1hbmFnZXIgZm9yIHRoZSB2YXVsdC4KCiMgQXJndW1lbnRzOgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KKiBgbmV3X3JlYmFsYW5jZV9tYW5hZ2VyYCAtIFRoZSBuZXcgcmViYWxhbmNlIG1hbmFnZXIgYWRkcmVzcy4KCiMgUmV0dXJuczoKKiBgKClgIC0gTm8gcmV0dXJuIHZhbHVlLgAAAAAAABVzZXRfcmViYWxhbmNlX21hbmFnZXIAAAAAAAABAAAAAAAAABVuZXdfcmViYWxhbmNlX21hbmFnZXIAAAAAAAATAAAAAA==",
+    "AAAAAAAAAOZSZXRyaWV2ZXMgdGhlIGN1cnJlbnQgcmViYWxhbmNlIG1hbmFnZXIgYWRkcmVzcyBmb3IgdGhlIHZhdWx0LgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoKIyBSZXR1cm5zOgoqIGBSZXN1bHQ8QWRkcmVzcywgQ29udHJhY3RFcnJvcj5gIC0gVGhlIHJlYmFsYW5jZSBtYW5hZ2VyIGFkZHJlc3MgaWYgc3VjY2Vzc2Z1bCwgb3RoZXJ3aXNlIHJldHVybnMgYSBDb250cmFjdEVycm9yLgAAAAAAFWdldF9yZWJhbGFuY2VfbWFuYWdlcgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAAAAAXJVcGdyYWRlcyB0aGUgY29udHJhY3Qgd2l0aCBuZXcgV2ViQXNzZW1ibHkgKFdBU00pIGNvZGUuCgpUaGlzIGZ1bmN0aW9uIHVwZGF0ZXMgdGhlIGNvbnRyYWN0IHdpdGggbmV3IFdBU00gY29kZSBwcm92aWRlZCBieSB0aGUgYG5ld193YXNtX2hhc2hgLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIHJ1bnRpbWUgZW52aXJvbm1lbnQuCiogYG5ld193YXNtX2hhc2hgIC0gVGhlIGhhc2ggb2YgdGhlIG5ldyBXQVNNIGNvZGUgdG8gdXBncmFkZSB0aGUgY29udHJhY3QgdG8uCgojIFJldHVybnMKKiBgUmVzdWx0PCgpLCBDb250cmFjdEVycm9yPmAgLSBSZXR1cm5zIE9rKCgpKSBvbiBzdWNjZXNzLCBDb250cmFjdEVycm9yIGlmIHVwZ3JhZGUgZmFpbHMKAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAA1uZXdfd2FzbV9oYXNoAAAAAAAD7gAAACAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAATtSZWJhbGFuY2VzIHRoZSB2YXVsdCBieSBleGVjdXRpbmcgYSBzZXJpZXMgb2YgaW5zdHJ1Y3Rpb25zLgoKIyBBcmd1bWVudHM6CiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoqIGBpbnN0cnVjdGlvbnNgIC0gQSB2ZWN0b3Igb2YgYEluc3RydWN0aW9uYCBzdHJ1Y3RzIHJlcHJlc2VudGluZyBhY3Rpb25zICh3aXRoZHJhdywgaW52ZXN0LCBzd2FwLCB6YXBwZXIpIHRvIGJlIHRha2VuLgoKIyBSZXR1cm5zOgoqIGBSZXN1bHQ8KCksIENvbnRyYWN0RXJyb3I+YCAtIE9rIGlmIHN1Y2Nlc3NmdWwsIG90aGVyd2lzZSByZXR1cm5zIGEgQ29udHJhY3RFcnJvci4AAAAACXJlYmFsYW5jZQAAAAAAAAIAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAAAAAAMaW5zdHJ1Y3Rpb25zAAAD6gAAB9AAAAALSW5zdHJ1Y3Rpb24AAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAa1Mb2NrcyBmZWVzIGZvciBhbGwgYXNzZXRzIGFuZCB0aGVpciBzdHJhdGVnaWVzLgoKSXRlcmF0ZXMgdGhyb3VnaCBlYWNoIGFzc2V0IGFuZCBpdHMgc3RyYXRlZ2llcywgbG9ja2luZyBmZWVzIGJhc2VkIG9uIGBuZXdfZmVlX2Jwc2Agb3IgdGhlIGRlZmF1bHQgdmF1bHQgZmVlLgoKIyBBcmd1bWVudHMKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQgcmVmZXJlbmNlLgoqIGBuZXdfZmVlX2Jwc2AgLSBPcHRpb25hbCBmZWUgYmFzaXMgcG9pbnRzIHRvIG92ZXJyaWRlIHRoZSBkZWZhdWx0LgoKIyBSZXR1cm5zCiogYFJlc3VsdDxWZWM8KEFkZHJlc3MsIGkxMjgpPiwgQ29udHJhY3RFcnJvcj5gIC0gQSB2ZWN0b3Igb2YgdHVwbGVzIHdpdGggc3RyYXRlZ3kgYWRkcmVzc2VzIGFuZCBsb2NrZWQgZmVlIGFtb3VudHMgaW4gdGhlaXIgdW5kZXJseWluZ19hc3NldC4AAAAAAAAJbG9ja19mZWVzAAAAAAAAAQAAAAAAAAALbmV3X2ZlZV9icHMAAAAD6AAAAAQAAAABAAAD6QAAA+oAAAfQAAAABlJlcG9ydAAAAAAH0AAAAA1Db250cmFjdEVycm9yAAAA",
+    "AAAAAAAAAUlSZWxlYXNlcyBsb2NrZWQgZmVlcyBmb3IgYSBzcGVjaWZpYyBzdHJhdGVneS4KCiMgQXJndW1lbnRzCiogYGVgIC0gVGhlIGVudmlyb25tZW50IHJlZmVyZW5jZS4KKiBgc3RyYXRlZ3lgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIHN0cmF0ZWd5IGZvciB3aGljaCB0byByZWxlYXNlIGZlZXMuCiogYGFtb3VudGAgLSBUaGUgYW1vdW50IG9mIGZlZXMgdG8gcmVsZWFzZS4KCiMgUmV0dXJucwoqIGBSZXN1bHQ8UmVwb3J0LCBDb250cmFjdEVycm9yPmAgLSBBIHJlcG9ydCBvZiB0aGUgcmVsZWFzZWQgZmVlcyBvciBhIGBDb250cmFjdEVycm9yYCBpZiB0aGUgb3BlcmF0aW9uIGZhaWxzLgAAAAAAAAxyZWxlYXNlX2ZlZXMAAAACAAAAAAAAAAhzdHJhdGVneQAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAH0AAAAAZSZXBvcnQAAAAAB9AAAAANQ29udHJhY3RFcnJvcgAAAA==",
+    "AAAAAAAAAmFEaXN0cmlidXRlcyB0aGUgbG9ja2VkIGZlZXMgZm9yIGFsbCBhc3NldHMgYW5kIHRoZWlyIHN0cmF0ZWdpZXMuCgpUaGlzIGZ1bmN0aW9uIGl0ZXJhdGVzIHRocm91Z2ggZWFjaCBhc3NldCBhbmQgaXRzIHN0cmF0ZWdpZXMsIGNhbGN1bGF0aW5nIHRoZSBmZWVzIHRvIGJlIGRpc3RyaWJ1dGVkCnRvIHRoZSB2YXVsdCBmZWUgcmVjZWl2ZXIgYW5kIHRoZSBEZUZpbmRleCBwcm90b2NvbCBmZWUgcmVjZWl2ZXIgYmFzZWQgb24gdGhlaXIgcmVzcGVjdGl2ZSBmZWUgcmF0ZXMuCkl0IGVuc3VyZXMgcHJvcGVyIGF1dGhvcml6YXRpb24gYW5kIHZhbGlkYXRpb24gY2hlY2tzIGJlZm9yZSBwcm9jZWVkaW5nIHdpdGggdGhlIGRpc3RyaWJ1dGlvbi4KCiMgQXJndW1lbnRzCiogYGVgIC0gVGhlIGVudmlyb25tZW50IHJlZmVyZW5jZS4KKiBgY2FsbGVyYCAtIFRoZSBhZGRyZXNzIGluaXRpYXRpbmcgdGhlIGZlZSBkaXN0cmlidXRpb24uCgojIFJldHVybnMKKiBgUmVzdWx0PFZlYzwoQWRkcmVzcywgaTEyOCk+LCBDb250cmFjdEVycm9yPmAgLSBBIHZlY3RvciBvZiB0dXBsZXMgd2l0aCBhc3NldCBhZGRyZXNzZXMgYW5kIHRoZSB0b3RhbCBkaXN0cmlidXRlZCBmZWUgYW1vdW50cy4AAAAAAAAPZGlzdHJpYnV0ZV9mZWVzAAAAAAEAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAEAAAPpAAAD6gAAA+0AAAACAAAAEwAAAAsAAAfQAAAADUNvbnRyYWN0RXJyb3IAAAA=",
+    "AAAAAQAAAAAAAAAAAAAACFN0cmF0ZWd5AAAAAwAAAAAAAAAHYWRkcmVzcwAAAAATAAAAAAAAAARuYW1lAAAAEAAAAAAAAAAGcGF1c2VkAAAAAAAB",
+    "AAAAAQAAAAAAAAAAAAAAEEFzc2V0U3RyYXRlZ3lTZXQAAAACAAAAAAAAAAdhZGRyZXNzAAAAABMAAAAAAAAACnN0cmF0ZWdpZXMAAAAAA+oAAAfQAAAACFN0cmF0ZWd5",
+    "AAAABAAAAAAAAAAAAAAADVN0cmF0ZWd5RXJyb3IAAAAAAAATAAAAAAAAAA5Ob3RJbml0aWFsaXplZAAAAAABkQAAAAAAAAASTmVnYXRpdmVOb3RBbGxvd2VkAAAAAAGaAAAAAAAAAA9JbnZhbGlkQXJndW1lbnQAAAABmwAAAAAAAAATSW5zdWZmaWNpZW50QmFsYW5jZQAAAAGcAAAAAAAAABFVbmRlcmZsb3dPdmVyZmxvdwAAAAAAAZ0AAAAAAAAAD0FyaXRobWV0aWNFcnJvcgAAAAGeAAAAAAAAAA5EaXZpc2lvbkJ5WmVybwAAAAABnwAAAAAAAAATSW52YWxpZFNoYXJlc01pbnRlZAAAAAGgAAAAAAAAABlPbmx5UG9zaXRpdmVBbW91bnRBbGxvd2VkAAAAAAABoQAAAAAAAAANTm90QXV0aG9yaXplZAAAAAAAAaIAAAAAAAAAF1Byb3RvY29sQWRkcmVzc05vdEZvdW5kAAAAAaQAAAAAAAAAD0RlYWRsaW5lRXhwaXJlZAAAAAGlAAAAAAAAAA1FeHRlcm5hbEVycm9yAAAAAAABpgAAAAAAAAARU29yb3N3YXBQYWlyRXJyb3IAAAAAAAGnAAAAAAAAABJBbW91bnRCZWxvd01pbkR1c3QAAAAAAcMAAAAAAAAAGFVuZGVybHlpbmdBbW91bnRCZWxvd01pbgAAAcQAAAAAAAAAFUJUb2tlbnNBbW91bnRCZWxvd01pbgAAAAAAAcUAAAAAAAAAEUludGVybmFsU3dhcEVycm9yAAAAAAABxgAAAAAAAAAOU3VwcGx5Tm90Rm91bmQAAAAAAcc=",
+    "AAAAAQAAAAAAAAAAAAAADERlcG9zaXRFdmVudAAAAAIAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAEZnJvbQAAABM=",
+    "AAAAAQAAAAAAAAAAAAAADEhhcnZlc3RFdmVudAAAAAMAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAEZnJvbQAAABMAAAAAAAAAD3ByaWNlX3Blcl9zaGFyZQAAAAAL",
+    "AAAAAQAAAAAAAAAAAAAADVdpdGhkcmF3RXZlbnQAAAAAAAACAAAAAAAAAAZhbW91bnQAAAAAAAsAAAAAAAAABGZyb20AAAAT",
+    "AAAAAQAAAAAAAAAAAAAADVRva2VuTWV0YWRhdGEAAAAAAAADAAAAAAAAAAdkZWNpbWFsAAAAAAQAAAAAAAAABG5hbWUAAAAQAAAAAAAAAAZzeW1ib2wAAAAAABA=",
+    "AAAABAAAAAAAAAAAAAAAFFNvcm9zd2FwTGlicmFyeUVycm9yAAAABgAAACRTb3Jvc3dhcExpYnJhcnk6IGluc3VmZmljaWVudCBhbW91bnQAAAASSW5zdWZmaWNpZW50QW1vdW50AAAAAAEtAAAAJ1Nvcm9zd2FwTGlicmFyeTogaW5zdWZmaWNpZW50IGxpcXVpZGl0eQAAAAAVSW5zdWZmaWNpZW50TGlxdWlkaXR5AAAAAAABLgAAACpTb3Jvc3dhcExpYnJhcnk6IGluc3VmZmljaWVudCBpbnB1dCBhbW91bnQAAAAAABdJbnN1ZmZpY2llbnRJbnB1dEFtb3VudAAAAAEvAAAAK1Nvcm9zd2FwTGlicmFyeTogaW5zdWZmaWNpZW50IG91dHB1dCBhbW91bnQAAAAAGEluc3VmZmljaWVudE91dHB1dEFtb3VudAAAATAAAAAdU29yb3N3YXBMaWJyYXJ5OiBpbnZhbGlkIHBhdGgAAAAAAAALSW52YWxpZFBhdGgAAAABMQAAAD1Tb3Jvc3dhcExpYnJhcnk6IHRva2VuX2EgYW5kIHRva2VuX2IgaGF2ZSBpZGVudGljYWwgYWRkcmVzc2VzAAAAAAAAE1NvcnRJZGVudGljYWxUb2tlbnMAAAABMg==",
+    "AAAAAAAAAVZTb3J0cyB0d28gdG9rZW4gYWRkcmVzc2VzIGluIGEgY29uc2lzdGVudCBvcmRlci4KCiMgQXJndW1lbnRzCgoqIGB0b2tlbl9hYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBmaXJzdCB0b2tlbi4KKiBgdG9rZW5fYmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgc2Vjb25kIHRva2VuLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBSZXN1bHQ8KEFkZHJlc3MsIEFkZHJlc3MpLCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgYSB0dXBsZSB3aXRoIHRoZSBzb3J0ZWQgdG9rZW4gYWRkcmVzc2VzLCBhbmQgYEVycmAgaW5kaWNhdGVzIGFuIGVycm9yIHN1Y2ggYXMgaWRlbnRpY2FsIHRva2Vucy4AAAAAAAtzb3J0X3Rva2VucwAAAAACAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEwAAAAEAAAPpAAAD7QAAAAIAAAATAAAAEwAAB9AAAAAUU29yb3N3YXBMaWJyYXJ5RXJyb3I=",
+    "AAAAAAAAAgRDYWxjdWxhdGVzIHRoZSBkZXRlcm1pbmlzdGljIGFkZHJlc3MgZm9yIGEgcGFpciB3aXRob3V0IG1ha2luZyBhbnkgZXh0ZXJuYWwgY2FsbHMuCmNoZWNrIDxodHRwczovL2dpdGh1Yi5jb20vcGFsdGFsYWJzL2RldGVybWluaXN0aWMtYWRkcmVzcy1zb3JvYmFuPgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoqIGBmYWN0b3J5YCAtIFRoZSBmYWN0b3J5IGFkZHJlc3MuCiogYHRva2VuX2FgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIGZpcnN0IHRva2VuLgoqIGB0b2tlbl9iYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBzZWNvbmQgdG9rZW4uCgojIFJldHVybnMKClJldHVybnMgYFJlc3VsdDxBZGRyZXNzLCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgdGhlIGRldGVybWluaXN0aWMgYWRkcmVzcyBmb3IgdGhlIHBhaXIsIGFuZCBgRXJyYCBpbmRpY2F0ZXMgYW4gZXJyb3Igc3VjaCBhcyBpZGVudGljYWwgdG9rZW5zIG9yIGFuIGlzc3VlIHdpdGggc29ydGluZy4AAAAIcGFpcl9mb3IAAAADAAAAAAAAAAdmYWN0b3J5AAAAABMAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAA+kAAAATAAAH0AAAABRTb3Jvc3dhcExpYnJhcnlFcnJvcg==",
+    "AAAAAAAAAbZGZXRjaGVzIGFuZCBzb3J0cyB0aGUgcmVzZXJ2ZXMgZm9yIGEgcGFpciBvZiB0b2tlbnMgdXNpbmcgdGhlIGZhY3RvcnkgYWRkcmVzcy4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KKiBgZmFjdG9yeWAgLSBUaGUgZmFjdG9yeSBhZGRyZXNzLgoqIGB0b2tlbl9hYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBmaXJzdCB0b2tlbi4KKiBgdG9rZW5fYmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgc2Vjb25kIHRva2VuLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBSZXN1bHQ8KGkxMjgsIGkxMjgpLCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgYSB0dXBsZSBvZiBzb3J0ZWQgcmVzZXJ2ZXMsIGFuZCBgRXJyYCBpbmRpY2F0ZXMgYW4gZXJyb3Igc3VjaCBhcyBpZGVudGljYWwgdG9rZW5zIG9yIGFuIGlzc3VlIHdpdGggc29ydGluZy4AAAAAABlnZXRfcmVzZXJ2ZXNfd2l0aF9mYWN0b3J5AAAAAAAAAwAAAAAAAAAHZmFjdG9yeQAAAAATAAAAAAAAAAd0b2tlbl9hAAAAABMAAAAAAAAAB3Rva2VuX2IAAAAAEwAAAAEAAAPpAAAD7QAAAAIAAAALAAAACwAAB9AAAAAUU29yb3N3YXBMaWJyYXJ5RXJyb3I=",
+    "AAAAAAAAAa1GZXRjaGVzIGFuZCBzb3J0cyB0aGUgcmVzZXJ2ZXMgZm9yIGEgcGFpciBvZiB0b2tlbnMgdXNpbmcgdGhlIHBhaXIgYWRkcmVzcy4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIFRoZSBlbnZpcm9ubWVudC4KKiBgcGFpcmAgLSBUaGUgcGFpciBhZGRyZXNzLgoqIGB0b2tlbl9hYCAtIFRoZSBhZGRyZXNzIG9mIHRoZSBmaXJzdCB0b2tlbi4KKiBgdG9rZW5fYmAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgc2Vjb25kIHRva2VuLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBSZXN1bHQ8KGkxMjgsIGkxMjgpLCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgYSB0dXBsZSBvZiBzb3J0ZWQgcmVzZXJ2ZXMsIGFuZCBgRXJyYCBpbmRpY2F0ZXMgYW4gZXJyb3Igc3VjaCBhcyBpZGVudGljYWwgdG9rZW5zIG9yIGFuIGlzc3VlIHdpdGggc29ydGluZy4AAAAAAAAWZ2V0X3Jlc2VydmVzX3dpdGhfcGFpcgAAAAAAAwAAAAAAAAAEcGFpcgAAABMAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAA+kAAAPtAAAAAgAAAAsAAAALAAAH0AAAABRTb3Jvc3dhcExpYnJhcnlFcnJvcg==",
+    "AAAAAAAAAcVHaXZlbiBzb21lIGFtb3VudCBvZiBhbiBhc3NldCBhbmQgcGFpciByZXNlcnZlcywgcmV0dXJucyBhbiBlcXVpdmFsZW50IGFtb3VudCBvZiB0aGUgb3RoZXIgYXNzZXQuCgojIEFyZ3VtZW50cwoKKiBgYW1vdW50X2FgIC0gVGhlIGFtb3VudCBvZiB0aGUgZmlyc3QgYXNzZXQuCiogYHJlc2VydmVfYWAgLSBSZXNlcnZlcyBvZiB0aGUgZmlyc3QgYXNzZXQgaW4gdGhlIHBhaXIuCiogYHJlc2VydmVfYmAgLSBSZXNlcnZlcyBvZiB0aGUgc2Vjb25kIGFzc2V0IGluIHRoZSBwYWlyLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBSZXN1bHQ8aTEyOCwgU29yb3N3YXBMaWJyYXJ5RXJyb3I+YCB3aGVyZSBgT2tgIGNvbnRhaW5zIHRoZSBjYWxjdWxhdGVkIGVxdWl2YWxlbnQgYW1vdW50LCBhbmQgYEVycmAgaW5kaWNhdGVzIGFuIGVycm9yIHN1Y2ggYXMgaW5zdWZmaWNpZW50IGFtb3VudCBvciBsaXF1aWRpdHkAAAAAAAAFcXVvdGUAAAAAAAADAAAAAAAAAAhhbW91bnRfYQAAAAsAAAAAAAAACXJlc2VydmVfYQAAAAAAAAsAAAAAAAAACXJlc2VydmVfYgAAAAAAAAsAAAABAAAD6QAAAAsAAAfQAAAAFFNvcm9zd2FwTGlicmFyeUVycm9y",
+    "AAAAAAAAAd1HaXZlbiBhbiBpbnB1dCBhbW91bnQgb2YgYW4gYXNzZXQgYW5kIHBhaXIgcmVzZXJ2ZXMsIHJldHVybnMgdGhlIG1heGltdW0gb3V0cHV0IGFtb3VudCBvZiB0aGUgb3RoZXIgYXNzZXQuCgojIEFyZ3VtZW50cwoKKiBgYW1vdW50X2luYCAtIFRoZSBpbnB1dCBhbW91bnQgb2YgdGhlIGFzc2V0LgoqIGByZXNlcnZlX2luYCAtIFJlc2VydmVzIG9mIHRoZSBpbnB1dCBhc3NldCBpbiB0aGUgcGFpci4KKiBgcmVzZXJ2ZV9vdXRgIC0gUmVzZXJ2ZXMgb2YgdGhlIG91dHB1dCBhc3NldCBpbiB0aGUgcGFpci4KCiMgUmV0dXJucwoKUmV0dXJucyBgUmVzdWx0PGkxMjgsIFNvcm9zd2FwTGlicmFyeUVycm9yPmAgd2hlcmUgYE9rYCBjb250YWlucyB0aGUgY2FsY3VsYXRlZCBtYXhpbXVtIG91dHB1dCBhbW91bnQsIGFuZCBgRXJyYCBpbmRpY2F0ZXMgYW4gZXJyb3Igc3VjaCBhcyBpbnN1ZmZpY2llbnQgaW5wdXQgYW1vdW50IG9yIGxpcXVpZGl0eS4AAAAAAAAOZ2V0X2Ftb3VudF9vdXQAAAAAAAMAAAAAAAAACWFtb3VudF9pbgAAAAAAAAsAAAAAAAAACnJlc2VydmVfaW4AAAAAAAsAAAAAAAAAC3Jlc2VydmVfb3V0AAAAAAsAAAABAAAD6QAAAAsAAAfQAAAAFFNvcm9zd2FwTGlicmFyeUVycm9y",
+    "AAAAAAAAAdRHaXZlbiBhbiBvdXRwdXQgYW1vdW50IG9mIGFuIGFzc2V0IGFuZCBwYWlyIHJlc2VydmVzLCByZXR1cm5zIGEgcmVxdWlyZWQgaW5wdXQgYW1vdW50IG9mIHRoZSBvdGhlciBhc3NldC4KCiMgQXJndW1lbnRzCgoqIGBhbW91bnRfb3V0YCAtIFRoZSBvdXRwdXQgYW1vdW50IG9mIHRoZSBhc3NldC4KKiBgcmVzZXJ2ZV9pbmAgLSBSZXNlcnZlcyBvZiB0aGUgaW5wdXQgYXNzZXQgaW4gdGhlIHBhaXIuCiogYHJlc2VydmVfb3V0YCAtIFJlc2VydmVzIG9mIHRoZSBvdXRwdXQgYXNzZXQgaW4gdGhlIHBhaXIuCgojIFJldHVybnMKClJldHVybnMgYFJlc3VsdDxpMTI4LCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgdGhlIHJlcXVpcmVkIGlucHV0IGFtb3VudCwgYW5kIGBFcnJgIGluZGljYXRlcyBhbiBlcnJvciBzdWNoIGFzIGluc3VmZmljaWVudCBvdXRwdXQgYW1vdW50IG9yIGxpcXVpZGl0eS4AAAANZ2V0X2Ftb3VudF9pbgAAAAAAAAMAAAAAAAAACmFtb3VudF9vdXQAAAAAAAsAAAAAAAAACnJlc2VydmVfaW4AAAAAAAsAAAAAAAAAC3Jlc2VydmVfb3V0AAAAAAsAAAABAAAD6QAAAAsAAAfQAAAAFFNvcm9zd2FwTGlicmFyeUVycm9y",
+    "AAAAAAAAAZRQZXJmb3JtcyBjaGFpbmVkIGdldF9hbW91bnRfb3V0IGNhbGN1bGF0aW9ucyBvbiBhbnkgbnVtYmVyIG9mIHBhaXJzLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gVGhlIGVudmlyb25tZW50LgoqIGBmYWN0b3J5YCAtIFRoZSBmYWN0b3J5IGFkZHJlc3MuCiogYGFtb3VudF9pbmAgLSBUaGUgaW5wdXQgYW1vdW50LgoqIGBwYXRoYCAtIFZlY3RvciBvZiB0b2tlbiBhZGRyZXNzZXMgcmVwcmVzZW50aW5nIHRoZSBwYXRoLgoKIyBSZXR1cm5zCgpSZXR1cm5zIGBSZXN1bHQ8VmVjPGkxMjg+LCBTb3Jvc3dhcExpYnJhcnlFcnJvcj5gIHdoZXJlIGBPa2AgY29udGFpbnMgYSB2ZWN0b3Igb2YgY2FsY3VsYXRlZCBhbW91bnRzLCBhbmQgYEVycmAgaW5kaWNhdGVzIGFuIGVycm9yIHN1Y2ggYXMgYW4gaW52YWxpZCBwYXRoLgAAAA9nZXRfYW1vdW50c19vdXQAAAAAAwAAAAAAAAAHZmFjdG9yeQAAAAATAAAAAAAAAAlhbW91bnRfaW4AAAAAAAALAAAAAAAAAARwYXRoAAAD6gAAABMAAAABAAAD6QAAA+oAAAALAAAH0AAAABRTb3Jvc3dhcExpYnJhcnlFcnJvcg==",
+    "AAAAAAAAAZVQZXJmb3JtcyBjaGFpbmVkIGdldF9hbW91bnRfaW4gY2FsY3VsYXRpb25zIG9uIGFueSBudW1iZXIgb2YgcGFpcnMuCgojIEFyZ3VtZW50cwoKKiBgZWAgLSBUaGUgZW52aXJvbm1lbnQuCiogYGZhY3RvcnlgIC0gVGhlIGZhY3RvcnkgYWRkcmVzcy4KKiBgYW1vdW50X291dGAgLSBUaGUgb3V0cHV0IGFtb3VudC4KKiBgcGF0aGAgLSBWZWN0b3Igb2YgdG9rZW4gYWRkcmVzc2VzIHJlcHJlc2VudGluZyB0aGUgcGF0aC4KCiMgUmV0dXJucwoKUmV0dXJucyBgUmVzdWx0PFZlYzxpMTI4PiwgU29yb3N3YXBMaWJyYXJ5RXJyb3I+YCB3aGVyZSBgT2tgIGNvbnRhaW5zIGEgdmVjdG9yIG9mIGNhbGN1bGF0ZWQgYW1vdW50cywgYW5kIGBFcnJgIGluZGljYXRlcyBhbiBlcnJvciBzdWNoIGFzIGFuIGludmFsaWQgcGF0aC4AAAAAAAAOZ2V0X2Ftb3VudHNfaW4AAAAAAAMAAAAAAAAAB2ZhY3RvcnkAAAAAEwAAAAAAAAAKYW1vdW50X291dAAAAAAACwAAAAAAAAAEcGF0aAAAA+oAAAATAAAAAQAAA+kAAAPqAAAACwAAB9AAAAAUU29yb3N3YXBMaWJyYXJ5RXJyb3I="
+  ]
+}

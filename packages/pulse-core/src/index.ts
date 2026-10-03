@@ -124,6 +124,7 @@ import {
 /** The Stellar network to connect to. */
 export type Network = "mainnet" | "testnet";
 
+/** Health of one event source: whether it is running, when its last event arrived, and the current reconnect attempt. */
 export type SourceStatus = {
   running: boolean;
   lastEventAt: string | null;
@@ -131,6 +132,7 @@ export type SourceStatus = {
   cursor?: string;
 };
 
+/** Aggregate engine health across every source: run state, watcher counts, per-source status, and the resolved ingestion transport. */
 export type EngineStatus = {
   running: boolean;
   watcherCount: number;
@@ -175,7 +177,9 @@ export const NETWORK_PASSPHRASES = {
 export type PaymentEventType = "payment.received" | "payment.sent" | "payment.self";
 /** Event type for account options changes. */
 export type AccountOptionsEventType = "account.options_changed";
+/** Event types for liquidity pool deposits and withdrawals. */
 export type LiquidityPoolEventType = "lp.deposited" | "lp.withdrawn";
+/** Event types for trustline authorization changes. */
 export type TrustAuthEventType = "trustline.authorized" | "trustline.deauthorized";
 /**
  * Event type for a CAP-67 unified-stream `clawback` event. Has no
@@ -193,7 +197,9 @@ export type AssetClawbackEventType = "asset.clawback";
 export type FeeIncurredEventType = "fee.incurred";
 /** Event type for account creation. */
 export type AccountEventType = "account.created";
+/** Event type for claimable balance creation. */
 export type ClaimableCreatedEventType = "claimable.created";
+/** Event type for claimable balance claims. */
 export type ClaimableClaimedEventType = "claimable.claimed";
 /** Event types for trustline lifecycle events (added, removed, or limit updated). */
 export type TrustlineEventType = "trustline.added" | "trustline.removed" | "trustline.updated";
@@ -209,8 +215,11 @@ export type WatcherNotificationType =
   | "engine.cursor_expired"
   | "engine.backpressure";
 
+/** Event types for the DEX offer lifecycle: created, updated, or deleted. */
 export type OfferEventType = "offer.created" | "offer.updated" | "offer.deleted";
+/** Event type for account sequence-number bumps. */
 export type BumpSequenceEventType = "account.bump_sequence";
+/** Event types for account data entries: set or cleared. */
 export type DataEventType = "data.set" | "data.cleared";
 
 /**
@@ -317,6 +326,10 @@ export type AccountOptionsEvent = {
 /** Rational (numerator/denominator) form of an offer's price, as returned by Horizon. */
 export type PriceR = { n: number; d: number };
 
+/**
+ * A normalized DEX offer event: an offer created, updated, or deleted,
+ * with both asset legs, the amount, and the price in string and rational form.
+ */
 export type OfferEvent = {
   type: OfferEventType;
   offer_id: string;
@@ -333,6 +346,7 @@ export type OfferEvent = {
   raw?: RawHorizonManageSellOffer | RawHorizonManageBuyOffer;
 } & ClassicEventIdentity;
 
+/** A normalized sequence-bump event: the account and the new sequence number (`bump_to`). */
 export type BumpSequenceEvent = {
   type: BumpSequenceEventType;
   source: AccountAddress;
@@ -348,6 +362,10 @@ export type ClaimableBalanceClaimant = {
   predicate: ClaimPredicate;
 };
 
+/**
+ * A normalized claimable-balance creation event: the sponsor, the new
+ * `balanceId`, the claimants with their predicates, and the funded asset.
+ */
 export type ClaimableCreatedEvent = {
   type: ClaimableCreatedEventType;
   sponsor: AccountAddress;
@@ -361,6 +379,7 @@ export type ClaimableCreatedEvent = {
   raw?: RawHorizonCreateClaimableBalance;
 } & ClassicEventIdentity;
 
+/** A normalized claimable-balance claim event: the claimant sweeping `balanceId`. */
 export type ClaimableClaimedEvent = {
   type: ClaimableClaimedEventType;
   claimant: AccountAddress;
@@ -371,6 +390,10 @@ export type ClaimableClaimedEvent = {
   raw?: RawHorizonClaimClaimableBalance;
 } & ClassicEventIdentity;
 
+/**
+ * A normalized account-data event: the entry `name` set to `value` (raw
+ * base64 plus decoded bytes), or cleared when `value` is null.
+ */
 export type DataEvent = {
   type: DataEventType;
   source: AccountAddress;
@@ -390,6 +413,10 @@ export type LiquidityPoolReserve = {
   amount: StellarAmount;
 };
 
+/**
+ * A normalized liquidity-pool deposit event: the pool, the reserves put in,
+ * and the shares received in return.
+ */
 export type LiquidityPoolDepositEvent = {
   type: "lp.deposited";
   source: AccountAddress;
@@ -402,6 +429,10 @@ export type LiquidityPoolDepositEvent = {
   raw?: RawHorizonLiquidityPoolDeposit;
 } & ClassicEventIdentity;
 
+/**
+ * A normalized liquidity-pool withdrawal event: the pool, the reserves paid
+ * out, and the shares redeemed for them.
+ */
 export type LiquidityPoolWithdrawEvent = {
   type: "lp.withdrawn";
   source: AccountAddress;
@@ -414,6 +445,12 @@ export type LiquidityPoolWithdrawEvent = {
   raw?: RawHorizonLiquidityPoolWithdraw;
 } & ClassicEventIdentity;
 
+/**
+ * A normalized trustline authorization event: the `trustor` whose line the
+ * `issuer` authorized or deauthorized for `asset`. `operation` names the
+ * originating operation (`allow_trust`, `set_trust_line_flags`, or CAP-67
+ * `set_authorized`).
+ */
 export type TrustAuthEvent = {
   type: TrustAuthEventType;
   trustor: AccountAddress;
@@ -516,6 +553,10 @@ export type Sep31Status =
   | "error";
 
 /**
+ * Legacy catch-all anchor transaction event: one SEP-24/SEP-31 transaction
+ * changing status, with the normalized `status` plus the protocol-specific
+ * `protocol_status` and amounts when known.
+ *
  * @deprecated Use the `anchor.deposit.*` / `anchor.withdrawal.*` /
  * `anchor.payment.*` family ({@link AnchorFlowEvent}) instead. This single
  * catch-all event forces consumers to branch on `protocol` and a raw status
@@ -790,6 +831,7 @@ export interface AbiRegistryClientLike {
   getSpecAt?(contractId: string, ledger: number): Promise<unknown>;
 }
 
+/** Soroban RPC polling configuration: endpoint, cadence, paging, and the opt-in unified-events transport. */
 export type SorobanConfig = {
   /** Soroban RPC endpoint used for live contract-event polling. */
   rpcUrl: string;
@@ -830,6 +872,11 @@ export type NetworkSourceConfig = {
   soroban?: SorobanConfig;
 };
 
+/**
+ * Top-level `EventEngine` configuration: the Stellar network (or per-network
+ * sources), Horizon and Soroban endpoints, reconnect/cursor/queue tuning, and
+ * opt-in enrichment (ABI registry, taxonomy) and ingestion transports.
+ */
 export type CoreConfig = {
   /**
    * The Stellar network to connect to. Pass an array of `NetworkSourceConfig`
@@ -952,7 +999,16 @@ export function resolveFamilyTransport(
   return UNIFIED_EQUIVALENT_FAMILIES.has(family) ? "unified" : "horizon";
 }
 
-// Error class for invalid network validation
+/**
+ * Thrown when an {@link EventEngine} is configured with a network name it does
+ * not recognise.
+ *
+ * Only `"mainnet"` and `"testnet"` are supported. The message names the
+ * rejected value and lists the valid ones, so a config typo is diagnosable
+ * from the error alone.
+ *
+ * @param network - The rejected network identifier, as passed to the engine.
+ */
 export class UnknownNetworkError extends Error {
   constructor(network: string) {
     const validNetworks = ["mainnet", "testnet"].join(", ");
@@ -961,11 +1017,13 @@ export class UnknownNetworkError extends Error {
   }
 }
 
+/** Engine health verdict: `ok`, plus human-readable `reasons` when it is not. */
 export type HealthCheckResult = {
   ok: boolean;
   reasons: string[];
 };
 
+/** Per-watcher subscription options: an event filter predicate and a label for observability. */
 export type SubscribeOptions = {
   /** Optional predicate applied before each event is emitted to this watcher.
    *  Return `false` to suppress delivery. If the predicate throws, the event
@@ -1114,12 +1172,14 @@ export * as events from "./events.js";
 // Phase 1 - new RPC-shaped contract subscription API
 // ---------------------------------------------------------------------------
 
+/** RPC-shaped filter for contract subscriptions: event kind, contract ids, and topic filters. */
 export type ContractFilter = {
   type?: "system" | "contract" | "diagnostic";
   contractIds?: string[];
   topics?: string[][];
 };
 
+/** Contract subscription configuration: one or more {@link ContractFilter}s selecting the events to receive. */
 export type ContractSubscriptionConfig = {
   filters: ContractFilter[];
 };

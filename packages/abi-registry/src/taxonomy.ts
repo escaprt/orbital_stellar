@@ -252,6 +252,7 @@ const PRIMITIVE_TYPES: ReadonlySet<string> = new Set<PrimitiveType>([
   "address",
   "void",
   "error",
+  "val",
 ]);
 
 const NETWORKS: ReadonlySet<string> = new Set<TaxonomyNetwork>(["mainnet", "testnet", "futurenet"]);

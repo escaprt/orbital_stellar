@@ -1,0 +1,149 @@
+{
+  "contractId": "CDL74RF5BLYR2YBLCCI7F5FB6TPSCLKEJUBSD2RSVWZ4YHF3VMFAIGWA",
+  "description": "KALE farming contract (kalepail): proof-of-teamwork farm where farmers plant (stake), work (submit a proof-of-work hash) and harvest (claim the block reward) KALE, the Stellar asset only mintable through this contract.",
+  "events": [],
+  "functions": [
+    {
+      "name": "plant",
+      "params": [
+        { "name": "farmer", "type": "address" },
+        { "name": "amount", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "work",
+      "params": [
+        { "name": "farmer", "type": "address" },
+        { "name": "hash", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "nonce", "type": "u64" }
+      ],
+      "returns": "u32"
+    },
+    {
+      "name": "harvest",
+      "params": [
+        { "name": "farmer", "type": "address" },
+        { "name": "index", "type": "u32" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "__constructor",
+      "params": [
+        { "name": "farmer", "type": "address" },
+        { "name": "asset", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "upgrade",
+      "params": [{ "name": "hash", "type": { "size": 32, "type": "bytes_n" } }],
+      "returns": "void"
+    },
+    { "name": "pause", "params": [], "returns": "void" },
+    { "name": "unpause", "params": [], "returns": "void" },
+    { "name": "remove_block", "params": [{ "name": "index", "type": "u32" }], "returns": "void" },
+    {
+      "name": "__check_auth",
+      "params": [
+        { "name": "_signature_payload", "type": { "size": 32, "type": "bytes_n" } },
+        {
+          "name": "_signatures",
+          "type": { "inner": { "item": "val", "type": "vec" }, "type": "option" }
+        },
+        {
+          "name": "_auth_contexts",
+          "type": { "item": { "name": "Context", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": { "err": { "name": "Errors", "type": "named" }, "ok": "void", "type": "result" }
+    }
+  ],
+  "name": "KALE Farm contract",
+  "network": "mainnet",
+  "types": {
+    "Block": {
+      "fields": [
+        { "name": "entropy", "type": { "size": 32, "type": "bytes_n" } },
+        { "name": "max_gap", "type": "u32" },
+        { "name": "max_stake", "type": "i128" },
+        { "name": "max_zeros", "type": "u32" },
+        { "name": "min_gap", "type": "u32" },
+        { "name": "min_stake", "type": "i128" },
+        { "name": "min_zeros", "type": "u32" },
+        { "name": "normalized_total", "type": "i128" },
+        { "name": "staked_total", "type": "i128" },
+        { "name": "timestamp", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "Block"
+    },
+    "Errors": {
+      "kind": "enum",
+      "name": "Errors",
+      "variants": [
+        { "discriminant": 1, "name": "HomesteadExists" },
+        { "discriminant": 2, "name": "HomesteadMissing" },
+        { "discriminant": 3, "name": "FarmBlockMissing" },
+        { "discriminant": 4, "name": "FarmPaused" },
+        { "discriminant": 5, "name": "FarmNotPaused" },
+        { "discriminant": 6, "name": "PlantAmountTooLow" },
+        { "discriminant": 7, "name": "ZeroCountTooLow" },
+        { "discriminant": 8, "name": "PailExists" },
+        { "discriminant": 9, "name": "PailMissing" },
+        { "discriminant": 10, "name": "WorkMissing" },
+        { "discriminant": 11, "name": "BlockMissing" },
+        { "discriminant": 12, "name": "BlockInvalid" },
+        { "discriminant": 13, "name": "HashInvalid" },
+        { "discriminant": 14, "name": "HarvestNotReady" },
+        { "discriminant": 15, "name": "GapCountTooLow" }
+      ]
+    },
+    "Pail": {
+      "fields": [
+        { "name": "gap", "type": { "inner": "u32", "type": "option" } },
+        { "name": "sequence", "type": "u32" },
+        { "name": "stake", "type": "i128" },
+        { "name": "zeros", "type": { "inner": "u32", "type": "option" } }
+      ],
+      "kind": "struct",
+      "name": "Pail"
+    },
+    "Storage": {
+      "cases": [
+        { "fields": [], "name": "Homesteader" },
+        { "fields": [], "name": "HomesteadAsset" },
+        { "fields": [], "name": "FarmIndex" },
+        { "fields": [], "name": "FarmBlock" },
+        { "fields": [], "name": "FarmPaused" },
+        { "fields": [{ "name": "_0", "type": "u32" }], "name": "Block" },
+        {
+          "fields": [
+            { "name": "_0", "type": "address" },
+            { "name": "_1", "type": "u32" }
+          ],
+          "name": "Pail"
+        }
+      ],
+      "kind": "union",
+      "name": "Storage"
+    }
+  },
+  "version": "1.0.0",
+  "xdrEntries": [
+    "AAAAAAAAAAAAAAAFcGxhbnQAAAAAAAACAAAAAAAAAAZmYXJtZXIAAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAA=",
+    "AAAAAAAAAAAAAAAEd29yawAAAAMAAAAAAAAABmZhcm1lcgAAAAAAEwAAAAAAAAAEaGFzaAAAA+4AAAAgAAAAAAAAAAVub25jZQAAAAAAAAYAAAABAAAABA==",
+    "AAAAAAAAAAAAAAAHaGFydmVzdAAAAAACAAAAAAAAAAZmYXJtZXIAAAAAABMAAAAAAAAABWluZGV4AAAAAAAABAAAAAEAAAAL",
+    "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAIAAAAAAAAABmZhcm1lcgAAAAAAEwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAAHdXBncmFkZQAAAAABAAAAAAAAAARoYXNoAAAD7gAAACAAAAAA",
+    "AAAAAAAAAAAAAAAFcGF1c2UAAAAAAAAAAAAAAA==",
+    "AAAAAAAAAAAAAAAHdW5wYXVzZQAAAAAAAAAAAA==",
+    "AAAAAAAAAAAAAAAMcmVtb3ZlX2Jsb2NrAAAAAQAAAAAAAAAFaW5kZXgAAAAAAAAEAAAAAA==",
+    "AAAAAAAAAAAAAAAMX19jaGVja19hdXRoAAAAAwAAAAAAAAASX3NpZ25hdHVyZV9wYXlsb2FkAAAAAAPuAAAAIAAAAAAAAAALX3NpZ25hdHVyZXMAAAAD6AAAA+oAAAAAAAAAAAAAAA5fYXV0aF9jb250ZXh0cwAAAAAD6gAAB9AAAAAHQ29udGV4dAAAAAABAAAD6QAAA+0AAAAAAAAH0AAAAAZFcnJvcnMAAA==",
+    "AAAABAAAAAAAAAAAAAAABkVycm9ycwAAAAAADwAAAAAAAAAPSG9tZXN0ZWFkRXhpc3RzAAAAAAEAAAAAAAAAEEhvbWVzdGVhZE1pc3NpbmcAAAACAAAAAAAAABBGYXJtQmxvY2tNaXNzaW5nAAAAAwAAAAAAAAAKRmFybVBhdXNlZAAAAAAABAAAAAAAAAANRmFybU5vdFBhdXNlZAAAAAAAAAUAAAAAAAAAEVBsYW50QW1vdW50VG9vTG93AAAAAAAABgAAAAAAAAAPWmVyb0NvdW50VG9vTG93AAAAAAcAAAAAAAAAClBhaWxFeGlzdHMAAAAAAAgAAAAAAAAAC1BhaWxNaXNzaW5nAAAAAAkAAAAAAAAAC1dvcmtNaXNzaW5nAAAAAAoAAAAAAAAADEJsb2NrTWlzc2luZwAAAAsAAAAAAAAADEJsb2NrSW52YWxpZAAAAAwAAAAAAAAAC0hhc2hJbnZhbGlkAAAAAA0AAAAAAAAAD0hhcnZlc3ROb3RSZWFkeQAAAAAOAAAAAAAAAA5HYXBDb3VudFRvb0xvdwAAAAAADw==",
+    "AAAAAQAAAAAAAAAAAAAABUJsb2NrAAAAAAAACgAAAAAAAAAHZW50cm9weQAAAAPuAAAAIAAAAAAAAAAHbWF4X2dhcAAAAAAEAAAAAAAAAAltYXhfc3Rha2UAAAAAAAALAAAAAAAAAAltYXhfemVyb3MAAAAAAAAEAAAAAAAAAAdtaW5fZ2FwAAAAAAQAAAAAAAAACW1pbl9zdGFrZQAAAAAAAAsAAAAAAAAACW1pbl96ZXJvcwAAAAAAAAQAAAAAAAAAEG5vcm1hbGl6ZWRfdG90YWwAAAALAAAAAAAAAAxzdGFrZWRfdG90YWwAAAALAAAAAAAAAAl0aW1lc3RhbXAAAAAAAAAG",
+    "AAAAAQAAAAAAAAAAAAAABFBhaWwAAAAEAAAAAAAAAANnYXAAAAAD6AAAAAQAAAAAAAAACHNlcXVlbmNlAAAABAAAAAAAAAAFc3Rha2UAAAAAAAALAAAAAAAAAAV6ZXJvcwAAAAAAA+gAAAAE",
+    "AAAAAgAAAAAAAAAAAAAAB1N0b3JhZ2UAAAAABwAAAAAAAAAAAAAAC0hvbWVzdGVhZGVyAAAAAAAAAAAAAAAADkhvbWVzdGVhZEFzc2V0AAAAAAAAAAAAAAAAAAlGYXJtSW5kZXgAAAAAAAAAAAAAAAAAAAlGYXJtQmxvY2sAAAAAAAAAAAAAAAAAAApGYXJtUGF1c2VkAAAAAAABAAAAAAAAAAVCbG9jawAAAAAAAAEAAAAEAAAAAQAAAAAAAAAEUGFpbAAAAAIAAAATAAAABA=="
+  ]
+}

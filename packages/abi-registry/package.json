@@ -37,7 +37,8 @@
     "test:integration": "INTEGRATION_TESTS=true vitest run test/integration",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "validate": "node validate.js",
-    "seed:well-known": "tsx scripts/seed-well-known.ts"
+    "seed:well-known": "tsx scripts/seed-well-known.ts",
+    "seed:community": "tsx scripts/seed-community.ts"
   },
   "dependencies": {
     "@stellar/js-xdr": "4.0.0",

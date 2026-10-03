@@ -2,21 +2,41 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { ContractEmittedEvent } from "@orbital-stellar/pulse-core";
 import { acquireEventConnection } from "./connectionPool.js";
 
+/**
+ * Options for {@link useContractState}.
+ */
 export type ContractStateOptions = {
+  /** How often to re-fetch the ledger entry. Defaults to 10000 ms. */
   pollIntervalMs?: number;
+  /** When set, also refetch as soon as a matching `contract.emitted` event arrives */
   autoRefreshOn?: {
+    /** Base URL of the pulse-notify server */
     serverUrl: string;
+    /** Contract address to subscribe to (used as the connection's address) */
     contractId: string;
+    /** Only refetch for `contract.emitted` events this predicate accepts */
     filter?: (event: ContractEmittedEvent) => boolean;
+    /** API key forwarded as ?token= query param */
     token?: string;
   };
+  /** Extra headers sent with the Soroban RPC POST (e.g. bearer auth) */
   headers?: Record<string, string>;
 };
 
+/**
+ * State returned by {@link useContractState}.
+ *
+ * @typeParam T - Expected shape of the ledger entry. The RPC response is
+ *   passed through unvalidated, so narrow it yourself before relying on it.
+ */
 export type ContractStateResult<T = unknown> = {
+  /** Latest ledger entry, or null before the first successful fetch */
   data: T | null;
+  /** True while a fetch is in flight */
   loading: boolean;
+  /** Human-readable error message, or null when the last fetch succeeded */
   error: string | null;
+  /** Triggers an immediate re-fetch, cancelling any in-flight request */
   refetch: () => void;
 };
 
@@ -52,6 +72,24 @@ async function getLedgerEntry(
   return json.result;
 }
 
+/**
+ * Reads a single contract ledger entry from a Soroban RPC endpoint and keeps
+ * it fresh, so a component can render live contract state without wiring up an
+ * event subscription itself.
+ *
+ * @param rpcUrl    - Base URL of the Soroban RPC endpoint.
+ * @param contractId - Soroban contract address (C…) that owns the entry.
+ * @param key       - Ledger key to fetch, sent verbatim as the RPC `key` param.
+ * @param options   - Poll interval, event-driven auto-refresh and extra RPC headers.
+ * @returns The latest entry with loading/error flags and a `refetch()` trigger.
+ *
+ * @example
+ * const { data, loading, error } = useContractState<Balance>(
+ *   "https://soroban-testnet.stellar.org",
+ *   contractId,
+ *   ledgerKey,
+ * );
+ */
 export function useContractState<T = unknown>(
   rpcUrl: string,
   contractId: string,

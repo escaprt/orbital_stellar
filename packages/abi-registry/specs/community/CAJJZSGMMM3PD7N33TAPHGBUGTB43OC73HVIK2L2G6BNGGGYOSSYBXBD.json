@@ -1,0 +1,467 @@
+{
+  "contractId": "CAJJZSGMMM3PD7N33TAPHGBUGTB43OC73HVIK2L2G6BNGGGYOSSYBXBD",
+  "description": "Blend v2 lending pool (Fixed pool): supply, borrow, repay and liquidation entry points; emits supply/borrow/liquidation events.",
+  "events": [],
+  "functions": [
+    {
+      "doc": "Initialize the pool\n\n### Arguments\nCreator supplied:\n* `admin` - The Address for the admin\n* `name` - The name of the pool\n* `oracle` - The contract address of the oracle\n* `backstop_take_rate` - The take rate for the backstop (7 decimals)\n* `max_positions` - The maximum number of positions a user is permitted to have\n* `min_collateral` - The minimum collateral required to open a borrow position in the oracles base asset\n\nPool Factory supplied:\n* `backstop_id` - The contract address of the pool's backstop module\n* `blnd_id` - The contract ID of the BLND token",
+      "name": "__constructor",
+      "params": [
+        { "name": "admin", "type": "address" },
+        { "name": "name", "type": "string" },
+        { "name": "oracle", "type": "address" },
+        { "name": "bstop_rate", "type": "u32" },
+        { "name": "max_positions", "type": "u32" },
+        { "name": "min_collateral", "type": "i128" },
+        { "name": "backstop_id", "type": "address" },
+        { "name": "blnd_id", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "propose_admin",
+      "params": [{ "name": "new_admin", "type": "address" }],
+      "returns": "void"
+    },
+    { "name": "accept_admin", "params": [], "returns": "void" },
+    {
+      "name": "update_pool",
+      "params": [
+        { "name": "backstop_take_rate", "type": "u32" },
+        { "name": "max_positions", "type": "u32" },
+        { "name": "min_collateral", "type": "i128" }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "queue_set_reserve",
+      "params": [
+        { "name": "asset", "type": "address" },
+        { "name": "metadata", "type": { "name": "ReserveConfig", "type": "named" } }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "cancel_set_reserve",
+      "params": [{ "name": "asset", "type": "address" }],
+      "returns": "void"
+    },
+    { "name": "set_reserve", "params": [{ "name": "asset", "type": "address" }], "returns": "u32" },
+    { "name": "get_config", "params": [], "returns": { "name": "PoolConfig", "type": "named" } },
+    { "name": "get_admin", "params": [], "returns": "address" },
+    { "name": "get_reserve_list", "params": [], "returns": { "item": "address", "type": "vec" } },
+    {
+      "name": "get_reserve",
+      "params": [{ "name": "asset", "type": "address" }],
+      "returns": { "name": "Reserve", "type": "named" }
+    },
+    {
+      "name": "get_positions",
+      "params": [{ "name": "address", "type": "address" }],
+      "returns": { "name": "Positions", "type": "named" }
+    },
+    {
+      "name": "submit",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" },
+        { "name": "to", "type": "address" },
+        {
+          "name": "requests",
+          "type": { "item": { "name": "Request", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": { "name": "Positions", "type": "named" }
+    },
+    {
+      "name": "submit_with_allowance",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "spender", "type": "address" },
+        { "name": "to", "type": "address" },
+        {
+          "name": "requests",
+          "type": { "item": { "name": "Request", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": { "name": "Positions", "type": "named" }
+    },
+    {
+      "name": "flash_loan",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "flash_loan", "type": { "name": "FlashLoan", "type": "named" } },
+        {
+          "name": "requests",
+          "type": { "item": { "name": "Request", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": { "name": "Positions", "type": "named" }
+    },
+    { "name": "update_status", "params": [], "returns": "u32" },
+    {
+      "name": "set_status",
+      "params": [{ "name": "pool_status", "type": "u32" }],
+      "returns": "void"
+    },
+    { "name": "gulp", "params": [{ "name": "asset", "type": "address" }], "returns": "i128" },
+    { "name": "gulp_emissions", "params": [], "returns": "i128" },
+    {
+      "name": "set_emissions_config",
+      "params": [
+        {
+          "name": "res_emission_metadata",
+          "type": { "item": { "name": "ReserveEmissionMetadata", "type": "named" }, "type": "vec" }
+        }
+      ],
+      "returns": "void"
+    },
+    {
+      "name": "claim",
+      "params": [
+        { "name": "from", "type": "address" },
+        { "name": "reserve_token_ids", "type": { "item": "u32", "type": "vec" } },
+        { "name": "to", "type": "address" }
+      ],
+      "returns": "i128"
+    },
+    {
+      "name": "get_reserve_emissions",
+      "params": [{ "name": "reserve_token_index", "type": "u32" }],
+      "returns": { "inner": { "name": "ReserveEmissionData", "type": "named" }, "type": "option" }
+    },
+    {
+      "name": "get_user_emissions",
+      "params": [
+        { "name": "user", "type": "address" },
+        { "name": "reserve_token_index", "type": "u32" }
+      ],
+      "returns": { "inner": { "name": "UserEmissionData", "type": "named" }, "type": "option" }
+    },
+    {
+      "name": "new_auction",
+      "params": [
+        { "name": "auction_type", "type": "u32" },
+        { "name": "user", "type": "address" },
+        { "name": "bid", "type": { "item": "address", "type": "vec" } },
+        { "name": "lot", "type": { "item": "address", "type": "vec" } },
+        { "name": "percent", "type": "u32" }
+      ],
+      "returns": { "name": "AuctionData", "type": "named" }
+    },
+    {
+      "name": "get_auction",
+      "params": [
+        { "name": "auction_type", "type": "u32" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": { "name": "AuctionData", "type": "named" }
+    },
+    {
+      "name": "del_auction",
+      "params": [
+        { "name": "auction_type", "type": "u32" },
+        { "name": "user", "type": "address" }
+      ],
+      "returns": "void"
+    },
+    { "name": "bad_debt", "params": [{ "name": "user", "type": "address" }], "returns": "void" }
+  ],
+  "name": "Blend Pool (v2)",
+  "network": "mainnet",
+  "types": {
+    "Asset": {
+      "cases": [
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "Stellar" },
+        { "fields": [{ "name": "_0", "type": "symbol" }], "name": "Other" }
+      ],
+      "doc": "Asset type",
+      "kind": "union",
+      "name": "Asset"
+    },
+    "AuctionData": {
+      "fields": [
+        {
+          "doc": "A map of the assets being bid on and the amount being bid. These are tokens spent\nby the filler of the auction.\n\nThe bid is different based on each auction type:\n- UserLiquidation: dTokens\n- BadDebtAuction: dTokens\n- InterestAuction: Underlying assets (backstop token)",
+          "name": "bid",
+          "type": { "key": "address", "type": "map", "value": "i128" }
+        },
+        {
+          "doc": "The block the auction begins on. This is used to determine how the auction\nshould be scaled based on the number of blocks that have passed since the auction began.",
+          "name": "block",
+          "type": "u32"
+        },
+        {
+          "doc": "A map of the assets being auctioned off and the amount being auctioned. These are tokens\nreceived by the filler of the auction.\n\nThe lot is different based on each auction type:\n- UserLiquidation: bTokens\n- BadDebtAuction: Underlying assets (backstop token)\n- InterestAuction: Underlying assets",
+          "name": "lot",
+          "type": { "key": "address", "type": "map", "value": "i128" }
+        }
+      ],
+      "kind": "struct",
+      "name": "AuctionData"
+    },
+    "AuctionKey": {
+      "fields": [
+        { "name": "auct_type", "type": "u32" },
+        { "name": "user", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "AuctionKey"
+    },
+    "FlashLoan": {
+      "fields": [
+        { "name": "amount", "type": "i128" },
+        { "name": "asset", "type": "address" },
+        { "name": "contract", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "FlashLoan"
+    },
+    "PoolConfig": {
+      "doc": "The pool's config",
+      "fields": [
+        { "name": "bstop_rate", "type": "u32" },
+        { "name": "max_positions", "type": "u32" },
+        { "name": "min_collateral", "type": "i128" },
+        { "name": "oracle", "type": "address" },
+        { "name": "status", "type": "u32" }
+      ],
+      "kind": "struct",
+      "name": "PoolConfig"
+    },
+    "PoolDataKey": {
+      "cases": [
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "ResConfig" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "ResInit" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "ResData" },
+        { "fields": [{ "name": "_0", "type": "u32" }], "name": "EmisData" },
+        { "fields": [{ "name": "_0", "type": "address" }], "name": "Positions" },
+        {
+          "fields": [{ "name": "_0", "type": { "name": "UserReserveKey", "type": "named" } }],
+          "name": "UserEmis"
+        },
+        {
+          "fields": [{ "name": "_0", "type": { "name": "AuctionKey", "type": "named" } }],
+          "name": "Auction"
+        }
+      ],
+      "kind": "union",
+      "name": "PoolDataKey"
+    },
+    "PoolEmissionConfig": {
+      "doc": "The pool's emission config",
+      "fields": [
+        { "name": "config", "type": "u128" },
+        { "name": "last_time", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "PoolEmissionConfig"
+    },
+    "PoolError": {
+      "doc": "Error codes for the pool contract. Common errors are codes that match up with the built-in\ncontracts error reporting. Pool specific errors start at 1200.",
+      "kind": "enum",
+      "name": "PoolError",
+      "variants": [
+        { "discriminant": 1, "name": "InternalError" },
+        { "discriminant": 3, "name": "AlreadyInitializedError" },
+        { "discriminant": 4, "name": "UnauthorizedError" },
+        { "discriminant": 8, "name": "NegativeAmountError" },
+        { "discriminant": 10, "name": "BalanceError" },
+        { "discriminant": 12, "name": "OverflowError" },
+        { "discriminant": 1200, "name": "BadRequest" },
+        { "discriminant": 1201, "name": "InvalidPoolConfigArgs" },
+        { "discriminant": 1202, "name": "InvalidReserveMetadata" },
+        { "discriminant": 1203, "name": "InitNotUnlocked" },
+        { "discriminant": 1204, "name": "StatusNotAllowed" },
+        { "discriminant": 1205, "name": "InvalidHf" },
+        { "discriminant": 1206, "name": "InvalidPoolStatus" },
+        { "discriminant": 1207, "name": "InvalidUtilRate" },
+        { "discriminant": 1208, "name": "MaxPositionsExceeded" },
+        { "discriminant": 1209, "name": "InternalReserveNotFound" },
+        { "discriminant": 1210, "name": "InvalidPrice" },
+        { "discriminant": 1211, "name": "InvalidLiquidation" },
+        { "discriminant": 1212, "name": "AuctionInProgress" },
+        { "discriminant": 1213, "name": "InvalidLiqTooLarge" },
+        { "discriminant": 1214, "name": "InvalidLiqTooSmall" },
+        { "discriminant": 1215, "name": "InterestTooSmall" },
+        { "discriminant": 1216, "name": "InvalidBTokenMintAmount" },
+        { "discriminant": 1217, "name": "InvalidBTokenBurnAmount" },
+        { "discriminant": 1218, "name": "InvalidDTokenMintAmount" },
+        { "discriminant": 1219, "name": "InvalidDTokenBurnAmount" },
+        { "discriminant": 1220, "name": "ExceededSupplyCap" },
+        { "discriminant": 1221, "name": "InvalidBid" },
+        { "discriminant": 1222, "name": "InvalidLot" },
+        { "discriminant": 1223, "name": "ReserveDisabled" },
+        { "discriminant": 1224, "name": "MinCollateralNotMet" }
+      ]
+    },
+    "Positions": {
+      "doc": "A user / contracts position's with the pool, stored in the Reserve's decimals",
+      "fields": [
+        { "name": "collateral", "type": { "key": "u32", "type": "map", "value": "i128" } },
+        { "name": "liabilities", "type": { "key": "u32", "type": "map", "value": "i128" } },
+        { "name": "supply", "type": { "key": "u32", "type": "map", "value": "i128" } }
+      ],
+      "kind": "struct",
+      "name": "Positions"
+    },
+    "PriceData": {
+      "doc": "Price data for an asset at a specific timestamp",
+      "fields": [
+        { "name": "price", "type": "i128" },
+        { "name": "timestamp", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "PriceData"
+    },
+    "QueuedReserveInit": {
+      "fields": [
+        { "name": "new_config", "type": { "name": "ReserveConfig", "type": "named" } },
+        { "name": "unlock_time", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "QueuedReserveInit"
+    },
+    "Request": {
+      "doc": "A request a user makes against the pool",
+      "fields": [
+        { "name": "address", "type": "address" },
+        { "name": "amount", "type": "i128" },
+        { "name": "request_type", "type": "u32" }
+      ],
+      "kind": "struct",
+      "name": "Request"
+    },
+    "Reserve": {
+      "fields": [
+        { "name": "asset", "type": "address" },
+        { "name": "config", "type": { "name": "ReserveConfig", "type": "named" } },
+        { "name": "data", "type": { "name": "ReserveData", "type": "named" } },
+        { "name": "scalar", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "Reserve"
+    },
+    "ReserveConfig": {
+      "doc": "The configuration information about a reserve asset",
+      "fields": [
+        { "name": "c_factor", "type": "u32" },
+        { "name": "decimals", "type": "u32" },
+        { "name": "enabled", "type": "bool" },
+        { "name": "index", "type": "u32" },
+        { "name": "l_factor", "type": "u32" },
+        { "name": "max_util", "type": "u32" },
+        { "name": "r_base", "type": "u32" },
+        { "name": "r_one", "type": "u32" },
+        { "name": "r_three", "type": "u32" },
+        { "name": "r_two", "type": "u32" },
+        { "name": "reactivity", "type": "u32" },
+        { "name": "supply_cap", "type": "i128" },
+        { "name": "util", "type": "u32" }
+      ],
+      "kind": "struct",
+      "name": "ReserveConfig"
+    },
+    "ReserveData": {
+      "doc": "The data for a reserve asset",
+      "fields": [
+        { "name": "b_rate", "type": "i128" },
+        { "name": "b_supply", "type": "i128" },
+        { "name": "backstop_credit", "type": "i128" },
+        { "name": "d_rate", "type": "i128" },
+        { "name": "d_supply", "type": "i128" },
+        { "name": "ir_mod", "type": "i128" },
+        { "name": "last_time", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "ReserveData"
+    },
+    "ReserveEmissionData": {
+      "doc": "The emission data for the reserve b or d token",
+      "fields": [
+        { "name": "eps", "type": "u64" },
+        { "name": "expiration", "type": "u64" },
+        { "name": "index", "type": "i128" },
+        { "name": "last_time", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "ReserveEmissionData"
+    },
+    "ReserveEmissionMetadata": {
+      "doc": "Metadata for a pool's reserve emission configuration",
+      "fields": [
+        { "name": "res_index", "type": "u32" },
+        { "name": "res_type", "type": "u32" },
+        { "name": "share", "type": "u64" }
+      ],
+      "kind": "struct",
+      "name": "ReserveEmissionMetadata"
+    },
+    "UserEmissionData": {
+      "doc": "The user emission data for the reserve b or d token",
+      "fields": [
+        { "name": "accrued", "type": "i128" },
+        { "name": "index", "type": "i128" }
+      ],
+      "kind": "struct",
+      "name": "UserEmissionData"
+    },
+    "UserReserveKey": {
+      "fields": [
+        { "name": "reserve_id", "type": "u32" },
+        { "name": "user", "type": "address" }
+      ],
+      "kind": "struct",
+      "name": "UserReserveKey"
+    }
+  },
+  "version": "0.0.0",
+  "xdrEntries": [
+    "AAAAAQAAAAAAAAAAAAAAC0F1Y3Rpb25EYXRhAAAAAAMAAAEMQSBtYXAgb2YgdGhlIGFzc2V0cyBiZWluZyBiaWQgb24gYW5kIHRoZSBhbW91bnQgYmVpbmcgYmlkLiBUaGVzZSBhcmUgdG9rZW5zIHNwZW50CmJ5IHRoZSBmaWxsZXIgb2YgdGhlIGF1Y3Rpb24uCgpUaGUgYmlkIGlzIGRpZmZlcmVudCBiYXNlZCBvbiBlYWNoIGF1Y3Rpb24gdHlwZToKLSBVc2VyTGlxdWlkYXRpb246IGRUb2tlbnMKLSBCYWREZWJ0QXVjdGlvbjogZFRva2VucwotIEludGVyZXN0QXVjdGlvbjogVW5kZXJseWluZyBhc3NldHMgKGJhY2tzdG9wIHRva2VuKQAAAANiaWQAAAAD7AAAABMAAAALAAAAo1RoZSBibG9jayB0aGUgYXVjdGlvbiBiZWdpbnMgb24uIFRoaXMgaXMgdXNlZCB0byBkZXRlcm1pbmUgaG93IHRoZSBhdWN0aW9uCnNob3VsZCBiZSBzY2FsZWQgYmFzZWQgb24gdGhlIG51bWJlciBvZiBibG9ja3MgdGhhdCBoYXZlIHBhc3NlZCBzaW5jZSB0aGUgYXVjdGlvbiBiZWdhbi4AAAAABWJsb2NrAAAAAAAABAAAASZBIG1hcCBvZiB0aGUgYXNzZXRzIGJlaW5nIGF1Y3Rpb25lZCBvZmYgYW5kIHRoZSBhbW91bnQgYmVpbmcgYXVjdGlvbmVkLiBUaGVzZSBhcmUgdG9rZW5zCnJlY2VpdmVkIGJ5IHRoZSBmaWxsZXIgb2YgdGhlIGF1Y3Rpb24uCgpUaGUgbG90IGlzIGRpZmZlcmVudCBiYXNlZCBvbiBlYWNoIGF1Y3Rpb24gdHlwZToKLSBVc2VyTGlxdWlkYXRpb246IGJUb2tlbnMKLSBCYWREZWJ0QXVjdGlvbjogVW5kZXJseWluZyBhc3NldHMgKGJhY2tzdG9wIHRva2VuKQotIEludGVyZXN0QXVjdGlvbjogVW5kZXJseWluZyBhc3NldHMAAAAAAANsb3QAAAAD7AAAABMAAAAL",
+    "AAAAAAAAAjVJbml0aWFsaXplIHRoZSBwb29sCgojIyMgQXJndW1lbnRzCkNyZWF0b3Igc3VwcGxpZWQ6CiogYGFkbWluYCAtIFRoZSBBZGRyZXNzIGZvciB0aGUgYWRtaW4KKiBgbmFtZWAgLSBUaGUgbmFtZSBvZiB0aGUgcG9vbAoqIGBvcmFjbGVgIC0gVGhlIGNvbnRyYWN0IGFkZHJlc3Mgb2YgdGhlIG9yYWNsZQoqIGBiYWNrc3RvcF90YWtlX3JhdGVgIC0gVGhlIHRha2UgcmF0ZSBmb3IgdGhlIGJhY2tzdG9wICg3IGRlY2ltYWxzKQoqIGBtYXhfcG9zaXRpb25zYCAtIFRoZSBtYXhpbXVtIG51bWJlciBvZiBwb3NpdGlvbnMgYSB1c2VyIGlzIHBlcm1pdHRlZCB0byBoYXZlCiogYG1pbl9jb2xsYXRlcmFsYCAtIFRoZSBtaW5pbXVtIGNvbGxhdGVyYWwgcmVxdWlyZWQgdG8gb3BlbiBhIGJvcnJvdyBwb3NpdGlvbiBpbiB0aGUgb3JhY2xlcyBiYXNlIGFzc2V0CgpQb29sIEZhY3Rvcnkgc3VwcGxpZWQ6CiogYGJhY2tzdG9wX2lkYCAtIFRoZSBjb250cmFjdCBhZGRyZXNzIG9mIHRoZSBwb29sJ3MgYmFja3N0b3AgbW9kdWxlCiogYGJsbmRfaWRgIC0gVGhlIGNvbnRyYWN0IElEIG9mIHRoZSBCTE5EIHRva2VuAAAAAAAADV9fY29uc3RydWN0b3IAAAAAAAAIAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAABG5hbWUAAAAQAAAAAAAAAAZvcmFjbGUAAAAAABMAAAAAAAAACmJzdG9wX3JhdGUAAAAAAAQAAAAAAAAADW1heF9wb3NpdGlvbnMAAAAAAAAEAAAAAAAAAA5taW5fY29sbGF0ZXJhbAAAAAAACwAAAAAAAAALYmFja3N0b3BfaWQAAAAAEwAAAAAAAAAHYmxuZF9pZAAAAAATAAAAAA==",
+    "AAAAAAAAAAAAAAANcHJvcG9zZV9hZG1pbgAAAAAAAAEAAAAAAAAACW5ld19hZG1pbgAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAAMYWNjZXB0X2FkbWluAAAAAAAAAAA=",
+    "AAAAAAAAAAAAAAALdXBkYXRlX3Bvb2wAAAAAAwAAAAAAAAASYmFja3N0b3BfdGFrZV9yYXRlAAAAAAAEAAAAAAAAAA1tYXhfcG9zaXRpb25zAAAAAAAABAAAAAAAAAAObWluX2NvbGxhdGVyYWwAAAAAAAsAAAAA",
+    "AAAAAAAAAAAAAAARcXVldWVfc2V0X3Jlc2VydmUAAAAAAAACAAAAAAAAAAVhc3NldAAAAAAAABMAAAAAAAAACG1ldGFkYXRhAAAH0AAAAA1SZXNlcnZlQ29uZmlnAAAAAAAAAA==",
+    "AAAAAAAAAAAAAAASY2FuY2VsX3NldF9yZXNlcnZlAAAAAAABAAAAAAAAAAVhc3NldAAAAAAAABMAAAAA",
+    "AAAAAAAAAAAAAAALc2V0X3Jlc2VydmUAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAAAQ=",
+    "AAAAAAAAAAAAAAAKZ2V0X2NvbmZpZwAAAAAAAAAAAAEAAAfQAAAAClBvb2xDb25maWcAAA==",
+    "AAAAAAAAAAAAAAAJZ2V0X2FkbWluAAAAAAAAAAAAAAEAAAAT",
+    "AAAAAAAAAAAAAAAQZ2V0X3Jlc2VydmVfbGlzdAAAAAAAAAABAAAD6gAAABM=",
+    "AAAAAAAAAAAAAAALZ2V0X3Jlc2VydmUAAAAAAQAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAQAAB9AAAAAHUmVzZXJ2ZQA=",
+    "AAAAAAAAAAAAAAANZ2V0X3Bvc2l0aW9ucwAAAAAAAAEAAAAAAAAAB2FkZHJlc3MAAAAAEwAAAAEAAAfQAAAACVBvc2l0aW9ucwAAAA==",
+    "AAAAAAAAAAAAAAAGc3VibWl0AAAAAAAEAAAAAAAAAARmcm9tAAAAEwAAAAAAAAAHc3BlbmRlcgAAAAATAAAAAAAAAAJ0bwAAAAAAEwAAAAAAAAAIcmVxdWVzdHMAAAPqAAAH0AAAAAdSZXF1ZXN0AAAAAAEAAAfQAAAACVBvc2l0aW9ucwAAAA==",
+    "AAAAAAAAAAAAAAAVc3VibWl0X3dpdGhfYWxsb3dhbmNlAAAAAAAABAAAAAAAAAAEZnJvbQAAABMAAAAAAAAAB3NwZW5kZXIAAAAAEwAAAAAAAAACdG8AAAAAABMAAAAAAAAACHJlcXVlc3RzAAAD6gAAB9AAAAAHUmVxdWVzdAAAAAABAAAH0AAAAAlQb3NpdGlvbnMAAAA=",
+    "AAAAAAAAAAAAAAAKZmxhc2hfbG9hbgAAAAAAAwAAAAAAAAAEZnJvbQAAABMAAAAAAAAACmZsYXNoX2xvYW4AAAAAB9AAAAAJRmxhc2hMb2FuAAAAAAAAAAAAAAhyZXF1ZXN0cwAAA+oAAAfQAAAAB1JlcXVlc3QAAAAAAQAAB9AAAAAJUG9zaXRpb25zAAAA",
+    "AAAAAAAAAAAAAAANdXBkYXRlX3N0YXR1cwAAAAAAAAAAAAABAAAABA==",
+    "AAAAAAAAAAAAAAAKc2V0X3N0YXR1cwAAAAAAAQAAAAAAAAALcG9vbF9zdGF0dXMAAAAABAAAAAA=",
+    "AAAAAAAAAAAAAAAEZ3VscAAAAAEAAAAAAAAABWFzc2V0AAAAAAAAEwAAAAEAAAAL",
+    "AAAAAAAAAAAAAAAOZ3VscF9lbWlzc2lvbnMAAAAAAAAAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAUc2V0X2VtaXNzaW9uc19jb25maWcAAAABAAAAAAAAABVyZXNfZW1pc3Npb25fbWV0YWRhdGEAAAAAAAPqAAAH0AAAABdSZXNlcnZlRW1pc3Npb25NZXRhZGF0YQAAAAAA",
+    "AAAAAAAAAAAAAAAFY2xhaW0AAAAAAAADAAAAAAAAAARmcm9tAAAAEwAAAAAAAAARcmVzZXJ2ZV90b2tlbl9pZHMAAAAAAAPqAAAABAAAAAAAAAACdG8AAAAAABMAAAABAAAACw==",
+    "AAAAAAAAAAAAAAAVZ2V0X3Jlc2VydmVfZW1pc3Npb25zAAAAAAAAAQAAAAAAAAATcmVzZXJ2ZV90b2tlbl9pbmRleAAAAAAEAAAAAQAAA+gAAAfQAAAAE1Jlc2VydmVFbWlzc2lvbkRhdGEA",
+    "AAAAAAAAAAAAAAASZ2V0X3VzZXJfZW1pc3Npb25zAAAAAAACAAAAAAAAAAR1c2VyAAAAEwAAAAAAAAATcmVzZXJ2ZV90b2tlbl9pbmRleAAAAAAEAAAAAQAAA+gAAAfQAAAAEFVzZXJFbWlzc2lvbkRhdGE=",
+    "AAAAAAAAAAAAAAALbmV3X2F1Y3Rpb24AAAAABQAAAAAAAAAMYXVjdGlvbl90eXBlAAAABAAAAAAAAAAEdXNlcgAAABMAAAAAAAAAA2JpZAAAAAPqAAAAEwAAAAAAAAADbG90AAAAA+oAAAATAAAAAAAAAAdwZXJjZW50AAAAAAQAAAABAAAH0AAAAAtBdWN0aW9uRGF0YQA=",
+    "AAAAAAAAAAAAAAALZ2V0X2F1Y3Rpb24AAAAAAgAAAAAAAAAMYXVjdGlvbl90eXBlAAAABAAAAAAAAAAEdXNlcgAAABMAAAABAAAH0AAAAAtBdWN0aW9uRGF0YQA=",
+    "AAAAAAAAAAAAAAALZGVsX2F1Y3Rpb24AAAAAAgAAAAAAAAAMYXVjdGlvbl90eXBlAAAABAAAAAAAAAAEdXNlcgAAABMAAAAA",
+    "AAAAAAAAAAAAAAAIYmFkX2RlYnQAAAABAAAAAAAAAAR1c2VyAAAAEwAAAAA=",
+    "AAAAAQAAADRNZXRhZGF0YSBmb3IgYSBwb29sJ3MgcmVzZXJ2ZSBlbWlzc2lvbiBjb25maWd1cmF0aW9uAAAAAAAAABdSZXNlcnZlRW1pc3Npb25NZXRhZGF0YQAAAAADAAAAAAAAAAlyZXNfaW5kZXgAAAAAAAAEAAAAAAAAAAhyZXNfdHlwZQAAAAQAAAAAAAAABXNoYXJlAAAAAAAABg==",
+    "AAAABAAAAJlFcnJvciBjb2RlcyBmb3IgdGhlIHBvb2wgY29udHJhY3QuIENvbW1vbiBlcnJvcnMgYXJlIGNvZGVzIHRoYXQgbWF0Y2ggdXAgd2l0aCB0aGUgYnVpbHQtaW4KY29udHJhY3RzIGVycm9yIHJlcG9ydGluZy4gUG9vbCBzcGVjaWZpYyBlcnJvcnMgc3RhcnQgYXQgMTIwMC4AAAAAAAAAAAAACVBvb2xFcnJvcgAAAAAAAB8AAAAAAAAADUludGVybmFsRXJyb3IAAAAAAAABAAAAAAAAABdBbHJlYWR5SW5pdGlhbGl6ZWRFcnJvcgAAAAADAAAAAAAAABFVbmF1dGhvcml6ZWRFcnJvcgAAAAAAAAQAAAAAAAAAE05lZ2F0aXZlQW1vdW50RXJyb3IAAAAACAAAAAAAAAAMQmFsYW5jZUVycm9yAAAACgAAAAAAAAANT3ZlcmZsb3dFcnJvcgAAAAAAAAwAAAAAAAAACkJhZFJlcXVlc3QAAAAABLAAAAAAAAAAFUludmFsaWRQb29sQ29uZmlnQXJncwAAAAAABLEAAAAAAAAAFkludmFsaWRSZXNlcnZlTWV0YWRhdGEAAAAABLIAAAAAAAAAD0luaXROb3RVbmxvY2tlZAAAAASzAAAAAAAAABBTdGF0dXNOb3RBbGxvd2VkAAAEtAAAAAAAAAAJSW52YWxpZEhmAAAAAAAEtQAAAAAAAAARSW52YWxpZFBvb2xTdGF0dXMAAAAAAAS2AAAAAAAAAA9JbnZhbGlkVXRpbFJhdGUAAAAEtwAAAAAAAAAUTWF4UG9zaXRpb25zRXhjZWVkZWQAAAS4AAAAAAAAABdJbnRlcm5hbFJlc2VydmVOb3RGb3VuZAAAAAS5AAAAAAAAAAxJbnZhbGlkUHJpY2UAAAS6AAAAAAAAABJJbnZhbGlkTGlxdWlkYXRpb24AAAAABLsAAAAAAAAAEUF1Y3Rpb25JblByb2dyZXNzAAAAAAAEvAAAAAAAAAASSW52YWxpZExpcVRvb0xhcmdlAAAAAAS9AAAAAAAAABJJbnZhbGlkTGlxVG9vU21hbGwAAAAABL4AAAAAAAAAEEludGVyZXN0VG9vU21hbGwAAAS/AAAAAAAAABdJbnZhbGlkQlRva2VuTWludEFtb3VudAAAAATAAAAAAAAAABdJbnZhbGlkQlRva2VuQnVybkFtb3VudAAAAATBAAAAAAAAABdJbnZhbGlkRFRva2VuTWludEFtb3VudAAAAATCAAAAAAAAABdJbnZhbGlkRFRva2VuQnVybkFtb3VudAAAAATDAAAAAAAAABFFeGNlZWRlZFN1cHBseUNhcAAAAAAABMQAAAAAAAAACkludmFsaWRCaWQAAAAABMUAAAAAAAAACkludmFsaWRMb3QAAAAABMYAAAAAAAAAD1Jlc2VydmVEaXNhYmxlZAAAAATHAAAAAAAAABNNaW5Db2xsYXRlcmFsTm90TWV0AAAABMg=",
+    "AAAAAQAAACdBIHJlcXVlc3QgYSB1c2VyIG1ha2VzIGFnYWluc3QgdGhlIHBvb2wAAAAAAAAAAAdSZXF1ZXN0AAAAAAMAAAAAAAAAB2FkZHJlc3MAAAAAEwAAAAAAAAAGYW1vdW50AAAAAAALAAAAAAAAAAxyZXF1ZXN0X3R5cGUAAAAE",
+    "AAAAAQAAAAAAAAAAAAAACUZsYXNoTG9hbgAAAAAAAAMAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAhjb250cmFjdAAAABM=",
+    "AAAAAQAAAAAAAAAAAAAAB1Jlc2VydmUAAAAABAAAAAAAAAAFYXNzZXQAAAAAAAATAAAAAAAAAAZjb25maWcAAAAAB9AAAAANUmVzZXJ2ZUNvbmZpZwAAAAAAAAAAAAAEZGF0YQAAB9AAAAALUmVzZXJ2ZURhdGEAAAAAAAAAAAZzY2FsYXIAAAAAAAs=",
+    "AAAAAQAAAE1BIHVzZXIgLyBjb250cmFjdHMgcG9zaXRpb24ncyB3aXRoIHRoZSBwb29sLCBzdG9yZWQgaW4gdGhlIFJlc2VydmUncyBkZWNpbWFscwAAAAAAAAAAAAAJUG9zaXRpb25zAAAAAAAAAwAAAAAAAAAKY29sbGF0ZXJhbAAAAAAD7AAAAAQAAAALAAAAAAAAAAtsaWFiaWxpdGllcwAAAAPsAAAABAAAAAsAAAAAAAAABnN1cHBseQAAAAAD7AAAAAQAAAAL",
+    "AAAAAQAAABFUaGUgcG9vbCdzIGNvbmZpZwAAAAAAAAAAAAAKUG9vbENvbmZpZwAAAAAABQAAAAAAAAAKYnN0b3BfcmF0ZQAAAAAABAAAAAAAAAANbWF4X3Bvc2l0aW9ucwAAAAAAAAQAAAAAAAAADm1pbl9jb2xsYXRlcmFsAAAAAAALAAAAAAAAAAZvcmFjbGUAAAAAABMAAAAAAAAABnN0YXR1cwAAAAAABA==",
+    "AAAAAQAAABpUaGUgcG9vbCdzIGVtaXNzaW9uIGNvbmZpZwAAAAAAAAAAABJQb29sRW1pc3Npb25Db25maWcAAAAAAAIAAAAAAAAABmNvbmZpZwAAAAAACgAAAAAAAAAJbGFzdF90aW1lAAAAAAAABg==",
+    "AAAAAQAAADNUaGUgY29uZmlndXJhdGlvbiBpbmZvcm1hdGlvbiBhYm91dCBhIHJlc2VydmUgYXNzZXQAAAAAAAAAAA1SZXNlcnZlQ29uZmlnAAAAAAAADQAAAAAAAAAIY19mYWN0b3IAAAAEAAAAAAAAAAhkZWNpbWFscwAAAAQAAAAAAAAAB2VuYWJsZWQAAAAAAQAAAAAAAAAFaW5kZXgAAAAAAAAEAAAAAAAAAAhsX2ZhY3RvcgAAAAQAAAAAAAAACG1heF91dGlsAAAABAAAAAAAAAAGcl9iYXNlAAAAAAAEAAAAAAAAAAVyX29uZQAAAAAAAAQAAAAAAAAAB3JfdGhyZWUAAAAABAAAAAAAAAAFcl90d28AAAAAAAAEAAAAAAAAAApyZWFjdGl2aXR5AAAAAAAEAAAAAAAAAApzdXBwbHlfY2FwAAAAAAALAAAAAAAAAAR1dGlsAAAABA==",
+    "AAAAAQAAAAAAAAAAAAAAEVF1ZXVlZFJlc2VydmVJbml0AAAAAAAAAgAAAAAAAAAKbmV3X2NvbmZpZwAAAAAH0AAAAA1SZXNlcnZlQ29uZmlnAAAAAAAAAAAAAAt1bmxvY2tfdGltZQAAAAAG",
+    "AAAAAQAAABxUaGUgZGF0YSBmb3IgYSByZXNlcnZlIGFzc2V0AAAAAAAAAAtSZXNlcnZlRGF0YQAAAAAHAAAAAAAAAAZiX3JhdGUAAAAAAAsAAAAAAAAACGJfc3VwcGx5AAAACwAAAAAAAAAPYmFja3N0b3BfY3JlZGl0AAAAAAsAAAAAAAAABmRfcmF0ZQAAAAAACwAAAAAAAAAIZF9zdXBwbHkAAAALAAAAAAAAAAZpcl9tb2QAAAAAAAsAAAAAAAAACWxhc3RfdGltZQAAAAAAAAY=",
+    "AAAAAQAAAC5UaGUgZW1pc3Npb24gZGF0YSBmb3IgdGhlIHJlc2VydmUgYiBvciBkIHRva2VuAAAAAAAAAAAAE1Jlc2VydmVFbWlzc2lvbkRhdGEAAAAABAAAAAAAAAADZXBzAAAAAAYAAAAAAAAACmV4cGlyYXRpb24AAAAAAAYAAAAAAAAABWluZGV4AAAAAAAACwAAAAAAAAAJbGFzdF90aW1lAAAAAAAABg==",
+    "AAAAAQAAADNUaGUgdXNlciBlbWlzc2lvbiBkYXRhIGZvciB0aGUgcmVzZXJ2ZSBiIG9yIGQgdG9rZW4AAAAAAAAAABBVc2VyRW1pc3Npb25EYXRhAAAAAgAAAAAAAAAHYWNjcnVlZAAAAAALAAAAAAAAAAVpbmRleAAAAAAAAAs=",
+    "AAAAAQAAAAAAAAAAAAAADlVzZXJSZXNlcnZlS2V5AAAAAAACAAAAAAAAAApyZXNlcnZlX2lkAAAAAAAEAAAAAAAAAAR1c2VyAAAAEw==",
+    "AAAAAQAAAAAAAAAAAAAACkF1Y3Rpb25LZXkAAAAAAAIAAAAAAAAACWF1Y3RfdHlwZQAAAAAAAAQAAAAAAAAABHVzZXIAAAAT",
+    "AAAAAgAAAAAAAAAAAAAAC1Bvb2xEYXRhS2V5AAAAAAcAAAABAAAAAAAAAAlSZXNDb25maWcAAAAAAAABAAAAEwAAAAEAAAAAAAAAB1Jlc0luaXQAAAAAAQAAABMAAAABAAAAAAAAAAdSZXNEYXRhAAAAAAEAAAATAAAAAQAAAAAAAAAIRW1pc0RhdGEAAAABAAAABAAAAAEAAAAAAAAACVBvc2l0aW9ucwAAAAAAAAEAAAATAAAAAQAAAAAAAAAIVXNlckVtaXMAAAABAAAH0AAAAA5Vc2VyUmVzZXJ2ZUtleQAAAAAAAQAAAAAAAAAHQXVjdGlvbgAAAAABAAAH0AAAAApBdWN0aW9uS2V5AAA=",
+    "AAAAAQAAAC9QcmljZSBkYXRhIGZvciBhbiBhc3NldCBhdCBhIHNwZWNpZmljIHRpbWVzdGFtcAAAAAAAAAAACVByaWNlRGF0YQAAAAAAAAIAAAAAAAAABXByaWNlAAAAAAAACwAAAAAAAAAJdGltZXN0YW1wAAAAAAAABg==",
+    "AAAAAgAAAApBc3NldCB0eXBlAAAAAAAAAAAABUFzc2V0AAAAAAAAAgAAAAEAAAAAAAAAB1N0ZWxsYXIAAAAAAQAAABMAAAABAAAAAAAAAAVPdGhlcgAAAAAAAAEAAAAR"
+  ]
+}

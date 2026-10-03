@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import type { NormalizedEvent } from "@orbital-stellar/pulse-core";
 import { acquireEventConnection } from "./connectionPool.js";
 import type { UseEventConfig } from "./index.js";
@@ -28,12 +28,23 @@ type ResourceStatus<T extends NormalizedEvent> =
 
 type ResourceEntry<T extends NormalizedEvent> = {
   status: ResourceStatus<T>;
-  /** Number of hook instances currently using this resource. */
+  /** Number of committed hook instances currently using this resource. */
   refCount: number;
+  connection?: ReturnType<typeof acquireEventConnection>;
+  /**
+   * The connection is acquired during render (a suspended render never runs
+   * effects, so acquiring in an effect deadlocks the hook). If no consumer
+   * commits within this window the render was abandoned, so the connection is
+   * released instead of leaked. Cleared as soon as one consumer commits.
+   */
+  releaseTimer?: ReturnType<typeof setTimeout>;
 };
 
 // Keyed by the same tuple used by the connection pool.
 const resourceCache = new Map<string, ResourceEntry<NormalizedEvent>>();
+
+/** How long a rendered-but-never-committed resource keeps its connection. */
+const ABANDONED_RELEASE_MS = 30_000;
 
 function buildResourceKey(
   serverUrl: string,
@@ -65,7 +76,56 @@ function getOrCreateResource<T extends NormalizedEvent>(
   };
 
   resourceCache.set(resourceKey, entry);
+
+  try {
+    entry.connection = acquireEventConnection(
+      { serverUrl, address, token },
+      {
+        onOpen: () => {},
+        onEvent: (incoming) => {
+          const allowed =
+            eventType === "*" ||
+            (Array.isArray(eventType)
+              ? eventType.includes(incoming.type)
+              : incoming.type === eventType);
+
+          if (!allowed) return;
+
+          if (entry.status.status === "pending") {
+            const { resolve } = entry.status;
+            entry.status = { status: "ready", event: incoming as NormalizedEvent };
+            resolve();
+          } else {
+            entry.status = { status: "ready", event: incoming as NormalizedEvent };
+          }
+        },
+        onParseError: () => {},
+        onError: () => {},
+      },
+    );
+  } catch (error) {
+    resourceCache.delete(resourceKey);
+    throw error;
+  }
+
+  entry.releaseTimer = setTimeout(() => {
+    entry.releaseTimer = undefined;
+    if (entry.refCount > 0) return;
+    entry.connection?.unsubscribe();
+    entry.connection = undefined;
+    resourceCache.delete(resourceKey);
+  }, ABANDONED_RELEASE_MS);
+
   return entry as ResourceEntry<T>;
+}
+
+/** Test-only reset so a pending resource cannot outlive its test file. */
+export function __resetSuspenseResourcesForTests(): void {
+  for (const entry of resourceCache.values()) {
+    if (entry.releaseTimer !== undefined) clearTimeout(entry.releaseTimer);
+    entry.connection?.unsubscribe();
+  }
+  resourceCache.clear();
 }
 
 // ---------------------------------------------------------------------------
@@ -156,74 +216,29 @@ export function useStellarEventSuspense<T extends NormalizedEvent = NormalizedEv
   // thrown promise is available on the very first render pass.
   const entry = getOrCreateResource<T>(serverUrl, addr, eventType, token, resourceKey);
 
-  // Track the resource key this instance is currently subscribed to so the
-  // effect cleanup can release the right entry even if args change mid-life.
-  const resourceKeyRef = useRef<string | null>(null);
-
-  // Increment refCount once per (instance × resourceKey). We do this during
-  // render (not inside useEffect) so the count is correct before the first
-  // paint - important when StrictMode double-invokes render.
-  if (resourceKeyRef.current !== resourceKey) {
-    entry.refCount += 1;
-    resourceKeyRef.current = resourceKey;
-  }
-
   useEffect(() => {
-    const currentKey = resourceKey;
-    const currentEntry = resourceCache.get(currentKey) as ResourceEntry<T> | undefined;
+    const currentEntry = resourceCache.get(resourceKey) as ResourceEntry<T> | undefined;
+    const connection = currentEntry?.connection;
 
-    if (!currentEntry) return;
+    if (!currentEntry || !connection) return;
 
-    // Subscribe to the shared connection pool. The pool manages the actual
-    // EventSource lifetime; we only need to update the resource status here.
-    const connection = acquireEventConnection(
-      { serverUrl, address: addr, token },
-      {
-        onOpen: () => {
-          // Connection open - nothing to do for Suspense state.
-        },
-        onEvent: (incoming) => {
-          const allowed =
-            eventType === "*" ||
-            (Array.isArray(eventType)
-              ? eventType.includes(incoming.type)
-              : incoming.type === eventType);
-
-          if (!allowed) return;
-
-          if (currentEntry.status.status === "pending") {
-            const { resolve } = currentEntry.status;
-            currentEntry.status = { status: "ready", event: incoming as T };
-            resolve();
-          } else {
-            // Already resolved - update the stored event for subsequent renders.
-            currentEntry.status = { status: "ready", event: incoming as T };
-          }
-        },
-        onParseError: () => {
-          // Malformed message - stay suspended or keep the last good event.
-        },
-        onError: () => {
-          // Connection error - stay suspended; browser will reconnect.
-        },
-      },
-    );
-
-    // If the connection was already open when we subscribed (e.g. shared pool
-    // entry), there's nothing extra to do - we wait for the next event.
+    currentEntry.refCount += 1;
 
     return () => {
-      connection.unsubscribe();
-
-      // Release this instance's hold on the resource entry.
-      const entryToRelease = resourceCache.get(currentKey);
-      if (entryToRelease) {
-        entryToRelease.refCount -= 1;
-        if (entryToRelease.refCount <= 0) {
-          resourceCache.delete(currentKey);
+      currentEntry.refCount -= 1;
+      // The connection is shared by every consumer of this resource, so only
+      // the last committed consumer may release it.
+      if (currentEntry.refCount <= 0) {
+        if (currentEntry.releaseTimer !== undefined) {
+          clearTimeout(currentEntry.releaseTimer);
+          currentEntry.releaseTimer = undefined;
+        }
+        connection.unsubscribe();
+        currentEntry.connection = undefined;
+        if (resourceCache.get(resourceKey) === currentEntry) {
+          resourceCache.delete(resourceKey);
         }
       }
-      resourceKeyRef.current = null;
     };
   }, [resourceKey]);
 

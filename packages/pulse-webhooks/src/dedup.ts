@@ -1,10 +1,12 @@
 import type { NormalizedEvent } from "@orbital-stellar/pulse-core";
 
+/** Seen-id set backing {@link dedupReceiver}: `mark` records, `seen` checks. */
 export interface DedupStore {
   seen(id: string): Promise<boolean>;
   mark(id: string): Promise<void>;
 }
 
+/** In-memory {@link DedupStore} for single-process receivers and tests. */
 export class MemoryDedupStore implements DedupStore {
   private readonly ids = new Set<string>();
 
@@ -21,6 +23,7 @@ export class MemoryDedupStore implements DedupStore {
   }
 }
 
+/** Options for {@link dedupReceiver}. */
 export type DedupReceiverOptions = {
   idExtractor?: (event: NormalizedEvent) => string;
 };
@@ -31,6 +34,15 @@ const DEFAULT_ID_EXTRACTOR = (event: NormalizedEvent): string => {
   throw new Error("dedupReceiver: event has no raw.id string - provide a custom idExtractor");
 };
 
+/**
+ * Wraps an event handler so each event id is delivered at most once: repeats
+ * already recorded in `store` are skipped, new ids are marked then handled.
+ *
+ * @param handler - Downstream event handler invoked once per unseen id.
+ * @param store   - Seen-id set used to detect repeats.
+ * @param options - Optional `idExtractor` (defaults to reading `raw.id`).
+ * @returns A receiver function with the same handler signature.
+ */
 export function dedupReceiver(
   handler: (event: NormalizedEvent) => Promise<void>,
   store: DedupStore,
